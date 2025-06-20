@@ -33,7 +33,7 @@ const Index = () => {
         <div className="text-center mb-8">
           <div className="mb-6">
             <img 
-              src="/logo.png" 
+              src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" 
               alt="Logo" 
               className="w-16 h-16 mx-auto mb-4 object-contain"
             />
