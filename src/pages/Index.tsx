@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Brain,
   Activity,
   Utensils,
   Heart
@@ -33,7 +32,11 @@ const Index = () => {
         {/* Hero Section */}
         <div className="text-center mb-8">
           <div className="mb-6">
-            <Brain className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-16 h-16 mx-auto mb-4 object-contain"
+            />
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Track Your Digestive Health
             </h2>
