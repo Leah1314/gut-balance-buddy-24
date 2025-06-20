@@ -81,12 +81,21 @@ Focus on gut health implications and be as accurate as possible with nutrition e
     
     console.log('Raw OpenAI response:', content);
     
+    // Clean the content by removing markdown code blocks if present
+    let cleanContent = content.trim();
+    if (cleanContent.startsWith('```json')) {
+      cleanContent = cleanContent.replace(/^```json\n/, '').replace(/\n```$/, '');
+    } else if (cleanContent.startsWith('```')) {
+      cleanContent = cleanContent.replace(/^```\n/, '').replace(/\n```$/, '');
+    }
+    
     // Parse the JSON response
     let nutritionInfo;
     try {
-      nutritionInfo = JSON.parse(content);
+      nutritionInfo = JSON.parse(cleanContent);
     } catch (parseError) {
       console.error('Failed to parse OpenAI response as JSON:', parseError);
+      console.error('Cleaned content:', cleanContent);
       throw new Error('Invalid response format from OpenAI');
     }
 
