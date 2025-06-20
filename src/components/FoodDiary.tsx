@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Plus, 
   Apple, 
@@ -13,8 +13,10 @@ import {
   UtensilsCrossed,
   Search,
   Star,
-  AlertTriangle
+  AlertTriangle,
+  Camera
 } from "lucide-react";
+import FoodImageAnalyzer from "./FoodImageAnalyzer";
 
 const FoodDiary = () => {
   const [newFood, setNewFood] = useState("");
@@ -80,69 +82,85 @@ const FoodDiary = () => {
 
   return (
     <div className="space-y-6">
-      {/* Add Food Entry */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Plus className="w-5 h-5 text-green-600" />
-            <span>Log Food</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Meal Type Selection */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Meal Type</Label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {mealTypes.map((meal) => (
-                <Button
-                  key={meal.id}
-                  variant={selectedMeal === meal.id ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedMeal(meal.id)}
-                  className="flex items-center space-x-2"
-                >
-                  <meal.icon className="w-4 h-4" />
-                  <span>{meal.label}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
+      <Tabs defaultValue="manual" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm">
+          <TabsTrigger value="manual" className="flex items-center space-x-2">
+            <Plus className="w-4 h-4" />
+            <span>Manual Entry</span>
+          </TabsTrigger>
+          <TabsTrigger value="camera" className="flex items-center space-x-2">
+            <Camera className="w-4 h-4" />
+            <span>AI Analysis</span>
+          </TabsTrigger>
+        </TabsList>
 
-          {/* Food Input */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">What did you eat?</Label>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Enter food item..."
-                value={newFood}
-                onChange={(e) => setNewFood(e.target.value)}
-                className="flex-1"
-              />
-              <Button onClick={handleAddFood} disabled={!newFood.trim()}>
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
+        <TabsContent value="manual" className="space-y-6">
+          {/* Add Food Entry */}
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Plus className="w-5 h-5 text-green-600" />
+                <span>Log Food</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Meal Type</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {mealTypes.map((meal) => (
+                    <Button
+                      key={meal.id}
+                      variant={selectedMeal === meal.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedMeal(meal.id)}
+                      className="flex items-center space-x-2"
+                    >
+                      <meal.icon className="w-4 h-4" />
+                      <span>{meal.label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
 
-          {/* Quick Add Common Foods */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Quick Add</Label>
-            <div className="flex flex-wrap gap-2">
-              {commonFoods.map((food) => (
-                <Button
-                  key={food}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setNewFood(food)}
-                  className="text-xs"
-                >
-                  {food}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">What did you eat?</Label>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Enter food item..."
+                    value={newFood}
+                    onChange={(e) => setNewFood(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleAddFood} disabled={!newFood.trim()}>
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Quick Add</Label>
+                <div className="flex flex-wrap gap-2">
+                  {commonFoods.map((food) => (
+                    <Button
+                      key={food}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setNewFood(food)}
+                      className="text-xs"
+                    >
+                      {food}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="camera">
+          <FoodImageAnalyzer />
+        </TabsContent>
+      </Tabs>
 
       {/* Today's Meals */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
