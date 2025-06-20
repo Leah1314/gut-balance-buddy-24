@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
   Activity,
@@ -9,7 +10,8 @@ import {
   Clock,
   Droplets,
   Target,
-  TrendingUp
+  TrendingUp,
+  Camera
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,12 +22,15 @@ interface StoolEntry {
   type: number; // Bristol Stool Scale 1-7
   consistency: string;
   color: string;
+  photo?: string;
   notes?: string;
 }
 
 const StoolTracker = () => {
   const [selectedType, setSelectedType] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [entries, setEntries] = useState<StoolEntry[]>([]);
 
   const bristolTypes = [
@@ -48,6 +53,18 @@ const StoolTracker = () => {
     { name: "Black", value: "black", bg: "bg-gray-900" },
   ];
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const addEntry = () => {
     if (!selectedType || !selectedColor) {
       toast.error("Please select both stool type and color");
@@ -62,11 +79,14 @@ const StoolTracker = () => {
       type: selectedType,
       consistency: bristolTypes.find(t => t.type === selectedType)?.consistency || "",
       color: selectedColor,
+      photo: imagePreview || undefined,
     };
 
     setEntries([newEntry, ...entries]);
     setSelectedType(null);
     setSelectedColor("");
+    setSelectedImage(null);
+    setImagePreview(null);
     toast.success("Stool entry logged successfully!");
   };
 
@@ -100,6 +120,44 @@ const StoolTracker = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Photo Upload Section */}
+      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+        <CardContent className="p-6">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+            <Camera className="w-5 h-5 text-purple-600 mr-2" />
+            Take Photo (Optional)
+          </h3>
+          <div className="flex items-center justify-center w-full">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200">
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <Camera className="w-8 h-8 mb-3 text-gray-400" />
+                <p className="mb-2 text-sm text-gray-500">
+                  <span className="font-semibold">Click to take photo</span> or upload
+                </p>
+                <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
+              </div>
+              <Input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                capture="environment"
+                onChange={handleImageSelect}
+              />
+            </label>
+          </div>
+
+          {imagePreview && (
+            <div className="mt-4">
+              <img
+                src={imagePreview}
+                alt="Stool photo"
+                className="w-full h-48 object-cover rounded-xl border shadow-sm"
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Bristol Stool Scale */}
       <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
@@ -183,7 +241,7 @@ const StoolTracker = () => {
             <div className="space-y-3">
               {entries.slice(0, 5).map((entry) => (
                 <div key={entry.id} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-2">
                     <div>
                       <div className="font-medium">Type {entry.type} - {entry.consistency}</div>
                       <div className="text-sm text-gray-600 flex items-center space-x-2">
@@ -195,6 +253,13 @@ const StoolTracker = () => {
                     </div>
                     <Badge variant="secondary">{entry.color.replace('-', ' ')}</Badge>
                   </div>
+                  {entry.photo && (
+                    <img
+                      src={entry.photo}
+                      alt="Stool entry"
+                      className="w-full h-24 object-cover rounded-lg mt-2"
+                    />
+                  )}
                 </div>
               ))}
             </div>
