@@ -111,29 +111,29 @@ const StoolTracker = () => {
     <div className="space-y-6">
       {/* Health Insight */}
       {insight && (
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-xl">
+        <Card className="bg-green-50 border border-green-200 shadow-sm">
           <CardContent className="p-6 text-center">
-            <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+            <TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-3 stroke-2" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Digestive Health Score</h3>
-            <div className="text-2xl font-bold text-blue-600 mb-2">{insight.percentage}%</div>
+            <div className="text-2xl font-bold text-green-600 mb-2">{insight.percentage}%</div>
             <p className="text-sm text-gray-600">{insight.message}</p>
           </CardContent>
         </Card>
       )}
 
       {/* Photo Upload Section */}
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-200">
         <CardContent className="p-6">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-            <Camera className="w-5 h-5 text-purple-600 mr-2" />
+            <Camera className="w-5 h-5 text-green-600 mr-2 stroke-2" />
             Take Photo (Optional)
           </h3>
           <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200">
+            <label className="flex flex-col items-center justify-center w-full h-32 border border-gray-200 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Camera className="w-8 h-8 mb-3 text-gray-400" />
-                <p className="mb-2 text-sm text-gray-500">
-                  <span className="font-semibold">Click to take photo</span> or upload
+                <Camera className="w-8 h-8 mb-3 text-gray-400 stroke-2" />
+                <p className="mb-2 text-sm text-gray-700 font-medium">
+                  Click to take photo or upload
                 </p>
                 <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
               </div>
@@ -152,7 +152,7 @@ const StoolTracker = () => {
               <img
                 src={imagePreview}
                 alt="Stool photo"
-                className="w-full h-48 object-cover rounded-xl border shadow-sm"
+                className="w-full h-48 object-cover rounded-lg border border-gray-200"
               />
             </div>
           )}
@@ -160,10 +160,10 @@ const StoolTracker = () => {
       </Card>
 
       {/* Bristol Stool Scale */}
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-            <Target className="w-5 h-5 text-blue-600 mr-2" />
+            <Target className="w-5 h-5 text-green-600 mr-2 stroke-2" />
             Bristol Stool Scale
           </h3>
           <div className="space-y-3">
@@ -171,18 +171,18 @@ const StoolTracker = () => {
               <button
                 key={item.type}
                 onClick={() => setSelectedType(item.type)}
-                className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                className={`w-full p-3 rounded-lg border transition-all ${
                   selectedType === item.type
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between text-left">
                   <div>
                     <div className="font-medium">Type {item.type}</div>
                     <div className="text-sm text-gray-600">{item.description}</div>
                   </div>
-                  <Badge className={item.color}>
+                  <Badge className={`${item.color} bg-gray-100`}>
                     {item.consistency}
                   </Badge>
                 </div>
@@ -193,10 +193,10 @@ const StoolTracker = () => {
       </Card>
 
       {/* Color Selection */}
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-            <Droplets className="w-5 h-5 text-purple-600 mr-2" />
+            <Droplets className="w-5 h-5 text-green-600 mr-2 stroke-2" />
             Stool Color
           </h3>
           <div className="grid grid-cols-3 gap-3">
@@ -204,10 +204,10 @@ const StoolTracker = () => {
               <button
                 key={color.value}
                 onClick={() => setSelectedColor(color.value)}
-                className={`p-3 rounded-lg border-2 transition-all ${
+                className={`p-3 rounded-lg border transition-all ${
                   selectedColor === color.value
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center space-x-2">
@@ -224,40 +224,40 @@ const StoolTracker = () => {
       <Button
         onClick={addEntry}
         disabled={!selectedType || !selectedColor}
-        className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 text-lg"
+        className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 text-lg"
       >
-        <Activity className="w-5 h-5 mr-2" />
+        <Activity className="w-5 h-5 mr-2 stroke-2" />
         Log Stool Entry
       </Button>
 
       {/* Recent Entries */}
       {entries.length > 0 && (
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardContent className="p-6">
             <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-              <Calendar className="w-5 h-5 text-green-600 mr-2" />
+              <Calendar className="w-5 h-5 text-green-600 mr-2 stroke-2" />
               Recent Entries
             </h3>
             <div className="space-y-3">
               {entries.slice(0, 5).map((entry) => (
-                <div key={entry.id} className="p-3 bg-gray-50 rounded-lg">
+                <div key={entry.id} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                   <div className="flex items-center justify-between mb-2">
                     <div>
                       <div className="font-medium">Type {entry.type} - {entry.consistency}</div>
                       <div className="text-sm text-gray-600 flex items-center space-x-2">
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="w-4 h-4 stroke-2" />
                         <span>{entry.date}</span>
-                        <Clock className="w-4 h-4" />
+                        <Clock className="w-4 h-4 stroke-2" />
                         <span>{entry.time}</span>
                       </div>
                     </div>
-                    <Badge variant="secondary">{entry.color.replace('-', ' ')}</Badge>
+                    <Badge variant="secondary" className="bg-gray-200 text-gray-700">{entry.color.replace('-', ' ')}</Badge>
                   </div>
                   {entry.photo && (
                     <img
                       src={entry.photo}
                       alt="Stool entry"
-                      className="w-full h-24 object-cover rounded-lg mt-2"
+                      className="w-full h-24 object-cover rounded-lg mt-2 border border-gray-200"
                     />
                   )}
                 </div>
