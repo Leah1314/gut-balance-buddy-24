@@ -14,9 +14,9 @@ const Index = () => {
     backgroundColor: '#F9F8F4'
   }}>
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-10 w-full" style={{
+      <header style={{
       borderColor: '#D3D3D3'
-    }}>
+    }} className="fixed bg-white border-b sticky top-0 z-10 w-full">
         <div className="max-w-md mx-auto px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -113,9 +113,9 @@ const Index = () => {
       </div>
 
       {/* Bottom Tab Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 w-full" style={{
+      <div style={{
       borderColor: '#D3D3D3'
-    }}>
+    }} className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 w-full">
         <div className="max-w-md mx-auto px-6">
           <div className="grid grid-cols-3 gap-0">
             <button onClick={() => setActiveMainTab('track')} className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${activeMainTab === 'track' ? 'opacity-100' : 'opacity-60'}`} style={{
