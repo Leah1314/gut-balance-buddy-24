@@ -2,20 +2,22 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
-  ArrowRight,
-  Utensils
+  Activity,
+  MessageCircle,
+  Utensils,
+  ArrowRight
 } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
-import GutHealthCoach from "@/components/GutHealthCoach";
+import ChatPage from "@/components/ChatPage";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<'food' | 'stool'>('food');
+  const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat'>('track');
+  const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool'>('food');
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9F8F4' }}>
+    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F9F8F4' }}>
       {/* Header */}
       <header className="bg-white border-b" style={{ borderColor: '#D3D3D3' }}>
         <div className="container mx-auto px-4 py-4">
@@ -33,92 +35,127 @@ const Index = () => {
       </header>
 
       <div className="container mx-auto px-4 py-6 max-w-2xl">
-        {/* Hero Section */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-semibold mb-1" style={{ color: '#2E2E2E' }}>
-            Track Your Digestive Health
-          </h2>
-          <p className="text-base leading-tight" style={{ color: '#2E2E2E', opacity: 0.6 }}>
-            Monitor what goes in and what comes out for optimal gut health
-          </p>
-        </div>
-
-        {/* Tab Navigation */}
-        <Card className="mb-6 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-          <CardContent className="p-3">
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={() => setActiveTab('food')}
-                variant="ghost"
-                className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
-                  activeTab === 'food' 
-                    ? 'text-white border-transparent hover:opacity-90' 
-                    : 'border-opacity-100 hover:border-opacity-100'
-                }`}
-                style={{
-                  backgroundColor: activeTab === 'food' ? '#4A7C59' : 'transparent',
-                  borderColor: activeTab === 'food' ? '#4A7C59' : '#D3D3D3',
-                  color: activeTab === 'food' ? '#FFFFFF' : '#2E2E2E'
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab === 'food') {
-                    e.currentTarget.style.backgroundColor = '#5B8C6B';
-                  } else {
-                    e.currentTarget.style.backgroundColor = '#F9F8F4';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab === 'food') {
-                    e.currentTarget.style.backgroundColor = '#4A7C59';
-                  } else {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                <Utensils className={`w-4 h-4 stroke-2 ${activeTab === 'food' ? 'scale-105' : ''} transition-transform`} />
-                <span className="font-medium">Food In</span>
-              </Button>
-              <Button
-                onClick={() => setActiveTab('stool')}
-                variant="ghost"
-                className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
-                  activeTab === 'stool' 
-                    ? 'text-white border-transparent hover:opacity-90' 
-                    : 'border-opacity-100 hover:border-opacity-100'
-                }`}
-                style={{
-                  backgroundColor: activeTab === 'stool' ? '#4A7C59' : 'transparent',
-                  borderColor: activeTab === 'stool' ? '#4A7C59' : '#D3D3D3',
-                  color: activeTab === 'stool' ? '#FFFFFF' : '#2E2E2E'
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab === 'stool') {
-                    e.currentTarget.style.backgroundColor = '#5B8C6B';
-                  } else {
-                    e.currentTarget.style.backgroundColor = '#F9F8F4';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab === 'stool') {
-                    e.currentTarget.style.backgroundColor = '#4A7C59';
-                  } else {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                <ArrowRight className={`w-4 h-4 stroke-2 ${activeTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
-                <span className="font-medium">Stool Out</span>
-              </Button>
+        {activeMainTab === 'track' ? (
+          <>
+            {/* Hero Section */}
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold mb-1" style={{ color: '#2E2E2E' }}>
+                Track Your Digestive Health
+              </h2>
+              <p className="text-base leading-tight" style={{ color: '#2E2E2E', opacity: 0.6 }}>
+                Monitor what goes in and what comes out for optimal gut health
+              </p>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Content */}
-        {activeTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
+            {/* Track Sub-Tab Navigation */}
+            <Card className="mb-6 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+              <CardContent className="p-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={() => setActiveTrackTab('food')}
+                    variant="ghost"
+                    className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
+                      activeTrackTab === 'food' 
+                        ? 'text-white border-transparent hover:opacity-90' 
+                        : 'border-opacity-100 hover:border-opacity-100'
+                    }`}
+                    style={{
+                      backgroundColor: activeTrackTab === 'food' ? '#4A7C59' : 'transparent',
+                      borderColor: activeTrackTab === 'food' ? '#4A7C59' : '#D3D3D3',
+                      color: activeTrackTab === 'food' ? '#FFFFFF' : '#2E2E2E'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeTrackTab === 'food') {
+                        e.currentTarget.style.backgroundColor = '#5B8C6B';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#F9F8F4';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeTrackTab === 'food') {
+                        e.currentTarget.style.backgroundColor = '#4A7C59';
+                      } else {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
+                  >
+                    <Utensils className={`w-4 h-4 stroke-2 ${activeTrackTab === 'food' ? 'scale-105' : ''} transition-transform`} />
+                    <span className="font-medium">Food In</span>
+                  </Button>
+                  <Button
+                    onClick={() => setActiveTrackTab('stool')}
+                    variant="ghost"
+                    className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
+                      activeTrackTab === 'stool' 
+                        ? 'text-white border-transparent hover:opacity-90' 
+                        : 'border-opacity-100 hover:border-opacity-100'
+                    }`}
+                    style={{
+                      backgroundColor: activeTrackTab === 'stool' ? '#4A7C59' : 'transparent',
+                      borderColor: activeTrackTab === 'stool' ? '#4A7C59' : '#D3D3D3',
+                      color: activeTrackTab === 'stool' ? '#FFFFFF' : '#2E2E2E'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeTrackTab === 'stool') {
+                        e.currentTarget.style.backgroundColor = '#5B8C6B';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#F9F8F4';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeTrackTab === 'stool') {
+                        e.currentTarget.style.backgroundColor = '#4A7C59';
+                      } else {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
+                  >
+                    <ArrowRight className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
+                    <span className="font-medium">Stool Out</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Track Content */}
+            {activeTrackTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
+          </>
+        ) : (
+          <ChatPage />
+        )}
       </div>
 
-      {/* Floating Chat Coach */}
-      <GutHealthCoach />
+      {/* Bottom Tab Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50" style={{ borderColor: '#D3D3D3' }}>
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 gap-0">
+            <button
+              onClick={() => setActiveMainTab('track')}
+              className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${
+                activeMainTab === 'track' ? 'opacity-100' : 'opacity-60'
+              }`}
+              style={{
+                color: activeMainTab === 'track' ? '#4A7C59' : '#2E2E2E'
+              }}
+            >
+              <Activity className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'track' ? 'scale-105' : ''} transition-transform`} />
+              <span className="text-xs font-medium">Track</span>
+            </button>
+            <button
+              onClick={() => setActiveMainTab('chat')}
+              className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${
+                activeMainTab === 'chat' ? 'opacity-100' : 'opacity-60'
+              }`}
+              style={{
+                color: activeMainTab === 'chat' ? '#4A7C59' : '#2E2E2E'
+              }}
+            >
+              <MessageCircle className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'chat' ? 'scale-105' : ''} transition-transform`} />
+              <span className="text-xs font-medium">Chat</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
