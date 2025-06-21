@@ -14,10 +14,10 @@ serve(async (req) => {
   }
 
   try {
-    const { image } = await req.json();
+    const { image, fileType } = await req.json();
 
     if (!image) {
-      throw new Error('Image data is required');
+      throw new Error('File data is required');
     }
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
@@ -25,7 +25,16 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    console.log('Analyzing test results image with OpenAI...');
+    console.log('Analyzing test results file with OpenAI...');
+    console.log('File type:', fileType);
+
+    // Determine the appropriate media type for OpenAI
+    let mediaType = 'image/jpeg';
+    if (fileType === 'application/pdf') {
+      mediaType = 'application/pdf';
+    } else if (fileType?.startsWith('image/')) {
+      mediaType = fileType;
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -41,7 +50,7 @@ serve(async (req) => {
             content: [
               {
                 type: 'text',
-                text: `Analyze this medical test result image and provide a structured summary. Return ONLY a JSON object with this exact structure:
+                text: `Analyze this medical test result file and provide a structured summary. Return ONLY a JSON object with this exact structure:
 {
   "testType": "type of test (blood work, urine, etc.)",
   "keyFindings": ["list of key findings"],
@@ -51,12 +60,12 @@ serve(async (req) => {
   "summary": "brief overall summary"
 }
 
-Focus on extracting specific values, identifying any abnormal results, and providing health insights.`
+Focus on extracting specific values, identifying any abnormal results, and providing health insights. If this is a PDF, extract all readable text and medical data from it.`
               },
               {
                 type: 'image_url',
                 image_url: {
-                  url: `data:image/jpeg;base64,${image}`
+                  url: `data:${mediaType};base64,${image}`
                 }
               }
             ]
@@ -96,7 +105,7 @@ Focus on extracting specific values, identifying any abnormal results, and provi
       throw new Error('Invalid response format from OpenAI');
     }
 
-    console.log('Successfully analyzed test results image');
+    console.log('Successfully analyzed test results file');
     
     return new Response(JSON.stringify(testResults), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
