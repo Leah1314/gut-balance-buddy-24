@@ -16,8 +16,7 @@ export const useFoodLogsWithRAG = () => {
         type: 'food',
         food_name: foodLogData.food_name,
         description: foodLogData.description,
-        entry_type: foodLogData.entry_type || 'meal',
-        notes: foodLogData.notes,
+        notes: foodLogData.notes || `Added to food history`,
         timestamp: new Date().toISOString(),
         imageData: foodLogData.image_url ? foodLogData.image_url.split(',')[1] : null
       };

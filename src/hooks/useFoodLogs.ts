@@ -10,9 +10,6 @@ interface FoodLog {
   food_name: string;
   description?: string;
   image_url?: string;
-  timestamp?: string;
-  entry_type?: string;
-  notes?: string;
   analysis_result?: any;
   created_at: string;
 }
@@ -47,8 +44,6 @@ export const useFoodLogs = () => {
     food_name: string;
     description?: string;
     image_url?: string;
-    notes?: string;
-    entry_type?: string;
   }) => {
     if (!user) {
       toast.error('You must be logged in to add food logs');
@@ -62,22 +57,18 @@ export const useFoodLogs = () => {
           user_id: user.id,
           food_name: foodLogData.food_name,
           description: foodLogData.description,
-          image_url: foodLogData.image_url,
-          notes: foodLogData.notes,
-          entry_type: foodLogData.entry_type || 'food',
-          timestamp: new Date().toISOString()
+          image_url: foodLogData.image_url
         })
         .select()
         .single();
 
       if (error) throw error;
       
-      toast.success('Food log added successfully');
+      console.log('Food log added successfully:', data);
       await fetchFoodLogs(); // Refresh the list
       return data;
     } catch (error: any) {
       console.error('Error adding food log:', error);
-      toast.error('Failed to add food log');
       return null;
     }
   };
