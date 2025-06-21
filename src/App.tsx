@@ -1,7 +1,8 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
 import AuthGuard from "@/components/AuthGuard";
 import Index from "./pages/Index";
@@ -28,7 +29,8 @@ function App() {
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <Toaster />
+          <ShadcnToaster />
+          <SonnerToaster />
         </Router>
       </AuthProvider>
     </QueryClientProvider>
