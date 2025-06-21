@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -142,8 +141,8 @@ const Auth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="border"
-                  style={{ borderColor: '#D3D3D3' }}
+                  className="bg-white border"
+                  style={{ borderColor: '#D3D3D3', backgroundColor: '#FFFFFF', color: '#2E2E2E' }}
                   placeholder="Enter your email"
                 />
               </div>
@@ -158,8 +157,8 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="border"
-                  style={{ borderColor: '#D3D3D3' }}
+                  className="bg-white border"
+                  style={{ borderColor: '#D3D3D3', backgroundColor: '#FFFFFF', color: '#2E2E2E' }}
                   placeholder={isLogin ? "Enter your password" : "Create a password (min. 6 characters)"}
                   minLength={isLogin ? undefined : 6}
                 />
