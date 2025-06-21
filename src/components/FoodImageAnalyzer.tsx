@@ -293,7 +293,7 @@ const FoodImageAnalyzer = () => {
           {/* Save to Log Button */}
           <div className="text-center pt-4">
             <Button 
-              onClick={saveAnalysisTo Log}
+              onClick={saveAnalysisToLog}
               className="px-8 py-3 text-white font-medium transition-colors"
               style={{
                 backgroundColor: '#4A7C59'
