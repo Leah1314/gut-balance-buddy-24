@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Apple, Clock, Coffee, UtensilsCrossed, Search, Star, AlertTriangle, Camera } from "lucide-react";
+import { Plus, Apple, Clock, Coffee, UtensilsCrossed, Search, Star, AlertTriangle, Camera, CheckCircle, ArrowLeft } from "lucide-react";
 import FoodImageAnalyzer from "./FoodImageAnalyzer";
 import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
 import { toast } from "sonner";
@@ -13,6 +13,9 @@ import { toast } from "sonner";
 const FoodDiary = () => {
   const [newFood, setNewFood] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
+  const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
+  const [showLoggedState, setShowLoggedState] = useState(false);
+  const [lastLoggedSummary, setLastLoggedSummary] = useState<{foods: string[], mealType: string} | null>(null);
   const {
     addFoodLog,
     foodLogs
@@ -78,24 +81,56 @@ const FoodDiary = () => {
     }
   };
 
-  const handleQuickAdd = async (food: string) => {
-    const foodLogData = {
-      food_name: food,
-      description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`,
-      entry_type: selectedMeal,
-      notes: `Quick-added ${selectedMeal} item`
-    };
-
-    console.log('Quick adding food:', foodLogData);
-    const result = await addFoodLog(foodLogData);
-    
-    if (result) {
-      toast.success(`✅ Successfully added "${food}" to your ${selectedMeal} log!`);
-      console.log('Quick add successful:', result);
-    } else {
-      toast.error("❌ Failed to add food item. Please try again.");
-      console.error('Quick add failed');
+  const handleQuickAdd = (food: string) => {
+    if (!selectedFoods.includes(food)) {
+      setSelectedFoods([...selectedFoods, food]);
     }
+  };
+
+  const handleRemoveSelectedFood = (food: string) => {
+    setSelectedFoods(selectedFoods.filter(f => f !== food));
+  };
+
+  const handleLogSelectedFoods = async () => {
+    if (selectedFoods.length === 0) {
+      toast.error("Please select at least one food item");
+      return;
+    }
+
+    // Log each selected food
+    for (const food of selectedFoods) {
+      const foodLogData = {
+        food_name: food,
+        description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`,
+        entry_type: selectedMeal,
+        notes: `Quick-added ${selectedMeal} item`
+      };
+
+      console.log('Quick adding food:', foodLogData);
+      const result = await addFoodLog(foodLogData);
+      
+      if (!result) {
+        toast.error(`❌ Failed to add "${food}". Please try again.`);
+        console.error('Quick add failed for:', food);
+        return;
+      }
+    }
+
+    // Show success and transition to logged state
+    toast.success(`✅ Successfully logged ${selectedFoods.length} food item${selectedFoods.length > 1 ? 's' : ''} to your ${selectedMeal}!`);
+    
+    setLastLoggedSummary({
+      foods: [...selectedFoods],
+      mealType: selectedMeal
+    });
+    
+    setSelectedFoods([]);
+    setShowLoggedState(true);
+    
+    // Auto-hide logged state after 3 seconds
+    setTimeout(() => {
+      setShowLoggedState(false);
+    }, 3000);
   };
 
   const getRatingStars = (rating: number) => {
@@ -120,6 +155,42 @@ const FoodDiary = () => {
 
   // Get unique foods from user's history for personal food database
   const userFoodDatabase = (foodLogs || []).map(log => log.food_name).filter((food, index, array) => array.indexOf(food) === index).sort();
+
+  if (showLoggedState && lastLoggedSummary) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-green-50 border-green-200 shadow-lg">
+          <CardContent className="p-8 text-center">
+            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold text-green-800 mb-2">Food Logged Successfully!</h2>
+            <p className="text-green-700 mb-4">
+              You've logged {lastLoggedSummary.foods.length} item{lastLoggedSummary.foods.length > 1 ? 's' : ''} for {lastLoggedSummary.mealType}
+            </p>
+            <div className="space-y-2 mb-6">
+              <p className="font-medium text-green-800">Logged Items:</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {lastLoggedSummary.foods.map((food, index) => (
+                  <Badge key={index} className="bg-green-100 text-green-800 border-green-300">
+                    {food}
+                  </Badge>
+                ))}
+              </div>
+              <p className="text-sm text-green-600 capitalize">
+                Meal Type: {lastLoggedSummary.mealType}
+              </p>
+            </div>
+            <Button 
+              onClick={() => setShowLoggedState(false)}
+              className="bg-green-600 text-white hover:bg-green-700"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Food Diary
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -193,15 +264,39 @@ const FoodDiary = () => {
                   {commonFoods.map(food => (
                     <Button 
                       key={food} 
-                      variant="outline" 
+                      variant={selectedFoods.includes(food) ? "default" : "outline"}
                       size="sm" 
                       onClick={() => handleQuickAdd(food)} 
-                      className="text-xs bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
+                      className={`text-xs ${selectedFoods.includes(food) ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}
                     >
                       {food}
                     </Button>
                   ))}
                 </div>
+                
+                {selectedFoods.length > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <Label className="text-sm font-medium text-gray-900">Selected Foods</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedFoods.map((food, index) => (
+                        <Badge 
+                          key={index} 
+                          className="bg-green-100 text-green-800 border-green-300 cursor-pointer hover:bg-green-200"
+                          onClick={() => handleRemoveSelectedFood(food)}
+                        >
+                          {food} ✕
+                        </Badge>
+                      ))}
+                    </div>
+                    <Button 
+                      onClick={handleLogSelectedFoods}
+                      className="w-full bg-green-600 text-white hover:bg-green-700 font-medium"
+                      size="lg"
+                    >
+                      Log Food ({selectedFoods.length} item{selectedFoods.length > 1 ? 's' : ''})
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
