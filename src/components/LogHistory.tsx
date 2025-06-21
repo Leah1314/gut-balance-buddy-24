@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Utensils, Scroll, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
-import { useStoolLogsWithRAG } from "@/hooks/useStoolLogsWithRAG";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 import { format } from "date-fns";
 
 interface LogEntry {
@@ -20,9 +19,20 @@ interface LogEntry {
 const LogHistory = () => {
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [stoolLogs, setStoolLogs] = useState<any[]>([]);
   
   const { foodLogs, refreshFoodLogs } = useFoodLogsWithRAG();
-  const { stoolLogs, refreshStoolLogs } = useStoolLogsWithRAG();
+  const { getStoolLogs } = useStoolLogs();
+
+  const fetchStoolLogs = async () => {
+    try {
+      const logs = await getStoolLogs();
+      setStoolLogs(logs);
+    } catch (error) {
+      console.error('Error fetching stool logs:', error);
+      setStoolLogs([]);
+    }
+  };
 
   const combineAndSortLogs = () => {
     const combinedLogs: LogEntry[] = [];
@@ -72,13 +82,17 @@ const LogHistory = () => {
   };
 
   useEffect(() => {
+    fetchStoolLogs();
+  }, []);
+
+  useEffect(() => {
     combineAndSortLogs();
   }, [foodLogs, stoolLogs]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      await Promise.all([refreshFoodLogs(), refreshStoolLogs()]);
+      await Promise.all([refreshFoodLogs(), fetchStoolLogs()]);
     } catch (error) {
       console.error('Error refreshing logs:', error);
     } finally {
