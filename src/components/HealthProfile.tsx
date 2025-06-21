@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { User, Heart, AlertCircle, Save } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import TestResultsUpload from "./TestResultsUpload";
 
 interface HealthProfileData {
@@ -25,6 +26,7 @@ interface HealthProfileData {
 }
 
 const HealthProfile = () => {
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState<HealthProfileData>({
     dietary_restrictions: {},
     custom_restrictions: "",
@@ -63,15 +65,16 @@ const HealthProfile = () => {
   ];
 
   useEffect(() => {
-    loadHealthProfile();
-  }, []);
+    if (user) {
+      loadHealthProfile();
+    }
+  }, [user]);
 
   const loadHealthProfile = async () => {
+    if (!user) return;
+    
     setIsLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
       const { data, error } = await supabase
         .from('user_health_profiles')
         .select('*')
@@ -114,18 +117,10 @@ const HealthProfile = () => {
   };
 
   const saveHealthProfile = async () => {
+    if (!user) return;
+    
     setIsSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          variant: "default",
-          title: "Please log in to save your health profile",
-          className: "bg-amber-50 text-gray-800 border-amber-200"
-        });
-        return;
-      }
-
       const profilePayload = {
         user_id: user.id,
         dietary_restrictions: profileData.dietary_restrictions,
@@ -171,7 +166,7 @@ const HealthProfile = () => {
     }));
   };
 
-  const addMedicalCondition = () => {
+  const ad8MedicalCondition = () => {
     if (newCondition.trim()) {
       setProfileData(prev => ({
         ...prev,
@@ -262,7 +257,8 @@ const HealthProfile = () => {
               placeholder="Any other dietary restrictions or food allergies..."
               value={profileData.custom_restrictions}
               onChange={(e) => setProfileData(prev => ({ ...prev, custom_restrictions: e.target.value }))}
-              className="mt-1 bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
+              className="mt-1"
+              style={{ borderColor: '#D3D3D3' }}
             />
           </div>
         </CardContent>
@@ -286,7 +282,7 @@ const HealthProfile = () => {
                 placeholder="Years"
                 value={profileData.age || ""}
                 onChange={(e) => setProfileData(prev => ({ ...prev, age: e.target.value ? parseInt(e.target.value) : null }))}
-                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
+                style={{ borderColor: '#D3D3D3' }}
               />
             </div>
             <div>
@@ -297,7 +293,7 @@ const HealthProfile = () => {
                 placeholder="kg"
                 value={profileData.weight_kg || ""}
                 onChange={(e) => setProfileData(prev => ({ ...prev, weight_kg: e.target.value ? parseFloat(e.target.value) : null }))}
-                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
+                style={{ borderColor: '#D3D3D3' }}
               />
             </div>
             <div>
@@ -308,14 +304,14 @@ const HealthProfile = () => {
                 placeholder="cm"
                 value={profileData.height_cm || ""}
                 onChange={(e) => setProfileData(prev => ({ ...prev, height_cm: e.target.value ? parseFloat(e.target.value) : null }))}
-                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
+                style={{ borderColor: '#D3D3D3' }}
               />
             </div>
           </div>
           <div>
             <Label htmlFor="activity-level">Activity Level</Label>
             <Select value={profileData.activity_level} onValueChange={(value) => setProfileData(prev => ({ ...prev, activity_level: value }))}>
-              <SelectTrigger className="bg-gray-600 text-white border-gray-500">
+              <SelectTrigger style={{ borderColor: '#D3D3D3' }}>
                 <SelectValue placeholder="Select your activity level" />
               </SelectTrigger>
               <SelectContent>
@@ -347,12 +343,12 @@ const HealthProfile = () => {
                 value={newCondition}
                 onChange={(e) => setNewCondition(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addMedicalCondition()}
-                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
+                style={{ borderColor: '#D3D3D3' }}
               />
               <Button 
                 onClick={addMedicalCondition} 
                 size="sm"
-                className="bg-gray-600 text-white border-gray-500 hover:bg-gray-700"
+                style={{ backgroundColor: '#4A7C59', color: 'white' }}
               >
                 Add
               </Button>
@@ -385,12 +381,12 @@ const HealthProfile = () => {
                 value={newMedication}
                 onChange={(e) => setNewMedication(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addMedication()}
-                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
+                style={{ borderColor: '#D3D3D3' }}
               />
               <Button 
                 onClick={addMedication} 
                 size="sm"
-                className="bg-gray-600 text-white border-gray-500 hover:bg-gray-700"
+                style={{ backgroundColor: '#4A7C59', color: 'white' }}
               >
                 Add
               </Button>
@@ -422,7 +418,8 @@ const HealthProfile = () => {
               placeholder="Describe any ongoing symptoms, digestive issues, or additional notes..."
               value={profileData.symptoms_notes}
               onChange={(e) => setProfileData(prev => ({ ...prev, symptoms_notes: e.target.value }))}
-              className="mt-1 bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
+              className="mt-1"
+              style={{ borderColor: '#D3D3D3' }}
               rows={4}
             />
           </div>

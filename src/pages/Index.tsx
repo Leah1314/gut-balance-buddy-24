@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -8,13 +7,13 @@ import {
   MessageCircle,
   Utensils,
   Scroll,
-  User,
-  LogIn
+  User
 } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
 import ChatPage from "@/components/ChatPage";
 import HealthProfile from "@/components/HealthProfile";
+import UserMenu from "@/components/UserMenu";
 
 const Index = () => {
   const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat' | 'health'>('track');
@@ -36,17 +35,7 @@ const Index = () => {
               </div>
               <h1 className="text-xl font-semibold" style={{ color: '#2E2E2E' }}>In and Out</h1>
             </div>
-            <Link to="/auth">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center space-x-2"
-                style={{ color: '#2E2E2E' }}
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Login</span>
-              </Button>
-            </Link>
+            <UserMenu />
           </div>
         </div>
       </header>

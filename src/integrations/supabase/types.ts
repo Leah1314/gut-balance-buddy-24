@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      food_logs: {
+        Row: {
+          analysis_result: Json | null
+          created_at: string
+          description: string | null
+          food_name: string
+          id: string
+          image_url: string | null
+          user_id: string
+        }
+        Insert: {
+          analysis_result?: Json | null
+          created_at?: string
+          description?: string | null
+          food_name: string
+          id?: string
+          image_url?: string | null
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json | null
+          created_at?: string
+          description?: string | null
+          food_name?: string
+          id?: string
+          image_url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -30,6 +60,39 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      stool_logs: {
+        Row: {
+          bristol_type: number | null
+          color: string | null
+          consistency: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          bristol_type?: number | null
+          color?: string | null
+          consistency?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          bristol_type?: number | null
+          color?: string | null
+          consistency?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          notes?: string | null
+          user_id?: string
         }
         Relationships: []
       }
