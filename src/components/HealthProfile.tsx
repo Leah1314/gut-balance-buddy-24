@@ -204,7 +204,7 @@ const HealthProfile = () => {
           <div className="grid grid-cols-1 gap-3">
             {activityLevels.map(level => <Button key={level.value} variant={formData.activity_level === level.value ? "default" : "outline"} onClick={() => handleInputChange('activity_level', level.value)} className="">
                 <div>
-                  <p className="font-medium">{level.value.charAt(0).toUpperCase() + level.value.slice(1)}</p>
+                  <p className="font-medium my-[8px]">{level.value.charAt(0).toUpperCase() + level.value.slice(1)}</p>
                   <p className="text-sm opacity-80">{level.label}</p>
                 </div>
               </Button>)}
