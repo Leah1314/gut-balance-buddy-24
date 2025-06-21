@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,117 +89,105 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9F8F4' }}>
-      <div className="w-full max-w-md px-4">
-        <Card className="bg-white shadow-lg" style={{ borderColor: '#D3D3D3' }}>
-          <CardHeader className="text-center">
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="w-8 h-8 flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" 
-                  alt="Logo" 
-                  className="w-8 h-8 object-contain"
-                />
-              </div>
-              <h1 className="text-xl font-semibold" style={{ color: '#2E2E2E' }}>In and Out</h1>
+    <div className="min-h-screen bg-brand-background flex flex-col">
+      {/* Mobile-first full screen layout */}
+      <div className="flex-1 flex flex-col px-6 py-8 max-w-sm mx-auto w-full">
+        {/* Logo and branding section */}
+        <div className="flex flex-col items-center mb-12 mt-8">
+          <div className="w-16 h-16 flex items-center justify-center mb-6">
+            <img 
+              src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" 
+              alt="Logo" 
+              className="w-16 h-16 object-contain"
+            />
+          </div>
+          <h1 className="text-2xl font-bold text-brand-text mb-2">In and Out</h1>
+          <h2 className="text-3xl font-semibold text-brand-text text-center">
+            {isLogin ? "Welcome back" : "Create account"}
+          </h2>
+        </div>
+
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col space-y-6">
+          {/* Google Sign In */}
+          <Button
+            onClick={handleGoogleAuth}
+            disabled={loading}
+            variant="outline"
+            className="w-full h-12 flex items-center justify-center space-x-3 text-base border-brand-border bg-brand-surface"
+          >
+            <Chrome className="w-5 h-5" />
+            <span>Continue with Google</span>
+          </Button>
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full bg-brand-border" />
             </div>
-            <CardTitle className="text-2xl font-semibold" style={{ color: '#2E2E2E' }}>
-              {isLogin ? "Welcome back" : "Create account"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Google Sign In */}
-            <Button
-              onClick={handleGoogleAuth}
-              disabled={loading}
-              variant="outline"
-              className="w-full flex items-center justify-center space-x-2"
-              style={{ borderColor: '#D3D3D3' }}
-            >
-              <Chrome className="w-4 h-4" />
-              <span>Continue with Google</span>
-            </Button>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-brand-background px-4 text-gray-500">Or continue with email</span>
+            </div>
+          </div>
+
+          {/* Email/Password Form */}
+          <form onSubmit={handleEmailAuth} className="space-y-6">
+            <div className="space-y-3">
+              <Label htmlFor="email" className="text-brand-text text-base font-medium">
+                <Mail className="w-4 h-4 inline mr-2" />
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text"
+                placeholder="Enter your email"
+              />
+            </div>
             
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator className="w-full" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-muted-foreground">Or continue with email</span>
-              </div>
+            <div className="space-y-3">
+              <Label htmlFor="password" className="text-brand-text text-base font-medium">
+                <Lock className="w-4 h-4 inline mr-2" />
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text"
+                placeholder={isLogin ? "Enter your password" : "Create a password (min. 6 characters)"}
+                minLength={isLogin ? undefined : 6}
+              />
             </div>
+            
+            <Button
+              type="submit"
+              className="w-full h-12 text-white font-semibold text-base bg-brand-accent hover:bg-brand-accent-hover"
+              disabled={loading}
+            >
+              {loading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account")}
+            </Button>
+          </form>
+        </div>
 
-            {/* Email/Password Form */}
-            <form onSubmit={handleEmailAuth} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" style={{ color: '#2E2E2E' }}>
-                  <Mail className="w-4 h-4 inline mr-2" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="bg-white border"
-                  style={{ borderColor: '#D3D3D3', backgroundColor: '#FFFFFF', color: '#2E2E2E' }}
-                  placeholder="Enter your email"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" style={{ color: '#2E2E2E' }}>
-                  <Lock className="w-4 h-4 inline mr-2" />
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="bg-white border"
-                  style={{ borderColor: '#D3D3D3', backgroundColor: '#FFFFFF', color: '#2E2E2E' }}
-                  placeholder={isLogin ? "Enter your password" : "Create a password (min. 6 characters)"}
-                  minLength={isLogin ? undefined : 6}
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full text-white font-medium"
-                disabled={loading}
-                style={{ backgroundColor: '#4A7C59' }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.currentTarget.style.backgroundColor = '#5B8C6B';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.currentTarget.style.backgroundColor = '#4A7C59';
-                  }
-                }}
-              >
-                {loading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account")}
-              </Button>
-            </form>
-
-            <div className="text-center">
-              <Button
-                variant="ghost"
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-sm"
-                style={{ color: '#2E2E2E' }}
-                disabled={loading}
-              >
-                {isLogin 
-                  ? "Don't have an account? Sign up" 
-                  : "Already have an account? Sign in"
-                }
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Bottom section */}
+        <div className="mt-8 text-center">
+          <Button
+            variant="ghost"
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-base text-brand-text hover:bg-transparent"
+            disabled={loading}
+          >
+            {isLogin 
+              ? "Don't have an account? Sign up" 
+              : "Already have an account? Sign in"
+            }
+          </Button>
+        </div>
       </div>
     </div>
   );
