@@ -75,6 +75,24 @@ export const useRAG = () => {
     }
   };
 
+  const ingestImage = async (imageData: string, contentType = 'food') => {
+    setIsLoading(true);
+    try {
+      const result = await callRAGService('ingest_image', {
+        image_data: imageData,
+        content_type: contentType
+      });
+
+      console.log('Image ingested to RAG system');
+      return result;
+    } catch (error) {
+      console.error('Failed to ingest image:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const retrieveUserData = async (query: string, nResults = 5): Promise<RAGData> => {
     setIsLoading(true);
     try {
@@ -110,9 +128,34 @@ export const useRAG = () => {
 
       return result.caption || '';
     } catch (error) {
+      console.error('Failed to caption image:', error);
       return '';
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const enrichQuery = async (query: string): Promise<string> => {
+    try {
+      // Retrieve user's relevant data
+      const userData = await retrieveUserData(query, 3);
+      
+      let enrichedQuery = query;
+      
+      // Add health context if available
+      if (userData.health_info.length > 0) {
+        enrichedQuery += `\n\nUser's Health Profile:\n${userData.health_info.join('\n')}`;
+      }
+      
+      // Add tracking history context if available
+      if (userData.track_history.length > 0) {
+        enrichedQuery += `\n\nUser's Recent Tracking History:\n${userData.track_history.join('\n')}`;
+      }
+      
+      return enrichedQuery;
+    } catch (error) {
+      console.error('Failed to enrich query:', error);
+      return query;
     }
   };
 
@@ -120,8 +163,10 @@ export const useRAG = () => {
     isLoading,
     ingestHealthProfile,
     ingestTrackData,
+    ingestImage,
     retrieveUserData,
     checkUserData,
-    captionImage
+    captionImage,
+    enrichQuery
   };
 };

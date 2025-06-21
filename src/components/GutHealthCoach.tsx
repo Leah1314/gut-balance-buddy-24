@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { MessageCircle, Send, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Loader2, Database } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useRAG } from "@/hooks/useRAG";
 
 interface Message {
   id: string;
@@ -16,30 +17,62 @@ interface Message {
 
 const GutHealthCoach = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: "Hi! I'm your gut health coach. I can help you understand your digestive patterns, suggest meal improvements, and answer questions about symptoms. What would you like to know?",
-      role: 'assistant',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasUserData, setHasUserData] = useState({ health_info: false, track_history: false });
+  const { checkUserData, enrichQuery } = useRAG();
+
+  useEffect(() => {
+    // Check for user data when component mounts
+    const initializeChat = async () => {
+      try {
+        const dataStatus = await checkUserData();
+        setHasUserData(dataStatus);
+        
+        // Set welcome message based on data availability
+        const welcomeMessage = {
+          id: '1',
+          content: `Hi! I'm your gut health coach. ${
+            dataStatus.health_info || dataStatus.track_history 
+              ? "I can see you have some health data stored. I'll use this context to provide personalized advice!" 
+              : "I can help you understand digestive patterns and suggest improvements. Start tracking your food and symptoms to get personalized insights!"
+          } What would you like to know?`,
+          role: 'assistant' as const,
+          timestamp: new Date()
+        };
+        
+        setMessages([welcomeMessage]);
+      } catch (error) {
+        console.error('Failed to initialize chat:', error);
+        setMessages([{
+          id: '1',
+          content: "Hi! I'm your gut health coach. I can help you understand your digestive patterns and answer questions about symptoms. What would you like to know?",
+          role: 'assistant',
+          timestamp: new Date()
+        }]);
+      }
+    };
+
+    if (isOpen) {
+      initializeChat();
+    }
+  }, [isOpen, checkUserData]);
 
   const quickPrompts = [
     "Analyze my recent meal patterns",
-    "Help me understand my symptoms",
+    "Help me understand my symptoms", 
     "Suggest foods for better digestion",
     "What should I track daily?"
   ];
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || inputMessage;
+    if (!textToSend.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputMessage,
+      content: textToSend,
       role: 'user',
       timestamp: new Date()
     };
@@ -49,10 +82,14 @@ const GutHealthCoach = () => {
     setIsLoading(true);
 
     try {
+      // Enrich the query with user's health data
+      const enrichedQuery = await enrichQuery(textToSend);
+      
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: { 
-          message: inputMessage,
-          conversationHistory: messages 
+          message: enrichedQuery,
+          conversationHistory: messages,
+          hasUserData: hasUserData
         }
       });
 
@@ -75,7 +112,7 @@ const GutHealthCoach = () => {
   };
 
   const handleQuickPrompt = (prompt: string) => {
-    setInputMessage(prompt);
+    sendMessage(prompt);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -109,9 +146,17 @@ const GutHealthCoach = () => {
       
       <SheetContent className="w-full sm:max-w-md bg-white" style={{ borderColor: '#D3D3D3' }}>
         <SheetHeader className="pb-4" style={{ borderBottomColor: '#D3D3D3' }}>
-          <SheetTitle className="flex items-center gap-2" style={{ color: '#2E2E2E' }}>
-            <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
-            Gut Health Coach
+          <SheetTitle className="flex items-center justify-between" style={{ color: '#2E2E2E' }}>
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
+              Gut Health Coach
+            </div>
+            {(hasUserData.health_info || hasUserData.track_history) && (
+              <div className="flex items-center gap-1 text-xs text-green-600">
+                <Database className="w-3 h-3" />
+                <span>Data Connected</span>
+              </div>
+            )}
           </SheetTitle>
         </SheetHeader>
 
@@ -154,7 +199,7 @@ const GutHealthCoach = () => {
                   }}
                 >
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Thinking...</span>
+                  <span className="text-sm">Analyzing your data...</span>
                 </div>
               </div>
             )}
@@ -210,7 +255,7 @@ const GutHealthCoach = () => {
                 disabled={isLoading}
               />
               <Button
-                onClick={sendMessage}
+                onClick={() => sendMessage()}
                 disabled={!inputMessage.trim() || isLoading}
                 className="shrink-0"
                 style={{

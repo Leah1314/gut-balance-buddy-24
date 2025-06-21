@@ -8,7 +8,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// RAG service URL - this would be the deployed Python service
+// RAG service URL - this would be the deployed Python FastAPI service
 const RAG_SERVICE_URL = Deno.env.get('RAG_SERVICE_URL') || 'http://localhost:8000';
 
 serve(async (req) => {
@@ -39,67 +39,65 @@ serve(async (req) => {
     const { action, data } = await req.json();
 
     let ragResponse;
+    let endpoint = '';
+    let payload = {};
 
     switch (action) {
       case 'ingest_health_profile':
-        ragResponse = await fetch(`${RAG_SERVICE_URL}/ingest`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: data.profile_text,
-            user_id: user.id,
-            data_type: 'health_info',
-            source: 'manual',
-            content_type: 'profile'
-          })
-        });
+        endpoint = '/ingest';
+        payload = {
+          text: data.profile_text,
+          user_id: user.id,
+          data_type: 'health_info',
+          source: 'manual',
+          content_type: 'profile'
+        };
         break;
 
       case 'ingest_track_data':
-        ragResponse = await fetch(`${RAG_SERVICE_URL}/ingest`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: data.track_text,
-            user_id: user.id,
-            data_type: 'track_history',
-            source: data.has_image ? 'image' : 'manual',
-            content_type: data.content_type || 'general'
-          })
-        });
+        endpoint = '/ingest';
+        payload = {
+          text: data.track_text,
+          user_id: user.id,
+          data_type: 'track_history',
+          source: data.has_image ? 'image' : 'manual',
+          content_type: data.content_type || 'general'
+        };
+        break;
+
+      case 'ingest_image':
+        endpoint = '/ingest_image';
+        payload = {
+          image_data: data.image_data,
+          user_id: user.id,
+          data_type: 'track_history',
+          source: 'image',
+          content_type: data.content_type || 'food'
+        };
         break;
 
       case 'retrieve_user_data':
-        ragResponse = await fetch(`${RAG_SERVICE_URL}/retrieve`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: user.id,
-            query: data.query,
-            n_results: data.n_results || 5
-          })
-        });
+        endpoint = '/retrieve';
+        payload = {
+          user_id: user.id,
+          query: data.query,
+          n_results: data.n_results || 5
+        };
         break;
 
       case 'check_user_data':
-        ragResponse = await fetch(`${RAG_SERVICE_URL}/check_data`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: user.id
-          })
-        });
+        endpoint = '/check_data';
+        payload = {
+          user_id: user.id
+        };
         break;
 
       case 'caption_image':
-        ragResponse = await fetch(`${RAG_SERVICE_URL}/caption`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image_data: data.image_data,
-            content_type: data.content_type || 'food'
-          })
-        });
+        endpoint = '/caption';
+        payload = {
+          image_data: data.image_data,
+          content_type: data.content_type || 'food'
+        };
         break;
 
       default:
@@ -109,8 +107,15 @@ serve(async (req) => {
         );
     }
 
+    ragResponse = await fetch(`${RAG_SERVICE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
     if (!ragResponse.ok) {
-      throw new Error(`RAG service error: ${ragResponse.statusText}`);
+      const errorText = await ragResponse.text();
+      throw new Error(`RAG service error: ${ragResponse.statusText} - ${errorText}`);
     }
 
     const result = await ragResponse.json();

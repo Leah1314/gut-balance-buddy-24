@@ -40,59 +40,7 @@ class RAG:
         elif os.getenv('OPENAI_API_KEY'):
             openai.api_key = os.getenv('OPENAI_API_KEY')
     
-    def ingest_textual_data(self, 
-                          text: str, 
-                          user_id: str, 
-                          data_type: str = "health_info",
-                          source: str = "manual",
-                          content_type: str = "profile",
-                          additional_metadata: Dict[str, Any] = None) -> str:
-        """
-        Ingest textual data into vector database
-        
-        Args:
-            text: Raw text to ingest
-            user_id: Unique user identifier
-            data_type: "health_info" or "track_history"
-            source: "manual" or "image"
-            content_type: "food", "stool", "profile"
-            additional_metadata: Extra metadata to store
-            
-        Returns:
-            Document ID of ingested data
-        """
-        # Convert text to markdown format
-        converted_text = self.convert_to_format(text, "markdown")
-        
-        # Create document ID
-        doc_id = str(uuid.uuid4())
-        
-        # Prepare metadata
-        metadata = {
-            "user_id": user_id,
-            "timestamp": datetime.now().isoformat(),
-            "data_type": data_type,
-            "source": source,
-            "content_type": content_type,
-            "doc_id": doc_id
-        }
-        
-        if additional_metadata:
-            metadata.update(additional_metadata)
-        
-        # Choose appropriate collection
-        collection = self.health_collection if data_type == "health_info" else self.history_collection
-        
-        # Add document to collection
-        collection.add(
-            documents=[converted_text],
-            metadatas=[metadata],
-            ids=[doc_id]
-        )
-        
-        return doc_id
-    
-    def convert_to_format(self, text: str, format_type: str = "markdown") -> str:
+    def convert_text_to_format(self, text: str, format_type: str = "markdown") -> str:
         """
         Convert textual input into desired format
         
@@ -129,23 +77,79 @@ class RAG:
         
         return text
     
-    def handle_image_embedding(self, image_data: bytes, user_id: str, content_type: str = "food") -> str:
+    def ingest_text(self, text: str, metadata: Dict[str, Any]) -> str:
         """
-        Handle image embedding (placeholder for implementation)
+        Ingest textual data into vector database
         
         Args:
-            image_data: Raw image bytes
-            user_id: User identifier
-            content_type: Type of image content
+            text: Raw text to ingest
+            metadata: Dictionary containing user_id, timestamp, source, data_type
+            
+        Returns:
+            Document ID of ingested data
+        """
+        # Convert text to markdown format
+        converted_text = self.convert_text_to_format(text, "markdown")
+        
+        # Create document ID
+        doc_id = str(uuid.uuid4())
+        
+        # Prepare metadata with required fields
+        full_metadata = {
+            "user_id": metadata.get("user_id"),
+            "timestamp": datetime.now().isoformat(),
+            "data_type": metadata.get("data_type", "track_history"),
+            "source": metadata.get("source", "manual"),
+            "content_type": metadata.get("content_type", "general"),
+            "doc_id": doc_id
+        }
+        
+        # Add any additional metadata
+        for key, value in metadata.items():
+            if key not in full_metadata:
+                full_metadata[key] = value
+        
+        # Choose appropriate collection
+        collection = self.health_collection if metadata.get("data_type") == "health_info" else self.history_collection
+        
+        # Add document to collection
+        collection.add(
+            documents=[converted_text],
+            metadatas=[full_metadata],
+            ids=[doc_id]
+        )
+        
+        return doc_id
+    
+    def ingest_image(self, image: bytes, metadata: Dict[str, Any]) -> str:
+        """
+        Handle image embedding by captioning and ingesting as text
+        
+        Args:
+            image: Raw image bytes
+            metadata: Dictionary containing user_id, timestamp, source, data_type
             
         Returns:
             Document ID of processed image
         """
-        # This method will be implemented to:
-        # 1. Use OpenAI Vision API to caption the image
-        # 2. Convert caption to markdown
-        # 3. Ingest the caption into vector database
-        pass
+        try:
+            # Caption the image
+            caption = self.caption_image(image, metadata.get("content_type", "food"))
+            
+            # Convert caption to markdown and ingest
+            caption_text = f"**Image Analysis**: {caption}"
+            
+            # Update metadata to indicate this is from an image
+            image_metadata = metadata.copy()
+            image_metadata["source"] = "image"
+            image_metadata["has_image"] = True
+            
+            return self.ingest_text(caption_text, image_metadata)
+            
+        except Exception as e:
+            # Fallback: ingest basic metadata without caption
+            fallback_text = f"**Image Upload**: Unable to analyze image - {str(e)}"
+            return self.ingest_text(fallback_text, metadata)
     
     def caption_image(self, image_data: bytes, content_type: str = "food") -> str:
         """
@@ -173,7 +177,7 @@ class RAG:
                 prompt = "Describe this image in detail, focusing on relevant health or dietary information."
             
             response = openai.ChatCompletion.create(
-                model="gpt-4-vision-preview",
+                model="gpt-4o-mini",
                 messages=[
                     {
                         "role": "user",
@@ -274,54 +278,31 @@ class RAG:
         
         return has_data
     
-    def update_health_profile(self, user_id: str, profile_data: Dict[str, Any]) -> str:
-        """
-        Update user health profile in vector database
-        
-        Args:
-            user_id: User identifier
-            profile_data: Health profile data
-            
-        Returns:
-            Document ID of updated profile
-        """
-        # Convert profile data to text
-        profile_text = ""
-        for key, value in profile_data.items():
-            if value is not None and value != "":
-                profile_text += f"{key}: {value}\n"
-        
-        return self.ingest_textual_data(
-            text=profile_text,
-            user_id=user_id,
-            data_type="health_info",
-            source="manual",
-            content_type="profile"
-        )
+    # Legacy method names for backward compatibility
+    def ingest_textual_data(self, text: str, user_id: str, data_type: str = "health_info",
+                          source: str = "manual", content_type: str = "profile",
+                          additional_metadata: Dict[str, Any] = None) -> str:
+        """Legacy method - use ingest_text instead"""
+        metadata = {
+            "user_id": user_id,
+            "data_type": data_type,
+            "source": source,
+            "content_type": content_type
+        }
+        if additional_metadata:
+            metadata.update(additional_metadata)
+        return self.ingest_text(text, metadata)
     
-    def update_track_history(self, user_id: str, track_data: Dict[str, Any], has_image: bool = False) -> str:
-        """
-        Update user tracking history in vector database
-        
-        Args:
-            user_id: User identifier
-            track_data: Tracking data
-            has_image: Whether this entry includes image data
-            
-        Returns:
-            Document ID of updated history
-        """
-        # Convert track data to text
-        track_text = ""
-        for key, value in track_data.items():
-            if value is not None and value != "":
-                track_text += f"{key}: {value}\n"
-        
-        return self.ingest_textual_data(
-            text=track_text,
-            user_id=user_id,
-            data_type="track_history",
-            source="image" if has_image else "manual",
-            content_type=track_data.get("type", "general"),
-            additional_metadata={"entry_type": "tracking"}
-        )
+    def convert_to_format(self, text: str, format_type: str = "markdown") -> str:
+        """Legacy method - use convert_text_to_format instead"""
+        return self.convert_text_to_format(text, format_type)
+    
+    def handle_image_embedding(self, image_data: bytes, user_id: str, content_type: str = "food") -> str:
+        """Legacy method - use ingest_image instead"""
+        metadata = {
+            "user_id": user_id,
+            "data_type": "track_history",
+            "source": "image",
+            "content_type": content_type
+        }
+        return self.ingest_image(image_data, metadata)
