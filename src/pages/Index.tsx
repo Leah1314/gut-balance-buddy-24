@@ -16,7 +16,7 @@ const Index = () => {
       {/* Header */}
       <header style={{
       borderColor: '#D3D3D3'
-    }} className="fixed bg-white border-b sticky top-0 z-10 w-full">
+    }} className="fixed bg-white border-b sticky top-0 z-10 max-w-full ">
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
