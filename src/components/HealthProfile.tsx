@@ -82,8 +82,15 @@ const HealthProfile = () => {
       }
 
       if (data) {
+        // Safely parse dietary restrictions from Json to Record<string, boolean>
+        const dietaryRestrictions = data.dietary_restrictions && 
+          typeof data.dietary_restrictions === 'object' && 
+          !Array.isArray(data.dietary_restrictions) 
+          ? data.dietary_restrictions as Record<string, boolean>
+          : {};
+
         setProfileData({
-          dietary_restrictions: data.dietary_restrictions || {},
+          dietary_restrictions: dietaryRestrictions,
           custom_restrictions: data.custom_restrictions || "",
           age: data.age,
           weight_kg: data.weight_kg,
