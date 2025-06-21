@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Activity,
+  ArrowRight,
   Utensils
 } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
@@ -105,7 +105,7 @@ const Index = () => {
                   }
                 }}
               >
-                <Activity className={`w-4 h-4 stroke-2 ${activeTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
+                <ArrowRight className={`w-4 h-4 stroke-2 ${activeTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
                 <span className="font-medium">Stool Out</span>
               </Button>
             </div>
