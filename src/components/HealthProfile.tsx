@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Heart, AlertCircle, Save } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import TestResultsUpload from "./TestResultsUpload";
 
@@ -114,7 +114,11 @@ const HealthProfile = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error("Please log in to save your health profile");
+        toast({
+          variant: "default",
+          title: "Please log in to save your health profile",
+          className: "bg-amber-50 text-gray-800 border-amber-200"
+        });
         return;
       }
 
@@ -137,10 +141,17 @@ const HealthProfile = () => {
 
       if (error) throw error;
 
-      toast.success("Health profile saved successfully!");
+      toast({
+        variant: "default",
+        title: "Health profile saved successfully!",
+        className: "bg-green-50 text-green-800 border-green-200"
+      });
     } catch (error) {
       console.error('Error saving health profile:', error);
-      toast.error("Failed to save health profile");
+      toast({
+        variant: "destructive",
+        title: "Failed to save health profile"
+      });
     } finally {
       setIsSaving(false);
     }
