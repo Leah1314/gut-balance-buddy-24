@@ -1,0 +1,274 @@
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Camera, 
+  Upload, 
+  Loader2, 
+  AlertCircle,
+  CheckCircle,
+  Zap,
+  Heart
+} from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+interface StoolAnalysisData {
+  bristolType: number;
+  consistency: string;
+  color: string;
+  healthScore: number;
+  insights: string[];
+  recommendations: string[];
+}
+
+const StoolImageAnalyzer = () => {
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisData, setAnalysisData] = useState<StoolAnalysisData | null>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      setAnalysisData(null);
+    }
+  };
+
+  const convertImageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        resolve(base64.split(',')[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const analyzeImage = async () => {
+    if (!selectedImage) {
+      toast.error("Please select an image first");
+      return;
+    }
+
+    setIsAnalyzing(true);
+    
+    try {
+      // Mock analysis for now - in a real app this would call an AI service
+      const mockData: StoolAnalysisData = {
+        bristolType: 4,
+        consistency: "Normal",
+        color: "Brown",
+        healthScore: 8,
+        insights: [
+          "Bristol Type 4 indicates healthy bowel movement",
+          "Normal consistency suggests good hydration",
+          "Color appears within healthy range"
+        ],
+        recommendations: [
+          "Continue current diet and hydration habits",
+          "Maintain regular fiber intake",
+          "Keep monitoring for any changes"
+        ]
+      };
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setAnalysisData(mockData);
+      toast.success("Stool analysis complete!");
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      toast.error("Failed to analyze image. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const getBristolDescription = (type: number) => {
+    const descriptions = {
+      1: "Separate hard lumps",
+      2: "Sausage-shaped but lumpy",
+      3: "Like a sausage with cracks",
+      4: "Smooth, soft sausage",
+      5: "Soft blobs with clear edges",
+      6: "Fluffy pieces with ragged edges",
+      7: "Watery, no solid pieces"
+    };
+    return descriptions[type as keyof typeof descriptions] || "Unknown";
+  };
+
+  const getHealthScoreColor = (score: number) => {
+    if (score >= 8) return { color: '#4A7C59', backgroundColor: '#F9F8F4', borderColor: '#4A7C59' };
+    if (score >= 6) return { color: '#B8860B', backgroundColor: '#FFF8DC', borderColor: '#DAA520' };
+    return { color: '#DC143C', backgroundColor: '#FFE4E1', borderColor: '#DC143C' };
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Image Upload */}
+      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Camera className="w-5 h-5 text-blue-600" />
+            <span>AI Stool Analysis</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-center w-full">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                <p className="mb-2 text-sm text-gray-500">
+                  <span className="font-semibold">Click to upload</span> stool photo
+                </p>
+                <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
+              </div>
+              <Input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageSelect}
+              />
+            </label>
+          </div>
+
+          {imagePreview && (
+            <div className="space-y-3">
+              <img
+                src={imagePreview}
+                alt="Stool preview"
+                className="w-full h-48 object-cover rounded-lg border"
+              />
+              <Button
+                onClick={analyzeImage}
+                disabled={isAnalyzing}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Analyzing Image...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 mr-2" />
+                    Analyze with AI
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Analysis Results */}
+      {analysisData && (
+        <div className="space-y-4">
+          {/* Health Score */}
+          <Card className="shadow-sm" 
+                style={{ 
+                  backgroundColor: '#F9F8F4', 
+                  borderColor: '#4A7C59' 
+                }}>
+            <CardContent className="p-6 text-center">
+              <Heart className="w-8 h-8 mx-auto mb-3 stroke-2" style={{ color: '#4A7C59' }} />
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#2E2E2E' }}>Health Score</h3>
+              <div className="inline-flex items-center px-6 py-3 rounded-full text-2xl font-bold border"
+                   style={getHealthScoreColor(analysisData.healthScore)}>
+                {analysisData.healthScore}/10
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bristol Type Result */}
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span>Bristol Stool Type</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-3xl font-bold text-blue-600 mb-2">
+                  Type {analysisData.bristolType}
+                </div>
+                <p className="text-sm text-gray-600">
+                  {getBristolDescription(analysisData.bristolType)}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Analysis Details */}
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle>Analysis Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <p className="text-lg font-bold text-green-600">{analysisData.consistency}</p>
+                  <p className="text-sm text-gray-600">Consistency</p>
+                </div>
+                <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                  <p className="text-lg font-bold text-yellow-600">{analysisData.color}</p>
+                  <p className="text-sm text-gray-600">Color</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Insights */}
+          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle>AI Insights</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {analysisData.insights.map((insight, index) => (
+                  <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                    <p className="text-sm text-gray-700">{insight}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recommendations */}
+          <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle>Recommendations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {analysisData.recommendations.map((recommendation, index) => (
+                  <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <p className="text-sm text-gray-700">{recommendation}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default StoolImageAnalyzer;
