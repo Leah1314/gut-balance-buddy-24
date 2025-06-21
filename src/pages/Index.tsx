@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,9 +22,9 @@ const Index = () => {
     <div className="min-h-screen pb-20 overflow-x-hidden" style={{ backgroundColor: '#F9F8F4' }}>
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-10" style={{ borderColor: '#D3D3D3' }}>
-        <div className="w-full px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center justify-center space-x-3">
+        <div className="w-full max-w-none px-4 py-4">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center space-x-3">
               <div className="w-8 h-8 flex items-center justify-center">
                 <img 
                   src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" 
