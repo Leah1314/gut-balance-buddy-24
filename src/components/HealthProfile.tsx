@@ -243,7 +243,7 @@ const HealthProfile = () => {
               placeholder="Any other dietary restrictions or food allergies..."
               value={profileData.custom_restrictions}
               onChange={(e) => setProfileData(prev => ({ ...prev, custom_restrictions: e.target.value }))}
-              className="mt-1"
+              className="mt-1 bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
             />
           </div>
         </CardContent>
@@ -267,6 +267,7 @@ const HealthProfile = () => {
                 placeholder="Years"
                 value={profileData.age || ""}
                 onChange={(e) => setProfileData(prev => ({ ...prev, age: e.target.value ? parseInt(e.target.value) : null }))}
+                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               />
             </div>
             <div>
@@ -277,6 +278,7 @@ const HealthProfile = () => {
                 placeholder="kg"
                 value={profileData.weight_kg || ""}
                 onChange={(e) => setProfileData(prev => ({ ...prev, weight_kg: e.target.value ? parseFloat(e.target.value) : null }))}
+                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               />
             </div>
             <div>
@@ -287,13 +289,14 @@ const HealthProfile = () => {
                 placeholder="cm"
                 value={profileData.height_cm || ""}
                 onChange={(e) => setProfileData(prev => ({ ...prev, height_cm: e.target.value ? parseFloat(e.target.value) : null }))}
+                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               />
             </div>
           </div>
           <div>
             <Label htmlFor="activity-level">Activity Level</Label>
             <Select value={profileData.activity_level} onValueChange={(value) => setProfileData(prev => ({ ...prev, activity_level: value }))}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-gray-600 text-white border-gray-500">
                 <SelectValue placeholder="Select your activity level" />
               </SelectTrigger>
               <SelectContent>
@@ -325,6 +328,7 @@ const HealthProfile = () => {
                 value={newCondition}
                 onChange={(e) => setNewCondition(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addMedicalCondition()}
+                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               />
               <Button onClick={addMedicalCondition} variant="outline" size="sm">Add</Button>
             </div>
@@ -356,6 +360,7 @@ const HealthProfile = () => {
                 value={newMedication}
                 onChange={(e) => setNewMedication(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addMedication()}
+                className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               />
               <Button onClick={addMedication} variant="outline" size="sm">Add</Button>
             </div>
@@ -386,7 +391,7 @@ const HealthProfile = () => {
               placeholder="Describe any ongoing symptoms, digestive issues, or additional notes..."
               value={profileData.symptoms_notes}
               onChange={(e) => setProfileData(prev => ({ ...prev, symptoms_notes: e.target.value }))}
-              className="mt-1"
+              className="mt-1 bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               rows={4}
             />
           </div>
