@@ -7,7 +7,7 @@ import {
   Activity,
   MessageCircle,
   Utensils,
-  ArrowRight,
+  Scroll,
   User,
   LogIn
 } from "lucide-react";
@@ -127,7 +127,7 @@ const Index = () => {
                       }
                     }}
                   >
-                    <ArrowRight className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
+                    <Scroll className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
                     <span className="font-medium">Stool Out</span>
                   </Button>
                 </div>
