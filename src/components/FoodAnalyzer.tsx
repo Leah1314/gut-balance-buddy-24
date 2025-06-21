@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -128,9 +127,9 @@ const FoodAnalyzer = () => {
   };
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 8) return "text-green-600 bg-green-50 border-green-200";
-    if (rating >= 6) return "text-yellow-600 bg-yellow-50 border-yellow-200";
-    return "text-red-600 bg-red-50 border-red-200";
+    if (rating >= 8) return { color: '#4A7C59', backgroundColor: '#F9F8F4', borderColor: '#4A7C59' };
+    if (rating >= 6) return { color: '#B8860B', backgroundColor: '#FFF8DC', borderColor: '#DAA520' };
+    return { color: '#DC143C', backgroundColor: '#FFE4E1', borderColor: '#DC143C' };
   };
 
   const resetAnalysis = () => {
@@ -144,16 +143,33 @@ const FoodAnalyzer = () => {
   return (
     <div className="space-y-6">
       {/* Upload Section */}
-      <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-200">
+      <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200" 
+            style={{ borderColor: '#D3D3D3' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#4A7C59';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#D3D3D3';
+            }}>
         <CardContent className="p-6">
           <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center justify-center w-full h-36 border border-gray-200 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200">
+            <label className="flex flex-col items-center justify-center w-full h-36 border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 hover:border-opacity-100"
+                   style={{ 
+                     backgroundColor: '#F9F8F4',
+                     borderColor: '#D3D3D3'
+                   }}
+                   onMouseEnter={(e) => {
+                     e.currentTarget.style.backgroundColor = '#FFFFFF';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.currentTarget.style.backgroundColor = '#F9F8F4';
+                   }}>
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Camera className="w-8 h-8 mb-2 text-gray-400 stroke-2" />
-                <p className="mb-1 text-sm text-gray-700 font-medium">
+                <Camera className="w-8 h-8 mb-2 stroke-2" style={{ color: '#2E2E2E', opacity: 0.6 }} />
+                <p className="mb-1 text-sm font-medium" style={{ color: '#2E2E2E' }}>
                   Click to upload your food photo
                 </p>
-                <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
+                <p className="text-xs" style={{ color: '#2E2E2E', opacity: 0.6 }}>PNG, JPG, JPEG (MAX. 10MB)</p>
               </div>
               <Input
                 type="file"
@@ -167,7 +183,16 @@ const FoodAnalyzer = () => {
           <div className="text-center mt-3">
             <button
               onClick={() => setShowTextInput(!showTextInput)}
-              className="text-sm text-green-600 hover:text-green-700 font-medium transition-colors"
+              className="text-sm font-medium transition-colors"
+              style={{ 
+                color: '#4A7C59'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#5B8C6B';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#4A7C59';
+              }}
             >
               or type it in
             </button>
@@ -179,12 +204,29 @@ const FoodAnalyzer = () => {
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 placeholder="Enter food items (e.g., grilled chicken, brown rice, broccoli)"
-                className="border-gray-200 focus:border-green-500 focus:ring-green-500"
+                className="focus:ring-2 focus:ring-offset-2"
+                style={{
+                  borderColor: '#D3D3D3',
+                  '--tw-ring-color': '#4A7C59'
+                } as React.CSSProperties}
               />
               <Button
                 onClick={analyzeText}
                 disabled={isAnalyzing || !textInput.trim()}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium"
+                className="w-full text-white font-medium transition-colors"
+                style={{
+                  backgroundColor: '#4A7C59'
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#5B8C6B';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#4A7C59';
+                  }
+                }}
               >
                 {isAnalyzing ? (
                   <>
@@ -206,12 +248,26 @@ const FoodAnalyzer = () => {
               <img
                 src={imagePreview}
                 alt="Food preview"
-                className="w-full h-64 object-cover rounded-lg border border-gray-200"
+                className="w-full h-64 object-cover rounded-lg border"
+                style={{ borderColor: '#D3D3D3' }}
               />
               <Button
                 onClick={analyzeImage}
                 disabled={isAnalyzing}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium"
+                className="w-full text-white font-medium transition-colors"
+                style={{
+                  backgroundColor: '#4A7C59'
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#5B8C6B';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = '#4A7C59';
+                  }
+                }}
               >
                 {isAnalyzing ? (
                   <>
@@ -234,23 +290,34 @@ const FoodAnalyzer = () => {
       {nutritionData && (
         <div className="space-y-6">
           {/* Gut Health Score */}
-          <Card className="bg-green-50 border border-green-200 shadow-sm">
+          <Card className="shadow-sm" 
+                style={{ 
+                  backgroundColor: '#F9F8F4', 
+                  borderColor: '#4A7C59' 
+                }}>
             <CardContent className="p-6 text-center">
-              <Heart className="w-8 h-8 text-green-600 mx-auto mb-3 stroke-2" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Gut Health Score</h3>
-              <div className={`inline-flex items-center px-6 py-3 rounded-full text-2xl font-bold border ${getRatingColor(nutritionData.gutHealthRating)}`}>
+              <Heart className="w-8 h-8 mx-auto mb-3 stroke-2" style={{ color: '#4A7C59' }} />
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#2E2E2E' }}>Gut Health Score</h3>
+              <div className="inline-flex items-center px-6 py-3 rounded-full text-2xl font-bold border"
+                   style={getRatingColor(nutritionData.gutHealthRating)}>
                 {nutritionData.gutHealthRating}/10
               </div>
             </CardContent>
           </Card>
 
           {/* Food Items */}
-          <Card className="bg-white border border-gray-200 shadow-sm">
+          <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
             <CardContent className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-3">Identified Foods</h3>
+              <h3 className="font-semibold mb-3" style={{ color: '#2E2E2E' }}>Identified Foods</h3>
               <div className="flex flex-wrap gap-2">
                 {nutritionData.foodItems.map((item, index) => (
-                  <Badge key={index} variant="secondary" className="text-sm px-3 py-1 bg-gray-100 text-gray-700">
+                  <Badge key={index} variant="secondary" 
+                         className="text-sm px-3 py-1"
+                         style={{ 
+                           backgroundColor: '#F9F8F4', 
+                           color: '#2E2E2E',
+                           borderColor: '#D3D3D3'
+                         }}>
                     {item}
                   </Badge>
                 ))}
@@ -259,17 +326,23 @@ const FoodAnalyzer = () => {
           </Card>
 
           {/* AI Insights */}
-          <Card className="bg-green-50 border border-green-200 shadow-sm">
+          <Card className="shadow-sm" 
+                style={{ 
+                  backgroundColor: '#F9F8F4', 
+                  borderColor: '#4A7C59' 
+                }}>
             <CardContent className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <Brain className="w-5 h-5 text-green-600 mr-2 stroke-2" />
+              <h3 className="font-semibold mb-4 flex items-center" style={{ color: '#2E2E2E' }}>
+                <Brain className="w-5 h-5 mr-2 stroke-2" style={{ color: '#4A7C59' }} />
                 AI Insights
               </h3>
               <div className="space-y-3">
                 {nutritionData.insights.map((insight, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-green-100">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-sm text-gray-700">{insight}</p>
+                  <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border"
+                       style={{ borderColor: '#D3D3D3' }}>
+                    <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                         style={{ backgroundColor: '#4A7C59' }}></div>
+                    <p className="text-sm" style={{ color: '#2E2E2E' }}>{insight}</p>
                   </div>
                 ))}
               </div>
@@ -278,7 +351,21 @@ const FoodAnalyzer = () => {
 
           {/* Reset Button */}
           <div className="text-center pt-4">
-            <Button onClick={resetAnalysis} variant="outline" className="px-8 border-gray-200 text-gray-600 hover:border-gray-300">
+            <Button onClick={resetAnalysis} 
+                    variant="outline" 
+                    className="px-8 transition-colors"
+                    style={{
+                      borderColor: '#D3D3D3',
+                      color: '#2E2E2E'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#F9F8F4';
+                      e.currentTarget.style.borderColor = '#4A7C59';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.borderColor = '#D3D3D3';
+                    }}>
               Analyze Another Food
             </Button>
           </div>

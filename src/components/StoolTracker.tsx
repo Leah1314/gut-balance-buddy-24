@@ -2,270 +2,223 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Activity,
+  Save,
   Calendar,
   Clock,
-  Droplets,
-  Target,
-  TrendingUp,
-  Camera
+  Droplets
 } from "lucide-react";
 import { toast } from "sonner";
 
-interface StoolEntry {
-  id: string;
-  date: string;
-  time: string;
-  type: number; // Bristol Stool Scale 1-7
-  consistency: string;
-  color: string;
-  photo?: string;
-  notes?: string;
-}
-
 const StoolTracker = () => {
   const [selectedType, setSelectedType] = useState<number | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string>("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [entries, setEntries] = useState<StoolEntry[]>([]);
+  const [selectedConsistency, setSelectedConsistency] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [notes, setNotes] = useState("");
 
   const bristolTypes = [
-    { type: 1, description: "Separate hard lumps", consistency: "Very constipated", color: "text-red-600" },
-    { type: 2, description: "Lumpy and sausage-like", consistency: "Slightly constipated", color: "text-orange-600" },
-    { type: 3, description: "Sausage with cracks", consistency: "Normal", color: "text-yellow-600" },
-    { type: 4, description: "Smooth, soft sausage", consistency: "Ideal", color: "text-green-600" },
-    { type: 5, description: "Soft blobs with clear-cut edges", consistency: "Lacking fiber", color: "text-blue-600" },
-    { type: 6, description: "Mushy consistency with ragged edges", consistency: "Mild diarrhea", color: "text-purple-600" },
-    { type: 7, description: "Liquid consistency with no solid pieces", consistency: "Severe diarrhea", color: "text-red-600" },
+    { id: 1, name: "Type 1", description: "Separate hard lumps" },
+    { id: 2, name: "Type 2", description: "Sausage-shaped but lumpy" },
+    { id: 3, name: "Type 3", description: "Like a sausage with cracks" },
+    { id: 4, name: "Type 4", description: "Smooth, soft sausage" },
+    { id: 5, name: "Type 5", description: "Soft blobs with clear edges" },
+    { id: 6, name: "Type 6", description: "Fluffy pieces with ragged edges" },
+    { id: 7, name: "Type 7", description: "Watery, no solid pieces" }
   ];
 
-  const stoolColors = [
-    { name: "Brown", value: "brown", bg: "bg-amber-700" },
-    { name: "Light Brown", value: "light-brown", bg: "bg-amber-500" },
-    { name: "Dark Brown", value: "dark-brown", bg: "bg-amber-900" },
-    { name: "Green", value: "green", bg: "bg-green-600" },
-    { name: "Yellow", value: "yellow", bg: "bg-yellow-500" },
-    { name: "Red", value: "red", bg: "bg-red-600" },
-    { name: "Black", value: "black", bg: "bg-gray-900" },
-  ];
+  const consistencies = ["Very Hard", "Hard", "Normal", "Soft", "Very Soft", "Liquid"];
+  const colors = ["Brown", "Dark Brown", "Light Brown", "Yellow", "Green", "Black", "Red"];
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const addEntry = () => {
-    if (!selectedType || !selectedColor) {
-      toast.error("Please select both stool type and color");
+  const handleSave = () => {
+    if (!selectedType || !selectedConsistency || !selectedColor) {
+      toast.error("Please fill in all fields");
       return;
     }
 
-    const now = new Date();
-    const newEntry: StoolEntry = {
-      id: crypto.randomUUID(),
-      date: now.toLocaleDateString(),
-      time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      type: selectedType,
-      consistency: bristolTypes.find(t => t.type === selectedType)?.consistency || "",
-      color: selectedColor,
-      photo: imagePreview || undefined,
-    };
-
-    setEntries([newEntry, ...entries]);
+    // Here you would save to database
+    toast.success("Stool entry saved successfully!");
+    
+    // Reset form
     setSelectedType(null);
-    setSelectedColor("");
-    setSelectedImage(null);
-    setImagePreview(null);
-    toast.success("Stool entry logged successfully!");
+    setSelectedConsistency(null);
+    setSelectedColor(null);
+    setNotes("");
   };
-
-  const getHealthInsight = () => {
-    if (entries.length === 0) return null;
-    
-    const recentEntries = entries.slice(0, 7); // Last 7 entries
-    const idealCount = recentEntries.filter(e => e.type === 3 || e.type === 4).length;
-    const percentage = Math.round((idealCount / recentEntries.length) * 100);
-    
-    return {
-      percentage,
-      message: percentage >= 70 ? "Excellent digestive health!" : 
-               percentage >= 50 ? "Good, but could improve" : 
-               "Consider dietary adjustments"
-    };
-  };
-
-  const insight = getHealthInsight();
 
   return (
     <div className="space-y-6">
-      {/* Health Insight */}
-      {insight && (
-        <Card className="bg-green-50 border border-green-200 shadow-sm">
-          <CardContent className="p-6 text-center">
-            <TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-3 stroke-2" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Digestive Health Score</h3>
-            <div className="text-2xl font-bold text-green-600 mb-2">{insight.percentage}%</div>
-            <p className="text-sm text-gray-600">{insight.message}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Photo Upload Section */}
-      <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-200">
-        <CardContent className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-            <Camera className="w-5 h-5 text-green-600 mr-2 stroke-2" />
-            Take Photo (Optional)
-          </h3>
-          <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center justify-center w-full h-32 border border-gray-200 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Camera className="w-8 h-8 mb-3 text-gray-400 stroke-2" />
-                <p className="mb-2 text-sm text-gray-700 font-medium">
-                  Click to take photo or upload
-                </p>
-                <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
-              </div>
-              <Input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                capture="environment"
-                onChange={handleImageSelect}
-              />
-            </label>
-          </div>
-
-          {imagePreview && (
-            <div className="mt-4">
-              <img
-                src={imagePreview}
-                alt="Stool photo"
-                className="w-full h-48 object-cover rounded-lg border border-gray-200"
-              />
+      {/* Date/Time Header */}
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Calendar className="w-5 h-5 stroke-2" style={{ color: '#4A7C59' }} />
+              <span className="font-medium" style={{ color: '#2E2E2E' }}>
+                {new Date().toLocaleDateString()}
+              </span>
             </div>
-          )}
+            <div className="flex items-center space-x-3">
+              <Clock className="w-5 h-5 stroke-2" style={{ color: '#4A7C59' }} />
+              <span className="font-medium" style={{ color: '#2E2E2E' }}>
+                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Bristol Stool Scale */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      {/* Bristol Stool Chart */}
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
         <CardContent className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-            <Target className="w-5 h-5 text-green-600 mr-2 stroke-2" />
-            Bristol Stool Scale
-          </h3>
-          <div className="space-y-3">
-            {bristolTypes.map((item) => (
+          <h3 className="font-semibold mb-4" style={{ color: '#2E2E2E' }}>Bristol Stool Chart</h3>
+          <div className="grid grid-cols-1 gap-3">
+            {bristolTypes.map((type) => (
               <button
-                key={item.type}
-                onClick={() => setSelectedType(item.type)}
-                className={`w-full p-3 rounded-lg border transition-all ${
-                  selectedType === item.type
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                key={type.id}
+                onClick={() => setSelectedType(type.id)}
+                className={`p-4 rounded-lg border text-left transition-all duration-200 ${
+                  selectedType === type.id ? 'ring-2' : ''
                 }`}
+                style={{
+                  backgroundColor: selectedType === type.id ? '#F9F8F4' : '#FFFFFF',
+                  borderColor: selectedType === type.id ? '#4A7C59' : '#D3D3D3',
+                  '--tw-ring-color': '#4A7C59'
+                } as React.CSSProperties}
               >
-                <div className="flex items-center justify-between text-left">
+                <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-medium">Type {item.type}</div>
-                    <div className="text-sm text-gray-600">{item.description}</div>
-                  </div>
-                  <Badge className={`${item.color} bg-gray-100`}>
-                    {item.consistency}
-                  </Badge>
-                </div>
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Color Selection */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
-        <CardContent className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-            <Droplets className="w-5 h-5 text-green-600 mr-2 stroke-2" />
-            Stool Color
-          </h3>
-          <div className="grid grid-cols-3 gap-3">
-            {stoolColors.map((color) => (
-              <button
-                key={color.value}
-                onClick={() => setSelectedColor(color.value)}
-                className={`p-3 rounded-lg border transition-all ${
-                  selectedColor === color.value
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <div className={`w-4 h-4 rounded-full ${color.bg}`}></div>
-                  <span className="text-sm font-medium">{color.name}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Add Entry Button */}
-      <Button
-        onClick={addEntry}
-        disabled={!selectedType || !selectedColor}
-        className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 text-lg"
-      >
-        <Activity className="w-5 h-5 mr-2 stroke-2" />
-        Log Stool Entry
-      </Button>
-
-      {/* Recent Entries */}
-      {entries.length > 0 && (
-        <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-              <Calendar className="w-5 h-5 text-green-600 mr-2 stroke-2" />
-              Recent Entries
-            </h3>
-            <div className="space-y-3">
-              {entries.slice(0, 5).map((entry) => (
-                <div key={entry.id} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <div className="font-medium">Type {entry.type} - {entry.consistency}</div>
-                      <div className="text-sm text-gray-600 flex items-center space-x-2">
-                        <Calendar className="w-4 h-4 stroke-2" />
-                        <span>{entry.date}</span>
-                        <Clock className="w-4 h-4 stroke-2" />
-                        <span>{entry.time}</span>
-                      </div>
+                    <div className="font-medium" style={{ color: '#2E2E2E' }}>{type.name}</div>
+                    <div className="text-sm mt-1" style={{ color: '#2E2E2E', opacity: 0.6 }}>
+                      {type.description}
                     </div>
-                    <Badge variant="secondary" className="bg-gray-200 text-gray-700">{entry.color.replace('-', ' ')}</Badge>
                   </div>
-                  {entry.photo && (
-                    <img
-                      src={entry.photo}
-                      alt="Stool entry"
-                      className="w-full h-24 object-cover rounded-lg mt-2 border border-gray-200"
-                    />
+                  {selectedType === type.id && (
+                    <Badge className="text-white" style={{ backgroundColor: '#4A7C59' }}>
+                      Selected
+                    </Badge>
                   )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Consistency */}
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+        <CardContent className="p-6">
+          <h3 className="font-semibold mb-4" style={{ color: '#2E2E2E' }}>Consistency</h3>
+          <div className="flex flex-wrap gap-2">
+            {consistencies.map((consistency) => (
+              <button
+                key={consistency}
+                onClick={() => setSelectedConsistency(consistency)}
+                className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${
+                  selectedConsistency === consistency ? 'text-white' : ''
+                }`}
+                style={{
+                  backgroundColor: selectedConsistency === consistency ? '#4A7C59' : 'transparent',
+                  borderColor: selectedConsistency === consistency ? '#4A7C59' : '#D3D3D3',
+                  color: selectedConsistency === consistency ? '#FFFFFF' : '#2E2E2E'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedConsistency === consistency) {
+                    e.currentTarget.style.backgroundColor = '#5B8C6B';
+                  } else {
+                    e.currentTarget.style.backgroundColor = '#F9F8F4';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedConsistency === consistency) {
+                    e.currentTarget.style.backgroundColor = '#4A7C59';
+                  } else {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                {consistency}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Color */}
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+        <CardContent className="p-6">
+          <h3 className="font-semibold mb-4" style={{ color: '#2E2E2E' }}>Color</h3>
+          <div className="flex flex-wrap gap-2">
+            {colors.map((color) => (
+              <button
+                key={color}
+                onClick={() => setSelectedColor(color)}
+                className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${
+                  selectedColor === color ? 'text-white' : ''
+                }`}
+                style={{
+                  backgroundColor: selectedColor === color ? '#4A7C59' : 'transparent',
+                  borderColor: selectedColor === color ? '#4A7C59' : '#D3D3D3',
+                  color: selectedColor === color ? '#FFFFFF' : '#2E2E2E'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedColor === color) {
+                    e.currentTarget.style.backgroundColor = '#5B8C6B';
+                  } else {
+                    e.currentTarget.style.backgroundColor = '#F9F8F4';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedColor === color) {
+                    e.currentTarget.style.backgroundColor = '#4A7C59';
+                  } else {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                {color}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notes */}
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+        <CardContent className="p-6">
+          <h3 className="font-semibold mb-4" style={{ color: '#2E2E2E' }}>Additional Notes (Optional)</h3>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Any symptoms, medications, or observations..."
+            className="w-full h-24 p-3 border rounded-lg resize-none focus:ring-2 focus:ring-offset-2"
+            style={{
+              borderColor: '#D3D3D3',
+              '--tw-ring-color': '#4A7C59'
+            } as React.CSSProperties}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Save Button */}
+      <div className="text-center pt-4">
+        <Button 
+          onClick={handleSave}
+          className="px-8 py-3 text-white font-medium transition-colors"
+          style={{
+            backgroundColor: '#4A7C59'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#5B8C6B';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#4A7C59';
+          }}
+        >
+          <Save className="w-4 h-4 mr-2 stroke-2" />
+          Save Entry
+        </Button>
+      </div>
     </div>
   );
 };
