@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -7,7 +8,8 @@ import {
   MessageCircle,
   Utensils,
   ArrowRight,
-  User
+  User,
+  LogIn
 } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
@@ -23,15 +25,28 @@ const Index = () => {
       {/* Header */}
       <header className="bg-white border-b" style={{ borderColor: '#D3D3D3' }}>
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-center space-x-3">
-            <div className="w-8 h-8 flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" 
-                alt="Logo" 
-                className="w-8 h-8 object-contain"
-              />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center justify-center space-x-3">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" 
+                  alt="Logo" 
+                  className="w-8 h-8 object-contain"
+                />
+              </div>
+              <h1 className="text-xl font-semibold" style={{ color: '#2E2E2E' }}>In and Out</h1>
             </div>
-            <h1 className="text-xl font-semibold" style={{ color: '#2E2E2E' }}>In and Out</h1>
+            <Link to="/auth">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center space-x-2"
+                style={{ color: '#2E2E2E' }}
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Login</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
