@@ -85,14 +85,18 @@ const HealthProfile = () => {
   };
 
   const addMedicalCondition = () => {
-    if (newCondition.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        medical_conditions: [...prev.medical_conditions, newCondition.trim()]
-      }));
-      setNewCondition('');
-      toast.success(`✅ Medical condition "${newCondition}" added successfully!`);
+    if (!newCondition.trim()) {
+      toast.error("Please enter a medical condition");
+      return;
     }
+
+    setFormData(prev => ({
+      ...prev,
+      medical_conditions: [...prev.medical_conditions, newCondition.trim()]
+    }));
+    setNewCondition('');
+    toast.success(`✅ Medical condition "${newCondition}" added successfully!`);
+    console.log('Medical condition added:', newCondition);
   };
 
   const removeMedicalCondition = (index: number) => {
@@ -102,17 +106,22 @@ const HealthProfile = () => {
       medical_conditions: prev.medical_conditions.filter((_, i) => i !== index)
     }));
     toast.success(`✅ Medical condition "${condition}" removed successfully!`);
+    console.log('Medical condition removed:', condition);
   };
 
   const addMedication = () => {
-    if (newMedication.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        medications: [...prev.medications, newMedication.trim()]
-      }));
-      setNewMedication('');
-      toast.success(`✅ Medication "${newMedication}" added successfully!`);
+    if (!newMedication.trim()) {
+      toast.error("Please enter a medication");
+      return;
     }
+
+    setFormData(prev => ({
+      ...prev,
+      medications: [...prev.medications, newMedication.trim()]
+    }));
+    setNewMedication('');
+    toast.success(`✅ Medication "${newMedication}" added successfully!`);
+    console.log('Medication added:', newMedication);
   };
 
   const removeMedication = (index: number) => {
@@ -122,6 +131,7 @@ const HealthProfile = () => {
       medications: prev.medications.filter((_, i) => i !== index)
     }));
     toast.success(`✅ Medication "${medication}" removed successfully!`);
+    console.log('Medication removed:', medication);
   };
 
   const handleSave = async () => {
@@ -138,16 +148,19 @@ const HealthProfile = () => {
         custom_restrictions: formData.custom_restrictions || null
       };
 
+      console.log('Saving health profile:', profileData);
       const result = await updateProfile(profileData);
       
       if (result) {
         toast.success("✅ Health profile saved successfully!");
+        console.log('Health profile saved:', result);
       } else {
-        toast.error("Failed to save health profile. Please try again.");
+        toast.error("❌ Failed to save health profile. Please try again.");
+        console.error('Failed to save health profile');
       }
     } catch (error) {
       console.error('Error saving profile:', error);
-      toast.error("Failed to save health profile. Please try again.");
+      toast.error("❌ Failed to save health profile. Please try again.");
     }
   };
 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,10 @@ const FoodImageAnalyzer = () => {
       };
       reader.readAsDataURL(file);
       setNutritionData(null);
+      
+      // Show success message for image upload
+      toast.success(`✅ Image uploaded successfully! Ready for analysis.`);
+      console.log('Image uploaded:', file.name, file.size, 'bytes');
     }
   };
 
@@ -73,7 +78,7 @@ const FoodImageAnalyzer = () => {
     try {
       const base64Image = await convertImageToBase64(selectedImage);
       
-      console.log('Calling Supabase edge function...');
+      console.log('Calling Supabase edge function for image analysis...');
       
       const { data, error } = await supabase.functions.invoke('analyze-food-image', {
         body: {
@@ -92,11 +97,11 @@ const FoodImageAnalyzer = () => {
 
       console.log('Analysis result:', data);
       setNutritionData(data);
-      toast.success("Food analysis complete!");
+      toast.success("✅ Food analysis completed successfully!");
       
     } catch (error) {
       console.error('Analysis error:', error);
-      toast.error("Failed to analyze image. Please try again.");
+      toast.error("❌ Failed to analyze image. Please try again.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -118,14 +123,19 @@ const FoodImageAnalyzer = () => {
       entry_type: 'food'
     };
 
+    console.log('Saving analysis to food log:', foodLogData);
     const result = await addFoodLog(foodLogData);
     
     if (result) {
-      toast.success("Food analysis saved to your log!");
+      toast.success("✅ Food analysis saved to your log successfully!");
+      console.log('Analysis saved to log:', result);
       // Reset form
       setSelectedImage(null);
       setImagePreview(null);
       setNutritionData(null);
+    } else {
+      toast.error("❌ Failed to save food analysis. Please try again.");
+      console.error('Failed to save analysis to log');
     }
   };
 
