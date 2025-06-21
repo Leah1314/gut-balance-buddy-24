@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -63,9 +64,7 @@ const FoodDiary = () => {
 
     const foodLogData = {
       food_name: newFood,
-      description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`,
-      entry_type: selectedMeal,
-      notes: `Manually logged ${selectedMeal} item`
+      description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`
     };
 
     console.log('Adding food log:', foodLogData);
@@ -101,9 +100,7 @@ const FoodDiary = () => {
     for (const food of selectedFoods) {
       const foodLogData = {
         food_name: food,
-        description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`,
-        entry_type: selectedMeal,
-        notes: `Quick-added ${selectedMeal} item`
+        description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`
       };
 
       console.log('Quick adding food:', foodLogData);
@@ -139,13 +136,18 @@ const FoodDiary = () => {
     }, (_, i) => <Star key={i} className={`w-3 h-3 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />);
   };
 
-  // Group today's food logs by meal type
+  // Group today's food logs by meal type based on description
   const todayMeals = (foodLogs || []).filter(log => {
     const today = new Date().toDateString();
     const logDate = new Date(log.created_at).toDateString();
     return today === logDate;
   }).reduce((acc, log) => {
-    const mealType = log.entry_type || 'other';
+    // Extract meal type from description if it contains meal info
+    const mealType = log.description?.toLowerCase().includes('breakfast') ? 'breakfast' :
+                    log.description?.toLowerCase().includes('lunch') ? 'lunch' :
+                    log.description?.toLowerCase().includes('dinner') ? 'dinner' :
+                    log.description?.toLowerCase().includes('snack') ? 'snack' : 'other';
+    
     if (!acc[mealType]) {
       acc[mealType] = [];
     }
