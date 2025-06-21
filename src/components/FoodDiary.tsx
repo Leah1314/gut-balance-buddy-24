@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,9 +56,13 @@ const FoodDiary = () => {
       const result = await addFoodLog(foodLogData);
       
       if (result) {
-        toast.success(`${newFood} added to your ${selectedMeal} log!`);
+        toast.success(`✅ ${newFood} successfully added to your ${selectedMeal} log!`);
         setNewFood("");
+      } else {
+        toast.error("Failed to add food item. Please try again.");
       }
+    } else {
+      toast.error("Please enter a food name");
     }
   };
 
@@ -72,7 +77,9 @@ const FoodDiary = () => {
     const result = await addFoodLog(foodLogData);
     
     if (result) {
-      toast.success(`${food} added to your ${selectedMeal} log!`);
+      toast.success(`✅ ${food} successfully added to your ${selectedMeal} log!`);
+    } else {
+      toast.error("Failed to add food item. Please try again.");
     }
   };
 
@@ -100,6 +107,12 @@ const FoodDiary = () => {
       acc[mealType].push(log);
       return acc;
     }, {} as Record<string, any[]>);
+
+  // Get unique foods from user's history for personal food database
+  const userFoodDatabase = (foodLogs || [])
+    .map(log => log.food_name)
+    .filter((food, index, array) => array.indexOf(food) === index)
+    .sort();
 
   return (
     <div className="space-y-6">
@@ -132,7 +145,7 @@ const FoodDiary = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Meal Type</Label>
+                <Label className="text-sm font-medium text-gray-900">Meal Type</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {mealTypes.map((meal) => (
                     <Button
@@ -140,7 +153,11 @@ const FoodDiary = () => {
                       variant={selectedMeal === meal.id ? "default" : "outline"}
                       size="sm"
                       onClick={() => setSelectedMeal(meal.id)}
-                      className="flex items-center space-x-2"
+                      className={`flex items-center space-x-2 ${
+                        selectedMeal === meal.id 
+                          ? 'bg-green-600 text-white hover:bg-green-700' 
+                          : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+                      }`}
                     >
                       <meal.icon className="w-4 h-4" />
                       <span>{meal.label}</span>
@@ -150,27 +167,31 @@ const FoodDiary = () => {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium">What did you eat?</Label>
+                <Label className="text-sm font-medium text-gray-900">What did you eat?</Label>
                 <div className="flex space-x-2">
                   <Input
                     placeholder="Enter food item..."
                     value={newFood}
                     onChange={(e) => setNewFood(e.target.value)}
-                    className="flex-1"
+                    className="flex-1 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         handleAddFood();
                       }
                     }}
                   />
-                  <Button onClick={handleAddFood} disabled={!newFood.trim()}>
+                  <Button 
+                    onClick={handleAddFood} 
+                    disabled={!newFood.trim()}
+                    className="bg-green-600 text-white hover:bg-green-700"
+                  >
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Quick Add</Label>
+                <Label className="text-sm font-medium text-gray-900">Quick Add</Label>
                 <div className="flex flex-wrap gap-2">
                   {commonFoods.map((food) => (
                     <Button
@@ -178,7 +199,7 @@ const FoodDiary = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleQuickAdd(food)}
-                      className="text-xs"
+                      className="text-xs bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
                     >
                       {food}
                     </Button>
@@ -261,24 +282,47 @@ const FoodDiary = () => {
         </CardContent>
       </Card>
 
-      {/* Food Search */}
+      {/* Personal Food Database */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Search className="w-5 h-5 text-purple-600" />
-            <span>Food Database</span>
+            <span>Your Food History</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4">
-              Search our database of foods and their gut health impact
-            </p>
-            <Button variant="outline">
-              Browse Food Database
-            </Button>
-          </div>
+          {userFoodDatabase.length === 0 ? (
+            <div className="text-center py-8">
+              <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 mb-4">
+                No foods logged yet. Start tracking your meals to build your personal food database!
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Foods you've logged previously ({userFoodDatabase.length} items):
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {userFoodDatabase.slice(0, 20).map((food, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickAdd(food)}
+                    className="text-xs bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
+                  >
+                    {food}
+                  </Button>
+                ))}
+              </div>
+              {userFoodDatabase.length > 20 && (
+                <p className="text-xs text-gray-500">
+                  Showing first 20 items. You have {userFoodDatabase.length - 20} more foods in your history.
+                </p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

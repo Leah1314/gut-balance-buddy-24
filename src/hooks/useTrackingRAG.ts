@@ -1,58 +1,56 @@
 
-import { useRAG } from './useRAG';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
 
 export const useTrackingRAG = () => {
-  const { ingestTrackData, ingestImage, captionImage } = useRAG();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { user } = useAuth();
 
-  const updateRAGOnTrackingSave = async (trackingData: any, hasImage = false) => {
-    try {
-      // Check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.log('User not authenticated, skipping RAG update');
-        return;
-      }
-
-      // If there's an image, process it through RAG
-      if (hasImage && trackingData.imageData) {
-        try {
-          // For images, use the new ingestImage method that handles captioning
-          await ingestImage(trackingData.imageData, trackingData.type || 'food');
-        } catch (error) {
-          console.error('Failed to ingest image to RAG:', error);
-          // Fallback to text ingestion
-          await ingestTrackData({
-            ...trackingData,
-            note: 'Image analysis failed'
-          }, hasImage);
-        }
-      } else {
-        // For text-only data, use standard ingestion
-        await ingestTrackData(trackingData, hasImage);
-      }
-    } catch (error) {
-      console.error('Failed to update RAG with tracking data:', error);
+  const updateRAGOnTrackingSave = async (trackingData: any, includeImage: boolean = false) => {
+    if (!user) {
+      console.error('No authenticated user found for RAG update');
+      return;
     }
-  };
 
-  const captionImageForUser = async (imageData: string, contentType = 'food'): Promise<string> => {
+    setIsUpdating(true);
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.log('User not authenticated, skipping image captioning');
-        return '';
+      console.log('Updating RAG with tracking data for user:', user.id);
+      console.log('Tracking data:', trackingData);
+
+      const ragPayload = {
+        user_id: user.id, // Ensure user ID is included
+        type: trackingData.type,
+        data: {
+          ...trackingData,
+          user_id: user.id, // Also include in nested data
+          timestamp: trackingData.timestamp || new Date().toISOString()
+        },
+        include_image: includeImage
+      };
+
+      const { data, error } = await supabase.functions.invoke('rag-service', {
+        body: ragPayload
+      });
+
+      if (error) {
+        console.error('RAG service error:', error);
+        throw error;
       }
 
-      return await captionImage(imageData, contentType);
+      console.log('RAG update successful:', data);
+      return data;
     } catch (error) {
-      console.error('Failed to caption image:', error);
-      return '';
+      console.error('Error updating RAG:', error);
+      throw error;
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   return {
     updateRAGOnTrackingSave,
-    captionImageForUser
+    isUpdating
   };
 };
