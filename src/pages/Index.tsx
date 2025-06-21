@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
+import GutHealthCoach from "@/components/GutHealthCoach";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<'food' | 'stool'>('food');
@@ -115,6 +116,9 @@ const Index = () => {
         {/* Content */}
         {activeTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
       </div>
+
+      {/* Floating Chat Coach */}
+      <GutHealthCoach />
     </div>
   );
 };
