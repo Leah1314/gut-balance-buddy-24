@@ -218,7 +218,7 @@ const FoodDiary = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-900">Meal Type</Label>
+                <Label className="text-sm font-medium text-gray-900 text-left block">Meal Type</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {mealTypes.map(meal => (
                     <Button 
@@ -236,7 +236,7 @@ const FoodDiary = () => {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-900">What did you eat?</Label>
+                <Label className="text-sm font-medium text-gray-900 text-left block">What did you eat?</Label>
                 <div className="flex space-x-2">
                   <Input 
                     placeholder="Enter food item..." 
@@ -260,7 +260,7 @@ const FoodDiary = () => {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-900">Quick Add</Label>
+                <Label className="text-sm font-medium text-gray-900 text-left block">Quick Add</Label>
                 <div className="flex flex-wrap gap-2">
                   {commonFoods.map(food => (
                     <Button 
@@ -277,7 +277,7 @@ const FoodDiary = () => {
                 
                 {selectedFoods.length > 0 && (
                   <div className="space-y-3 pt-2">
-                    <Label className="text-sm font-medium text-gray-900">Selected Foods</Label>
+                    <Label className="text-sm font-medium text-gray-900 text-left block">Selected Foods</Label>
                     <div className="flex flex-wrap gap-2">
                       {selectedFoods.map((food, index) => (
                         <Badge 
