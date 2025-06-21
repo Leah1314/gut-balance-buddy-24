@@ -108,7 +108,7 @@ const Auth = () => {
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 flex flex-col space-y-6">
+        <div className="flex-1 flex flex-col space-y-4">
           {/* Google Sign In */}
           <Button
             onClick={handleGoogleAuth}
@@ -120,12 +120,12 @@ const Auth = () => {
             <span>Continue with Google</span>
           </Button>
           
-          <div className="relative">
+          <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
               <Separator className="w-full bg-brand-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-brand-background px-4 text-gray-500">Or continue with email</span>
+              <span className="bg-brand-background px-3 text-gray-500">Or continue with email</span>
             </div>
           </div>
 
