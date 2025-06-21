@@ -169,22 +169,22 @@ const HealthProfile = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900">
-                <Calendar className="w-4 h-4 inline mr-2" />
+              <Label className="text-sm font-medium text-gray-900 flex items-center">
+                <Calendar className="w-4 h-4 mr-2" />
                 Age
               </Label>
               <Input type="number" placeholder="Enter your age" value={formData.age} onChange={e => handleInputChange('age', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900">
-                <Scale className="w-4 h-4 inline mr-2" />
+              <Label className="text-sm font-medium text-gray-900 flex items-center">
+                <Scale className="w-4 h-4 mr-2" />
                 Weight (kg)
               </Label>
               <Input type="number" step="0.1" placeholder="Enter weight" value={formData.weight_kg} onChange={e => handleInputChange('weight_kg', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900">
-                <Ruler className="w-4 h-4 inline mr-2" />
+              <Label className="text-sm font-medium text-gray-900 flex items-center">
+                <Ruler className="w-4 h-4 mr-2" />
                 Height (cm)
               </Label>
               <Input type="number" placeholder="Enter height" value={formData.height_cm} onChange={e => handleInputChange('height_cm', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
@@ -213,7 +213,7 @@ const HealthProfile = () => {
                   : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <div className="w-full">
+              <div className="w-full text-left">
                 <p className="font-medium text-sm leading-tight mb-1">
                   {level.value.charAt(0).toUpperCase() + level.value.slice(1).replace('_', ' ')}
                 </p>
