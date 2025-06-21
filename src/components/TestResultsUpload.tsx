@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileImage, Search, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
+import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,31 +31,34 @@ const TestResultsUpload = () => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type.startsWith('image/')) {
+      if (file.type.startsWith('image/') || file.type === 'application/pdf') {
         setSelectedFile(file);
         setAnalysisResult(null);
       } else {
-        toast.error("Please select an image file");
+        toast.error("Please select an image or PDF file");
       }
     }
   };
 
   const analyzeTestResults = async () => {
     if (!selectedFile) {
-      toast.error("Please select an image first");
+      toast.error("Please select a file first");
       return;
     }
 
     setIsAnalyzing(true);
     try {
-      // Convert image to base64
+      // Convert file to base64
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64 = e.target?.result as string;
         const base64Data = base64.split(',')[1];
 
         const { data, error } = await supabase.functions.invoke('analyze-test-results', {
-          body: { image: base64Data }
+          body: { 
+            image: base64Data,
+            fileType: selectedFile.type
+          }
         });
 
         if (error) {
@@ -99,24 +102,31 @@ const TestResultsUpload = () => {
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2" style={{ color: '#2E2E2E' }}>
-            <FileImage className="w-5 h-5" style={{ color: '#4A7C59' }} />
+            <FileText className="w-5 h-5" style={{ color: '#4A7C59' }} />
             Upload Test Results
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="test-image">Select Test Result Image</Label>
+            <Label htmlFor="test-file">Select Test Result File (Image or PDF)</Label>
             <Input
-              id="test-image"
+              id="test-file"
               type="file"
-              accept="image/*"
+              accept="image/*,.pdf"
               onChange={handleFileSelect}
               className="mt-1 bg-gray-600 text-white border-gray-500 file:bg-gray-700 file:text-white file:border-0"
             />
             {selectedFile && (
-              <p className="text-sm mt-1" style={{ color: '#4A7C59' }}>
-                Selected: {selectedFile.name}
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                {selectedFile.type === 'application/pdf' ? (
+                  <FileText className="w-4 h-4" style={{ color: '#4A7C59' }} />
+                ) : (
+                  <FileImage className="w-4 h-4" style={{ color: '#4A7C59' }} />
+                )}
+                <p className="text-sm" style={{ color: '#4A7C59' }}>
+                  Selected: {selectedFile.name}
+                </p>
+              </div>
             )}
           </div>
           
