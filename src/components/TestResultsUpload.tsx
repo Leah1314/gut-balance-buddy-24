@@ -78,19 +78,19 @@ const TestResultsUpload = () => {
 
   const getConcernLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
-      case 'low': return 'text-green-600';
-      case 'moderate': return 'text-yellow-600';
-      case 'high': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'low': return 'text-green-700';
+      case 'moderate': return 'text-yellow-700';
+      case 'high': return 'text-red-700';
+      default: return 'text-gray-700';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'normal': return 'text-green-600';
-      case 'high': return 'text-red-600';
-      case 'low': return 'text-orange-600';
-      default: return 'text-gray-600';
+      case 'normal': return 'text-green-700';
+      case 'high': return 'text-red-700';
+      case 'low': return 'text-orange-700';
+      default: return 'text-gray-700';
     }
   };
 
@@ -152,24 +152,24 @@ const TestResultsUpload = () => {
       </Card>
 
       {analysisResult && (
-        <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+        <Card className="bg-white shadow-sm border border-gray-300">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2" style={{ color: '#2E2E2E' }}>
-              <CheckCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <CheckCircle className="w-5 h-5 text-green-600" />
               Analysis Results
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h4 className="font-semibold mb-2">Test Type: {analysisResult.testType}</h4>
-              <p className="text-sm" style={{ color: '#2E2E2E', opacity: 0.8 }}>
+              <h4 className="font-semibold mb-2 text-gray-900">Test Type: {analysisResult.testType}</h4>
+              <p className="text-sm text-gray-700">
                 {analysisResult.summary}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" />
-              <span className="font-medium">Concern Level: </span>
+              <AlertTriangle className="w-4 h-4 text-gray-700" />
+              <span className="font-medium text-gray-900">Concern Level: </span>
               <span className={`font-semibold ${getConcernLevelColor(analysisResult.concernLevel)}`}>
                 {analysisResult.concernLevel.charAt(0).toUpperCase() + analysisResult.concernLevel.slice(1)}
               </span>
@@ -177,20 +177,20 @@ const TestResultsUpload = () => {
 
             {analysisResult.values && analysisResult.values.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2">Test Values:</h5>
+                <h5 className="font-semibold mb-2 text-gray-900">Test Values:</h5>
                 <div className="space-y-2">
                   {analysisResult.values.map((value, index) => (
-                    <div key={index} className="bg-gray-50 p-3 rounded-md">
+                    <div key={index} className="bg-gray-50 p-3 rounded-md border border-gray-200">
                       <div className="flex justify-between items-center">
-                        <span className="font-medium">{value.parameter}</span>
+                        <span className="font-medium text-gray-900">{value.parameter}</span>
                         <span className={`font-semibold ${getStatusColor(value.status)}`}>
                           {value.status.toUpperCase()}
                         </span>
                       </div>
-                      <div className="text-sm" style={{ color: '#2E2E2E', opacity: 0.7 }}>
+                      <div className="text-sm text-gray-600">
                         Value: {value.value} {value.unit}
                       </div>
-                      <div className="text-sm" style={{ color: '#2E2E2E', opacity: 0.7 }}>
+                      <div className="text-sm text-gray-600">
                         Reference: {value.referenceRange}
                       </div>
                     </div>
@@ -201,10 +201,10 @@ const TestResultsUpload = () => {
 
             {analysisResult.keyFindings && analysisResult.keyFindings.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2">Key Findings:</h5>
+                <h5 className="font-semibold mb-2 text-gray-900">Key Findings:</h5>
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.keyFindings.map((finding, index) => (
-                    <li key={index} className="text-sm" style={{ color: '#2E2E2E', opacity: 0.8 }}>
+                    <li key={index} className="text-sm text-gray-700">
                       {finding}
                     </li>
                   ))}
@@ -214,10 +214,10 @@ const TestResultsUpload = () => {
 
             {analysisResult.recommendations && analysisResult.recommendations.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2">Recommendations:</h5>
+                <h5 className="font-semibold mb-2 text-gray-900">Recommendations:</h5>
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.recommendations.map((recommendation, index) => (
-                    <li key={index} className="text-sm" style={{ color: '#2E2E2E', opacity: 0.8 }}>
+                    <li key={index} className="text-sm text-gray-700">
                       {recommendation}
                     </li>
                   ))}
