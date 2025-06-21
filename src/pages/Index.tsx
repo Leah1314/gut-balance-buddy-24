@@ -7,7 +7,7 @@ import {
   Activity,
   MessageCircle,
   Utensils,
-  ScrollText,
+  Scroll,
   User,
   LogIn
 } from "lucide-react";
@@ -73,24 +73,24 @@ const Index = () => {
                     variant="ghost"
                     className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
                       activeTrackTab === 'food' 
-                        ? 'border-transparent hover:opacity-90' 
+                        ? 'text-white border-transparent hover:opacity-90' 
                         : 'border-opacity-100 hover:border-opacity-100'
                     }`}
                     style={{
-                      backgroundColor: activeTrackTab === 'food' ? '#22c55e' : 'transparent',
-                      borderColor: activeTrackTab === 'food' ? '#22c55e' : '#D3D3D3',
-                      color: activeTrackTab === 'food' ? '#000000' : '#2E2E2E'
+                      backgroundColor: activeTrackTab === 'food' ? '#4A7C59' : 'transparent',
+                      borderColor: activeTrackTab === 'food' ? '#4A7C59' : '#D3D3D3',
+                      color: activeTrackTab === 'food' ? '#FFFFFF' : '#2E2E2E'
                     }}
                     onMouseEnter={(e) => {
                       if (activeTrackTab === 'food') {
-                        e.currentTarget.style.backgroundColor = '#16a34a';
+                        e.currentTarget.style.backgroundColor = '#5B8C6B';
                       } else {
                         e.currentTarget.style.backgroundColor = '#F9F8F4';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (activeTrackTab === 'food') {
-                        e.currentTarget.style.backgroundColor = '#22c55e';
+                        e.currentTarget.style.backgroundColor = '#4A7C59';
                       } else {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }
@@ -104,30 +104,30 @@ const Index = () => {
                     variant="ghost"
                     className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
                       activeTrackTab === 'stool' 
-                        ? 'border-transparent hover:opacity-90' 
+                        ? 'text-white border-transparent hover:opacity-90' 
                         : 'border-opacity-100 hover:border-opacity-100'
                     }`}
                     style={{
-                      backgroundColor: activeTrackTab === 'stool' ? '#22c55e' : 'transparent',
-                      borderColor: activeTrackTab === 'stool' ? '#22c55e' : '#D3D3D3',
-                      color: activeTrackTab === 'stool' ? '#000000' : '#2E2E2E'
+                      backgroundColor: activeTrackTab === 'stool' ? '#4A7C59' : 'transparent',
+                      borderColor: activeTrackTab === 'stool' ? '#4A7C59' : '#D3D3D3',
+                      color: activeTrackTab === 'stool' ? '#FFFFFF' : '#2E2E2E'
                     }}
                     onMouseEnter={(e) => {
                       if (activeTrackTab === 'stool') {
-                        e.currentTarget.style.backgroundColor = '#16a34a';
+                        e.currentTarget.style.backgroundColor = '#5B8C6B';
                       } else {
                         e.currentTarget.style.backgroundColor = '#F9F8F4';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (activeTrackTab === 'stool') {
-                        e.currentTarget.style.backgroundColor = '#22c55e';
+                        e.currentTarget.style.backgroundColor = '#4A7C59';
                       } else {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       }
                     }}
                   >
-                    <ScrollText className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
+                    <Scroll className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
                     <span className="font-medium">Stool Out</span>
                   </Button>
                 </div>
@@ -154,8 +154,7 @@ const Index = () => {
                 activeMainTab === 'track' ? 'opacity-100' : 'opacity-60'
               }`}
               style={{
-                backgroundColor: activeMainTab === 'track' ? '#22c55e' : 'transparent',
-                color: activeMainTab === 'track' ? '#000000' : '#2E2E2E'
+                color: activeMainTab === 'track' ? '#4A7C59' : '#2E2E2E'
               }}
             >
               <Activity className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'track' ? 'scale-105' : ''} transition-transform`} />
@@ -167,8 +166,7 @@ const Index = () => {
                 activeMainTab === 'chat' ? 'opacity-100' : 'opacity-60'
               }`}
               style={{
-                backgroundColor: activeMainTab === 'chat' ? '#22c55e' : 'transparent',
-                color: activeMainTab === 'chat' ? '#000000' : '#2E2E2E'
+                color: activeMainTab === 'chat' ? '#4A7C59' : '#2E2E2E'
               }}
             >
               <MessageCircle className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'chat' ? 'scale-105' : ''} transition-transform`} />
@@ -180,8 +178,7 @@ const Index = () => {
                 activeMainTab === 'health' ? 'opacity-100' : 'opacity-60'
               }`}
               style={{
-                backgroundColor: activeMainTab === 'health' ? '#22c55e' : 'transparent',
-                color: activeMainTab === 'health' ? '#000000' : '#2E2E2E'
+                color: activeMainTab === 'health' ? '#4A7C59' : '#2E2E2E'
               }}
             >
               <User className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'health' ? 'scale-105' : ''} transition-transform`} />

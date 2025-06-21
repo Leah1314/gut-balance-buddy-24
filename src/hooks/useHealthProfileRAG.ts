@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 export const useHealthProfileRAG = () => {
   const { ingestHealthProfile } = useRAG();
 
-  const updateRAGOnProfileSave = async (profileData: any) => {
+  const updateRA­GOnProfileSave = async (profileData: any) => {
     try {
       // Check if user is authenticated
       const { data: { user } } = await supabase.auth.getUser();
