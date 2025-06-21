@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -330,7 +331,13 @@ const HealthProfile = () => {
                 onKeyPress={(e) => e.key === 'Enter' && addMedicalCondition()}
                 className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               />
-              <Button onClick={addMedicalCondition} variant="outline" size="sm">Add</Button>
+              <Button 
+                onClick={addMedicalCondition} 
+                size="sm"
+                className="bg-gray-600 text-white border-gray-500 hover:bg-gray-700"
+              >
+                Add
+              </Button>
             </div>
             {profileData.medical_conditions.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
@@ -362,7 +369,13 @@ const HealthProfile = () => {
                 onKeyPress={(e) => e.key === 'Enter' && addMedication()}
                 className="bg-gray-600 text-white placeholder:text-gray-300 border-gray-500"
               />
-              <Button onClick={addMedication} variant="outline" size="sm">Add</Button>
+              <Button 
+                onClick={addMedication} 
+                size="sm"
+                className="bg-gray-600 text-white border-gray-500 hover:bg-gray-700"
+              >
+                Add
+              </Button>
             </div>
             {profileData.medications.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
