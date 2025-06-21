@@ -78,19 +78,19 @@ const TestResultsUpload = () => {
 
   const getConcernLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
-      case 'low': return 'text-green-700';
-      case 'moderate': return 'text-yellow-700';
-      case 'high': return 'text-red-700';
-      default: return 'text-gray-700';
+      case 'low': return 'text-green-400';
+      case 'moderate': return 'text-yellow-400';
+      case 'high': return 'text-red-400';
+      default: return 'text-white';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'normal': return 'text-green-700';
-      case 'high': return 'text-red-700';
-      case 'low': return 'text-orange-700';
-      default: return 'text-gray-700';
+      case 'normal': return 'text-green-400';
+      case 'high': return 'text-red-400';
+      case 'low': return 'text-orange-400';
+      default: return 'text-white';
     }
   };
 
@@ -162,13 +162,13 @@ const TestResultsUpload = () => {
           <CardContent className="space-y-4">
             <div>
               <h4 className="font-semibold mb-2 text-white">Test Type: {analysisResult.testType}</h4>
-              <p className="text-sm text-gray-300">
+              <p className="text-sm text-white">
                 {analysisResult.summary}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-gray-300" />
+              <AlertTriangle className="w-4 h-4 text-white" />
               <span className="font-medium text-white">Concern Level: </span>
               <span className={`font-semibold ${getConcernLevelColor(analysisResult.concernLevel)}`}>
                 {analysisResult.concernLevel.charAt(0).toUpperCase() + analysisResult.concernLevel.slice(1)}
@@ -187,10 +187,10 @@ const TestResultsUpload = () => {
                           {value.status.toUpperCase()}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-300">
+                      <div className="text-sm text-white">
                         Value: {value.value} {value.unit}
                       </div>
-                      <div className="text-sm text-gray-300">
+                      <div className="text-sm text-white">
                         Reference: {value.referenceRange}
                       </div>
                     </div>
@@ -204,7 +204,7 @@ const TestResultsUpload = () => {
                 <h5 className="font-semibold mb-2 text-white">Key Findings:</h5>
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.keyFindings.map((finding, index) => (
-                    <li key={index} className="text-sm text-gray-300">
+                    <li key={index} className="text-sm text-white">
                       {finding}
                     </li>
                   ))}
@@ -217,7 +217,7 @@ const TestResultsUpload = () => {
                 <h5 className="font-semibold mb-2 text-white">Recommendations:</h5>
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.recommendations.map((recommendation, index) => (
-                    <li key={index} className="text-sm text-gray-300">
+                    <li key={index} className="text-sm text-white">
                       {recommendation}
                     </li>
                   ))}
