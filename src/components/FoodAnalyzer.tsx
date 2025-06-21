@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -213,9 +214,10 @@ const FoodAnalyzer = () => {
               <Button
                 onClick={analyzeText}
                 disabled={isAnalyzing || !textInput.trim()}
-                className="w-full text-white font-medium transition-colors"
+                className="w-full font-medium transition-colors"
                 style={{
-                  backgroundColor: '#4A7C59'
+                  backgroundColor: '#4A7C59',
+                  color: '#FFFFFF'
                 }}
                 onMouseEnter={(e) => {
                   if (!e.currentTarget.disabled) {
@@ -254,9 +256,10 @@ const FoodAnalyzer = () => {
               <Button
                 onClick={analyzeImage}
                 disabled={isAnalyzing}
-                className="w-full text-white font-medium transition-colors"
+                className="w-full font-medium transition-colors"
                 style={{
-                  backgroundColor: '#4A7C59'
+                  backgroundColor: '#4A7C59',
+                  color: '#FFFFFF'
                 }}
                 onMouseEnter={(e) => {
                   if (!e.currentTarget.disabled) {
@@ -356,7 +359,8 @@ const FoodAnalyzer = () => {
                     className="px-8 transition-colors"
                     style={{
                       borderColor: '#D3D3D3',
-                      color: '#2E2E2E'
+                      color: '#2E2E2E',
+                      backgroundColor: 'transparent'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = '#F9F8F4';
