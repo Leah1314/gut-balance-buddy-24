@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { User, Heart, AlertCircle, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import TestResultsUpload from "./TestResultsUpload";
 
 interface HealthProfileData {
   dietary_restrictions: Record<string, boolean>;
@@ -215,6 +215,9 @@ const HealthProfile = () => {
           Share your health information for personalized recommendations
         </p>
       </div>
+
+      {/* Test Results Upload */}
+      <TestResultsUpload />
 
       {/* Dietary Restrictions */}
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
