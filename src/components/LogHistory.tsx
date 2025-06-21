@@ -215,7 +215,7 @@ const LogHistory = () => {
                   </div>
                 </div>
                 
-                <div className="pl-13">
+                <div className="text-left">
                   {renderLogContent(entry)}
                 </div>
               </CardContent>
