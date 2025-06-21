@@ -9,7 +9,6 @@ import { User, Heart, Scale, Ruler, Calendar, AlertCircle, Plus, X, Save, FileTe
 import { useHealthProfile } from "@/hooks/useHealthProfileWithRAG";
 import { toast } from "sonner";
 import TestResultsUpload from "./TestResultsUpload";
-
 const HealthProfile = () => {
   const {
     healthProfile: profile,
@@ -203,10 +202,10 @@ const HealthProfile = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
-            {activityLevels.map(level => <Button key={level.value} variant={formData.activity_level === level.value ? "default" : "outline"} onClick={() => handleInputChange('activity_level', level.value)} className="h-auto py-4 px-4 text-left whitespace-normal">
-                <div className="w-full text-left">
-                  <p className="font-medium leading-tight">{level.value.charAt(0).toUpperCase() + level.value.slice(1)}</p>
-                  <p className="text-sm opacity-80 leading-tight mt-1 break-words">{level.label}</p>
+            {activityLevels.map(level => <Button key={level.value} variant={formData.activity_level === level.value ? "default" : "outline"} onClick={() => handleInputChange('activity_level', level.value)} className="">
+                <div className="bg-neutral-50 text-slate-950">
+                  <p className="font-medium my-[8px]">{level.value.charAt(0).toUpperCase() + level.value.slice(1)}</p>
+                  <p className="text-sm opacity-80">{level.label}</p>
                 </div>
               </Button>)}
           </div>
@@ -316,5 +315,4 @@ const HealthProfile = () => {
       </div>
     </div>;
 };
-
 export default HealthProfile;
