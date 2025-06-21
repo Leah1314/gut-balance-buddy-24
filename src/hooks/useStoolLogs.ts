@@ -1,117 +1,92 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 
-interface StoolLog {
-  id: string;
-  user_id: string;
-  bristol_type?: number;
-  color?: string;
-  consistency?: string;
-  notes?: string;
-  image_url?: string;
-  timestamp?: string;
-  created_at: string;
-}
-
 export const useStoolLogs = () => {
-  const [stoolLogs, setStoolLogs] = useState<StoolLog[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchStoolLogs = async () => {
-    if (!user) return;
+  const addStoolLog = async (stoolData: {
+    bristol_type: number;
+    consistency: string;
+    color: string;
+    notes?: string;
+    image_url?: string;
+  }) => {
+    setIsLoading(true);
     
-    setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('You must be logged in to save stool entries');
+        return null;
+      }
+
+      const { data, error } = await supabase
+        .from('stool_logs')
+        .insert({
+          user_id: user.id,
+          bristol_type: stoolData.bristol_type,
+          consistency: stoolData.consistency,
+          color: stoolData.color,
+          notes: stoolData.notes,
+          image_url: stoolData.image_url
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding stool log:', error);
+        toast.error('Failed to save stool entry');
+        return null;
+      }
+
+      console.log('Stool log saved successfully:', data);
+      toast.success('Stool entry saved successfully!');
+      return data;
+    } catch (error) {
+      console.error('Error in addStoolLog:', error);
+      toast.error('An error occurred while saving');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getStoolLogs = async () => {
+    setIsLoading(true);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('stool_logs')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setStoolLogs(data || []);
-    } catch (error: any) {
-      console.error('Error fetching stool logs:', error);
-      toast.error('Failed to load stool logs');
+      if (error) {
+        console.error('Error fetching stool logs:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getStoolLogs:', error);
+      return [];
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
-  const addStoolLog = async (stoolLogData: {
-    bristol_type?: number;
-    color?: string;
-    consistency?: string;
-    notes?: string;
-    image_url?: string;
-  }) => {
-    if (!user) {
-      toast.error('You must be logged in to add stool logs');
-      return null;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('stool_logs')
-        .insert({
-          user_id: user.id,
-          bristol_type: stoolLogData.bristol_type,
-          color: stoolLogData.color,
-          consistency: stoolLogData.consistency,
-          notes: stoolLogData.notes,
-          image_url: stoolLogData.image_url,
-          timestamp: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      toast.success('Stool log added successfully');
-      await fetchStoolLogs(); // Refresh the list
-      return data;
-    } catch (error: any) {
-      console.error('Error adding stool log:', error);
-      toast.error('Failed to add stool log');
-      return null;
-    }
-  };
-
-  const deleteStoolLog = async (id: string) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('stool_logs')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      
-      toast.success('Stool log deleted successfully');
-      await fetchStoolLogs(); // Refresh the list
-    } catch (error: any) {
-      console.error('Error deleting stool log:', error);
-      toast.error('Failed to delete stool log');
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchStoolLogs();
-    }
-  }, [user]);
 
   return {
-    stoolLogs,
-    loading,
     addStoolLog,
-    deleteStoolLog,
-    refreshStoolLogs: fetchStoolLogs
+    getStoolLogs,
+    isLoading
   };
 };
