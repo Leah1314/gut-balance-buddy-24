@@ -54,17 +54,21 @@ const StoolTracker = () => {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="manual" className="w-full">
+      <Tabs defaultValue="camera" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm">
-          <TabsTrigger value="manual" className="flex items-center space-x-2">
-            <Edit className="w-4 h-4" />
-            <span>Manual Entry</span>
-          </TabsTrigger>
           <TabsTrigger value="camera" className="flex items-center space-x-2">
             <Camera className="w-4 h-4" />
             <span>AI Analysis</span>
           </TabsTrigger>
+          <TabsTrigger value="manual" className="flex items-center space-x-2">
+            <Edit className="w-4 h-4" />
+            <span>Manual Entry</span>
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="camera">
+          <StoolImageAnalyzer />
+        </TabsContent>
 
         <TabsContent value="manual" className="space-y-6">
           {/* Date/Time Header */}
@@ -120,10 +124,6 @@ const StoolTracker = () => {
               Save Entry
             </Button>
           </div>
-        </TabsContent>
-
-        <TabsContent value="camera">
-          <StoolImageAnalyzer />
         </TabsContent>
       </Tabs>
     </div>
