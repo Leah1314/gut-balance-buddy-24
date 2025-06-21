@@ -7,28 +7,25 @@ import StoolTracker from "@/components/StoolTracker";
 import ChatPage from "@/components/ChatPage";
 import HealthProfile from "@/components/HealthProfile";
 import UserMenu from "@/components/UserMenu";
-
 const Index = () => {
   const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat' | 'health'>('track');
   const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool'>('food');
-
-  return (
-    <div className="min-h-screen pb-20" style={{
-      backgroundColor: '#F9F8F4'
-    }}>
+  return <div className="min-h-screen pb-20" style={{
+    backgroundColor: '#F9F8F4'
+  }}>
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-10 w-full" style={{
-        borderColor: '#D3D3D3'
-      }}>
-        <div className="w-full px-6">
+      borderColor: '#D3D3D3'
+    }}>
+        <div className="max-w-md mx-auto px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 flex items-center justify-center">
                 <img src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" alt="Logo" className="w-8 h-8 object-contain" />
               </div>
               <h1 className="text-xl font-semibold" style={{
-                color: '#2E2E2E'
-              }}>In and Out</h1>
+              color: '#2E2E2E'
+            }}>In and Out</h1>
             </div>
             <UserMenu />
           </div>
@@ -142,8 +139,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
