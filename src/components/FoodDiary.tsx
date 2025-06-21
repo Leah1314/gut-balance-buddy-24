@@ -128,7 +128,7 @@ const FoodDiary = () => {
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-900">Meal Type</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {mealTypes.map(meal => <Button key={meal.id} variant={selectedMeal === meal.id ? "default" : "outline"} size="sm" onClick={() => setSelectedMeal(meal.id)} className="">
+                  {mealTypes.map(meal => <Button key={meal.id} variant={selectedMeal === meal.id ? "default" : "outline"} size="sm" onClick={() => setSelectedMeal(meal.id)} className="text-slate-950 bg-neutral-50">
                       <meal.icon className="w-4 h-4" />
                       <span>{meal.label}</span>
                     </Button>)}
