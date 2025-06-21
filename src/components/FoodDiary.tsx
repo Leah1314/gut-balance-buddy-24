@@ -84,11 +84,17 @@ const FoodDiary = () => {
     <div className="space-y-6">
       <Tabs defaultValue="manual" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm">
-          <TabsTrigger value="manual" className="flex items-center space-x-2">
+          <TabsTrigger 
+            value="manual" 
+            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+          >
             <Plus className="w-4 h-4" />
             <span>Manual Entry</span>
           </TabsTrigger>
-          <TabsTrigger value="camera" className="flex items-center space-x-2">
+          <TabsTrigger 
+            value="camera" 
+            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+          >
             <Camera className="w-4 h-4" />
             <span>AI Analysis</span>
           </TabsTrigger>
