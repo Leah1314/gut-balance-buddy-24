@@ -36,7 +36,64 @@ serve(async (req) => {
       );
     }
 
-    const { action, data } = await req.json();
+    const requestBody = await req.json();
+    console.log('RAG service request:', requestBody);
+
+    // Handle direct hook calls (from useTrackingRAG)
+    if (requestBody.type && requestBody.data) {
+      // This is a tracking data ingestion request
+      const endpoint = '/ingest';
+      const payload = {
+        text: Object.entries(requestBody.data)
+          .filter(([_, value]) => value != null && value !== '')
+          .map(([key, value]) => `${key}: ${value}`)
+          .join('\n'),
+        user_id: user.id,
+        data_type: 'track_history',
+        source: requestBody.include_image ? 'image' : 'manual',
+        content_type: requestBody.type || 'general'
+      };
+
+      try {
+        const ragResponse = await fetch(`${RAG_SERVICE_URL}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!ragResponse.ok) {
+          // Log error but don't fail the request - RAG is optional
+          console.error('RAG service unavailable:', ragResponse.statusText);
+          return new Response(
+            JSON.stringify({ success: false, message: 'RAG service unavailable' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const result = await ragResponse.json();
+        console.log('RAG ingestion successful:', result);
+
+        return new Response(
+          JSON.stringify({ success: true, result }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (error) {
+        console.error('RAG service connection error:', error);
+        return new Response(
+          JSON.stringify({ success: false, message: 'RAG service connection failed' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Handle legacy action-based calls
+    const { action, data } = requestBody;
+    if (!action) {
+      return new Response(
+        JSON.stringify({ error: 'No action or type specified' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     let ragResponse;
     let endpoint = '';
@@ -65,17 +122,6 @@ serve(async (req) => {
         };
         break;
 
-      case 'ingest_image':
-        endpoint = '/ingest_image';
-        payload = {
-          image_data: data.image_data,
-          user_id: user.id,
-          data_type: 'track_history',
-          source: 'image',
-          content_type: data.content_type || 'food'
-        };
-        break;
-
       case 'retrieve_user_data':
         endpoint = '/retrieve';
         payload = {
@@ -92,12 +138,9 @@ serve(async (req) => {
         };
         break;
 
-      case 'caption_image':
-        endpoint = '/caption';
-        payload = {
-          image_data: data.image_data,
-          content_type: data.content_type || 'food'
-        };
+      case 'health_check':
+        endpoint = '/health';
+        payload = {};
         break;
 
       default:
@@ -107,26 +150,61 @@ serve(async (req) => {
         );
     }
 
-    ragResponse = await fetch(`${RAG_SERVICE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    try {
+      ragResponse = await fetch(`${RAG_SERVICE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-    if (!ragResponse.ok) {
-      const errorText = await ragResponse.text();
-      throw new Error(`RAG service error: ${ragResponse.statusText} - ${errorText}`);
+      if (!ragResponse.ok) {
+        const errorText = await ragResponse.text();
+        console.error('RAG service error:', ragResponse.statusText, errorText);
+        
+        // For health check, return service unavailable status
+        if (action === 'health_check') {
+          return new Response(
+            JSON.stringify({ status: 'unavailable', error: ragResponse.statusText }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        throw new Error(`RAG service error: ${ragResponse.statusText} - ${errorText}`);
+      }
+
+      const result = await ragResponse.json();
+
+      return new Response(
+        JSON.stringify(result),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+
+    } catch (error) {
+      console.error('RAG service connection error:', error);
+      
+      // Return a graceful fallback for data queries
+      if (action === 'retrieve_user_data') {
+        return new Response(
+          JSON.stringify({ health_info: [], track_history: [] }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      if (action === 'check_user_data') {
+        return new Response(
+          JSON.stringify({ health_info: false, track_history: false }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ error: 'RAG service unavailable', details: error.message }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const result = await ragResponse.json();
-
-    return new Response(
-      JSON.stringify(result),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
   } catch (error) {
-    console.error('RAG service error:', error);
+    console.error('Edge function error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

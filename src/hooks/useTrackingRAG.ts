@@ -19,12 +19,12 @@ export const useTrackingRAG = () => {
       console.log('Updating RAG with tracking data for user:', user.id);
       console.log('Tracking data:', trackingData);
 
+      // Send data directly to RAG service without action parameter
       const ragPayload = {
-        user_id: user.id, // Ensure user ID is included
         type: trackingData.type,
         data: {
           ...trackingData,
-          user_id: user.id, // Also include in nested data
+          user_id: user.id,
           timestamp: trackingData.timestamp || new Date().toISOString()
         },
         include_image: includeImage
@@ -36,14 +36,16 @@ export const useTrackingRAG = () => {
 
       if (error) {
         console.error('RAG service error:', error);
-        throw error;
+        // Don't throw error - RAG is optional functionality
+        return { success: false, error };
       }
 
-      console.log('RAG update successful:', data);
-      return data;
+      console.log('RAG update result:', data);
+      return { success: true, data };
     } catch (error) {
       console.error('Error updating RAG:', error);
-      throw error;
+      // Don't throw error - RAG is optional functionality
+      return { success: false, error };
     } finally {
       setIsUpdating(false);
     }

@@ -21,16 +21,14 @@ const GutHealthCoach = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasUserData, setHasUserData] = useState({ health_info: false, track_history: false });
-  const { checkUserData, enrichQuery } = useRAG();
+  const { checkUserData, retrieveUserData } = useRAG();
 
   useEffect(() => {
-    // Check for user data when component mounts
     const initializeChat = async () => {
       try {
         const dataStatus = await checkUserData();
         setHasUserData(dataStatus);
         
-        // Set welcome message based on data availability
         const welcomeMessage = {
           id: '1',
           content: `Hi! I'm your gut health coach. ${
@@ -82,9 +80,33 @@ const GutHealthCoach = () => {
     setIsLoading(true);
 
     try {
-      // Enrich the query with user's health data
-      const enrichedQuery = await enrichQuery(textToSend);
+      // Try to enrich the query with user's RAG data
+      let enrichedQuery = textToSend;
       
+      if (hasUserData.health_info || hasUserData.track_history) {
+        try {
+          console.log('Enriching query with RAG data...');
+          const ragData = await retrieveUserData(textToSend, 3);
+          
+          if (ragData.health_info.length > 0 || ragData.track_history.length > 0) {
+            enrichedQuery += '\n\n--- User Context ---\n';
+            
+            if (ragData.health_info.length > 0) {
+              enrichedQuery += 'Health Profile:\n' + ragData.health_info.join('\n') + '\n';
+            }
+            
+            if (ragData.track_history.length > 0) {
+              enrichedQuery += 'Recent Tracking History:\n' + ragData.track_history.join('\n') + '\n';
+            }
+            
+            console.log('Query enriched with RAG data');
+          }
+        } catch (error) {
+          console.error('Failed to enrich query with RAG data:', error);
+          // Continue with original query if RAG fails
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: { 
           message: enrichedQuery,
