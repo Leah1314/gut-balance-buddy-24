@@ -2,7 +2,7 @@
 import { useFoodLogs as useOriginalFoodLogs } from './useFoodLogs';
 import { useTrackingRAG } from './useTrackingRAG';
 
-export const useFoodLogs = () => {
+export const useFoodLogsWithRAG = () => {
   const originalHook = useOriginalFoodLogs();
   const { updateRAGOnTrackingSave } = useTrackingRAG();
 

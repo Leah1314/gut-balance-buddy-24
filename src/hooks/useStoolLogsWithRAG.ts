@@ -2,7 +2,7 @@
 import { useStoolLogs as useOriginalStoolLogs } from './useStoolLogs';
 import { useTrackingRAG } from './useTrackingRAG';
 
-export const useStoolLogs = () => {
+export const useStoolLogsWithRAG = () => {
   const originalHook = useOriginalStoolLogs();
   const { updateRAGOnTrackingSave } = useTrackingRAG();
 

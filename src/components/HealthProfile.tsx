@@ -28,7 +28,7 @@ import { useHealthProfile } from "@/hooks/useHealthProfileWithRAG";
 import TestResultsUpload from "./TestResultsUpload";
 
 const HealthProfile = () => {
-  const { healthProfile, saveHealthProfile, isLoading } = useHealthProfile();
+  const { healthProfile, saveHealthProfile, loading } = useHealthProfile();
 
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
@@ -145,7 +145,7 @@ const HealthProfile = () => {
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return <div className="flex justify-center p-8">Loading...</div>;
   }
 
@@ -434,10 +434,7 @@ const HealthProfile = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <TestResultsUpload 
-            onResultsUpdate={(results) => setRecentTests(results)}
-            existingResults={recentTests}
-          />
+          <TestResultsUpload />
         </CardContent>
       </Card>
 
@@ -446,24 +443,24 @@ const HealthProfile = () => {
         <CardContent className="p-6 text-center">
           <Button 
             onClick={handleSave}
-            disabled={isLoading}
+            disabled={loading}
             className="px-8 py-3 text-white font-medium transition-colors"
             style={{
               backgroundColor: '#4A7C59'
             }}
             onMouseEnter={(e) => {
-              if (!isLoading) {
+              if (!loading) {
                 e.currentTarget.style.backgroundColor = '#5B8C6B';
               }
             }}
             onMouseLeave={(e) => {
-              if (!isLoading) {
+              if (!loading) {
                 e.currentTarget.style.backgroundColor = '#4A7C59';
               }
             }}
           >
             <Save className="w-4 h-4 mr-2 stroke-2" />
-            {isLoading ? "Saving..." : "Save Health Profile"}
+            {loading ? "Saving..." : "Save Health Profile"}
           </Button>
         </CardContent>
       </Card>

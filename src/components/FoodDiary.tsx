@@ -86,7 +86,7 @@ const FoodDiary = () => {
   };
 
   // Group today's food logs by meal type
-  const todayMeals = foodLogs
+  const todayMeals = (foodLogs || [])
     .filter(log => {
       const today = new Date().toDateString();
       const logDate = new Date(log.created_at).toDateString();
@@ -99,7 +99,7 @@ const FoodDiary = () => {
       }
       acc[mealType].push(log);
       return acc;
-    }, {} as Record<string, typeof foodLogs>);
+    }, {} as Record<string, any[]>);
 
   return (
     <div className="space-y-6">
