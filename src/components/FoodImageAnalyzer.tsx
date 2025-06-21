@@ -12,10 +12,12 @@ import {
   Loader2, 
   AlertCircle,
   CheckCircle,
-  Zap
+  Zap,
+  Save
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
 
 interface NutritionData {
   foodItems: string[];
@@ -34,6 +36,7 @@ const FoodImageAnalyzer = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [nutritionData, setNutritionData] = useState<NutritionData | null>(null);
+  const { addFoodLog } = useFoodLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -97,6 +100,33 @@ const FoodImageAnalyzer = () => {
       toast.error("Failed to analyze image. Please try again.");
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const saveAnalysisToLog = async () => {
+    if (!nutritionData || !selectedImage) {
+      toast.error("No analysis data to save");
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(selectedImage);
+    
+    const foodLogData = {
+      food_name: nutritionData.foodItems.join(', '),
+      description: `Nutrition: ${nutritionData.calories} cal, ${nutritionData.protein}g protein, ${nutritionData.carbs}g carbs, ${nutritionData.fat}g fat`,
+      image_url: imageUrl,
+      notes: `Gut Health Rating: ${nutritionData.gutHealthRating}/10. ${nutritionData.insights.join('. ')}`,
+      entry_type: 'food'
+    };
+
+    const result = await addFoodLog(foodLogData);
+    
+    if (result) {
+      toast.success("Food analysis saved to your log!");
+      // Reset form
+      setSelectedImage(null);
+      setImagePreview(null);
+      setNutritionData(null);
     }
   };
 
@@ -259,6 +289,26 @@ const FoodImageAnalyzer = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Save to Log Button */}
+          <div className="text-center pt-4">
+            <Button 
+              onClick={saveAnalysisTo Log}
+              className="px-8 py-3 text-white font-medium transition-colors"
+              style={{
+                backgroundColor: '#4A7C59'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#5B8C6B';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#4A7C59';
+              }}
+            >
+              <Save className="w-4 h-4 mr-2 stroke-2" />
+              Save to My Log
+            </Button>
+          </div>
         </div>
       )}
     </div>

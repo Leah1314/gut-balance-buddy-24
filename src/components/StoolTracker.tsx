@@ -19,6 +19,7 @@ import { ColorSelector } from "./stool/ColorSelector";
 import { PhotoUpload } from "./stool/PhotoUpload";
 import { NotesSection } from "./stool/NotesSection";
 import StoolImageAnalyzer from "./StoolImageAnalyzer";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 const StoolTracker = () => {
   const [selectedType, setSelectedType] = useState<number | null>(null);
@@ -26,22 +27,37 @@ const StoolTracker = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
+  const { addStoolLog } = useStoolLogs();
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedType || !selectedConsistency || !selectedColor) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    // Here you would save to database
-    toast.success("Stool entry saved successfully!");
+    // Convert photo to URL if available (simplified for now)
+    const imageUrl = photos.length > 0 ? URL.createObjectURL(photos[0]) : undefined;
+
+    const stoolLogData = {
+      bristol_type: selectedType,
+      consistency: selectedConsistency,
+      color: selectedColor,
+      notes: notes || undefined,
+      image_url: imageUrl
+    };
+
+    const result = await addStoolLog(stoolLogData);
     
-    // Reset form
-    setSelectedType(null);
-    setSelectedConsistency(null);
-    setSelectedColor(null);
-    setNotes("");
-    setPhotos([]);
+    if (result) {
+      toast.success("Stool entry saved successfully!");
+      
+      // Reset form
+      setSelectedType(null);
+      setSelectedConsistency(null);
+      setSelectedColor(null);
+      setNotes("");
+      setPhotos([]);
+    }
   };
 
   const handlePhotoAdd = (file: File) => {

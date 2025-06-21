@@ -11,10 +11,12 @@ import {
   AlertCircle,
   CheckCircle,
   Zap,
-  Heart
+  Heart,
+  Save
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 interface StoolAnalysisData {
   bristolType: number;
@@ -30,6 +32,7 @@ const StoolImageAnalyzer = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<StoolAnalysisData | null>(null);
+  const { addStoolLog } = useStoolLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,6 +97,33 @@ const StoolImageAnalyzer = () => {
       toast.error("Failed to analyze image. Please try again.");
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const saveAnalysisToLog = async () => {
+    if (!analysisData || !selectedImage) {
+      toast.error("No analysis data to save");
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(selectedImage);
+    
+    const stoolLogData = {
+      bristol_type: analysisData.bristolType,
+      consistency: analysisData.consistency,
+      color: analysisData.color,
+      notes: `AI Analysis - Health Score: ${analysisData.healthScore}/10. Insights: ${analysisData.insights.join('. ')}`,
+      image_url: imageUrl
+    };
+
+    const result = await addStoolLog(stoolLogData);
+    
+    if (result) {
+      toast.success("Analysis saved to your log!");
+      // Reset form
+      setSelectedImage(null);
+      setImagePreview(null);
+      setAnalysisData(null);
     }
   };
 
@@ -265,6 +295,26 @@ const StoolImageAnalyzer = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Save to Log Button */}
+          <div className="text-center pt-4">
+            <Button 
+              onClick={saveAnalysisToLog}
+              className="px-8 py-3 text-white font-medium transition-colors"
+              style={{
+                backgroundColor: '#4A7C59'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#5B8C6B';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#4A7C59';
+              }}
+            >
+              <Save className="w-4 h-4 mr-2 stroke-2" />
+              Save to My Log
+            </Button>
+          </div>
         </div>
       )}
     </div>

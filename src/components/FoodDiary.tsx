@@ -17,40 +17,19 @@ import {
   Camera
 } from "lucide-react";
 import FoodImageAnalyzer from "./FoodImageAnalyzer";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
+import { toast } from "sonner";
 
 const FoodDiary = () => {
   const [newFood, setNewFood] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
+  const { addFoodLog, foodLogs } = useFoodLogs();
 
   const mealTypes = [
     { id: "breakfast", label: "Breakfast", icon: Coffee },
     { id: "lunch", label: "Lunch", icon: UtensilsCrossed },
     { id: "dinner", label: "Dinner", icon: UtensilsCrossed },
     { id: "snack", label: "Snack", icon: Apple },
-  ];
-
-  const todayMeals = [
-    {
-      meal: "Breakfast",
-      time: "8:30 AM",
-      foods: ["Oatmeal with berries", "Greek yogurt", "Green tea"],
-      symptoms: [],
-      rating: 5
-    },
-    {
-      meal: "Lunch", 
-      time: "12:30 PM",
-      foods: ["Quinoa salad", "Grilled chicken", "Mixed vegetables"],
-      symptoms: ["Bloating"],
-      rating: 3
-    },
-    {
-      meal: "Snack",
-      time: "3:00 PM", 
-      foods: ["Apple slices", "Almonds"],
-      symptoms: [],
-      rating: 5
-    }
   ];
 
   const commonFoods = [
@@ -64,10 +43,36 @@ const FoodDiary = () => {
     { food: "Beans", frequency: 2, severity: "Low" },
   ];
 
-  const handleAddFood = () => {
+  const handleAddFood = async () => {
     if (newFood.trim()) {
-      console.log("Adding food:", { food: newFood, meal: selectedMeal });
-      setNewFood("");
+      const foodLogData = {
+        food_name: newFood,
+        description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`,
+        entry_type: selectedMeal,
+        notes: `Manually logged ${selectedMeal} item`
+      };
+
+      const result = await addFoodLog(foodLogData);
+      
+      if (result) {
+        toast.success(`${newFood} added to your ${selectedMeal} log!`);
+        setNewFood("");
+      }
+    }
+  };
+
+  const handleQuickAdd = async (food: string) => {
+    const foodLogData = {
+      food_name: food,
+      description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`,
+      entry_type: selectedMeal,
+      notes: `Quick-added ${selectedMeal} item`
+    };
+
+    const result = await addFoodLog(foodLogData);
+    
+    if (result) {
+      toast.success(`${food} added to your ${selectedMeal} log!`);
     }
   };
 
@@ -79,6 +84,22 @@ const FoodDiary = () => {
       />
     ));
   };
+
+  // Group today's food logs by meal type
+  const todayMeals = foodLogs
+    .filter(log => {
+      const today = new Date().toDateString();
+      const logDate = new Date(log.created_at).toDateString();
+      return today === logDate;
+    })
+    .reduce((acc, log) => {
+      const mealType = log.entry_type || 'other';
+      if (!acc[mealType]) {
+        acc[mealType] = [];
+      }
+      acc[mealType].push(log);
+      return acc;
+    }, {} as Record<string, typeof foodLogs>);
 
   return (
     <div className="space-y-6">
@@ -136,6 +157,11 @@ const FoodDiary = () => {
                     value={newFood}
                     onChange={(e) => setNewFood(e.target.value)}
                     className="flex-1"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddFood();
+                      }
+                    }}
                   />
                   <Button onClick={handleAddFood} disabled={!newFood.trim()}>
                     <Plus className="w-4 h-4" />
@@ -151,7 +177,7 @@ const FoodDiary = () => {
                       key={food}
                       variant="outline"
                       size="sm"
-                      onClick={() => setNewFood(food)}
+                      onClick={() => handleQuickAdd(food)}
                       className="text-xs"
                     >
                       {food}
@@ -177,51 +203,33 @@ const FoodDiary = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {todayMeals.map((meal, index) => (
-            <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="font-medium text-gray-900">{meal.meal}</h3>
-                    <div className="flex items-center space-x-1">
-                      {getRatingStars(meal.rating)}
+          {Object.keys(todayMeals).length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No meals logged today. Start by adding some food!</p>
+          ) : (
+            Object.entries(todayMeals).map(([mealType, logs]) => (
+              <div key={mealType} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="font-medium text-gray-900 capitalize">{mealType}</h3>
+                    <div className="flex items-center space-x-1 text-sm text-gray-600">
+                      <Clock className="w-3 h-3" />
+                      <span>{logs.length} item{logs.length > 1 ? 's' : ''}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1 text-sm text-gray-600">
-                    <Clock className="w-3 h-3" />
-                    <span>{meal.time}</span>
-                  </div>
-                </div>
-                {meal.symptoms.length > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    <AlertTriangle className="w-3 h-3 mr-1" />
-                    Symptoms
-                  </Badge>
-                )}
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex flex-wrap gap-1">
-                  {meal.foods.map((food, foodIndex) => (
-                    <Badge key={foodIndex} variant="secondary" className="text-xs">
-                      {food}
-                    </Badge>
-                  ))}
                 </div>
                 
-                {meal.symptoms.length > 0 && (
+                <div className="space-y-2">
                   <div className="flex flex-wrap gap-1">
-                    <span className="text-xs text-gray-600">Symptoms:</span>
-                    {meal.symptoms.map((symptom, symptomIndex) => (
-                      <Badge key={symptomIndex} variant="destructive" className="text-xs">
-                        {symptom}
+                    {logs.map((log, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {log.food_name}
                       </Badge>
                     ))}
                   </div>
-                )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </CardContent>
       </Card>
 
