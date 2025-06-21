@@ -17,12 +17,12 @@ import {
   Save,
   FileText
 } from "lucide-react";
-import { useHealthProfileWithRAG } from "@/hooks/useHealthProfileWithRAG";
+import { useHealthProfile } from "@/hooks/useHealthProfileWithRAG";
 import { toast } from "sonner";
 import TestResultsUpload from "./TestResultsUpload";
 
 const HealthProfile = () => {
-  const { profile, updateProfile, loading } = useHealthProfileWithRAG();
+  const { healthProfile: profile, saveHealthProfile: updateProfile, loading } = useHealthProfile();
   const [formData, setFormData] = useState({
     age: '',
     weight_kg: '',
