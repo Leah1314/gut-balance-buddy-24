@@ -2,16 +2,17 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Activity, MessageCircle, Utensils, Scroll, User } from "lucide-react";
+import { Activity, MessageCircle, Utensils, Scroll, User, Calendar } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
 import ChatPage from "@/components/ChatPage";
 import HealthProfile from "@/components/HealthProfile";
+import LogHistory from "@/components/LogHistory";
 import UserMenu from "@/components/UserMenu";
 
 const Index = () => {
   const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat' | 'health'>('track');
-  const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool'>('food');
+  const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool' | 'history'>('food');
 
   return (
     <div className="min-h-screen pb-20" style={{
@@ -60,7 +61,7 @@ const Index = () => {
                 borderColor: '#D3D3D3'
               }}>
                 <CardContent className="p-3">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     <Button 
                       onClick={() => setActiveTrackTab('food')} 
                       variant="ghost" 
@@ -115,6 +116,33 @@ const Index = () => {
                       <Scroll className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
                       <span className="font-medium">Stool Out</span>
                     </Button>
+                    <Button 
+                      onClick={() => setActiveTrackTab('history')} 
+                      variant="ghost" 
+                      className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${activeTrackTab === 'history' ? 'text-white border-transparent hover:opacity-90' : 'border-opacity-100 hover:border-opacity-100'}`} 
+                      style={{
+                        backgroundColor: activeTrackTab === 'history' ? '#4A7C59' : 'transparent',
+                        borderColor: activeTrackTab === 'history' ? '#4A7C59' : '#D3D3D3',
+                        color: activeTrackTab === 'history' ? '#FFFFFF' : '#2E2E2E'
+                      }} 
+                      onMouseEnter={e => {
+                        if (activeTrackTab === 'history') {
+                          e.currentTarget.style.backgroundColor = '#5B8C6B';
+                        } else {
+                          e.currentTarget.style.backgroundColor = '#F9F8F4';
+                        }
+                      }} 
+                      onMouseLeave={e => {
+                        if (activeTrackTab === 'history') {
+                          e.currentTarget.style.backgroundColor = '#4A7C59';
+                        } else {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <Calendar className={`w-4 h-4 stroke-2 ${activeTrackTab === 'history' ? 'scale-105' : ''} transition-transform`} />
+                      <span className="font-medium">History</span>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -122,7 +150,13 @@ const Index = () => {
 
             {/* Track Content */}
             <div>
-              {activeTrackTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
+              {activeTrackTab === 'food' ? (
+                <FoodAnalyzer />
+              ) : activeTrackTab === 'stool' ? (
+                <StoolTracker />
+              ) : (
+                <LogHistory />
+              )}
             </div>
           </>
         ) : activeMainTab === 'chat' ? (
