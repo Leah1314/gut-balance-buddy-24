@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -357,16 +358,18 @@ const FoodDiary = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {triggerFoods.map((trigger, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg">
-              <div>
-                <p className="font-medium text-gray-900">{trigger.food}</p>
-                <p className="text-sm text-gray-600">
+            <div key={index} className="flex items-start justify-between p-3 bg-white rounded-lg">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="font-medium text-gray-900 text-left">{trigger.food}</p>
+                  <Badge variant={trigger.severity === "High" ? "destructive" : trigger.severity === "Medium" ? "default" : "secondary"}>
+                    {trigger.severity}
+                  </Badge>
+                </div>
+                <p className="text-sm text-gray-600 text-left">
                   Associated with symptoms {trigger.frequency} times this week
                 </p>
               </div>
-              <Badge variant={trigger.severity === "High" ? "destructive" : trigger.severity === "Medium" ? "default" : "secondary"}>
-                {trigger.severity}
-              </Badge>
             </div>
           ))}
         </CardContent>
