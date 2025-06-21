@@ -151,11 +151,11 @@ const ChatPage = () => {
           backgroundColor: message.role === 'user' ? '#4A7C59' : '#F9F8F4',
           borderColor: message.role === 'assistant' ? '#D3D3D3' : 'transparent',
           color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
-        }} className="">
-              <p className="text-sm leading-relaxed text-left">
+        }} className="py-[16px] px-[16px] bg-[#d9f8d9] rounded-md">
+              <p className="text-sm leading-relaxed text-left text-gray-800">
                 {message.content.replace('{we_have_your_data}', '')}
               </p>
-              <p className="text-xs mt-2 opacity-70">
+              <p className="text-xs mt-2 opacity-70 text-left">
                 {message.timestamp.toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit'
