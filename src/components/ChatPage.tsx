@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -146,7 +147,9 @@ const ChatPage = () => {
             Gut Health Coach
           </h2>
           {(hasUserData.health_info || hasUserData.track_history) && (
-            <Database className="w-5 h-5" style={{ color: '#4A7C59' }} title="Your data is available" />
+            <div title="Your data is available">
+              <Database className="w-5 h-5" style={{ color: '#4A7C59' }} />
+            </div>
           )}
         </div>
         <p className="text-base leading-tight" style={{ color: '#2E2E2E', opacity: 0.6 }}>
