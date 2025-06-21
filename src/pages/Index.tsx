@@ -22,8 +22,8 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-20" style={{ backgroundColor: '#F9F8F4' }}>
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-10 w-full" style={{ borderColor: '#D3D3D3' }}>
-        <div className="w-full px-6 py-4">
+      <header className="bg-white border-b sticky top-0 z-10" style={{ borderColor: '#D3D3D3' }}>
+        <div className="max-w-md mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 flex items-center justify-center">
@@ -40,7 +40,7 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="w-full px-6 py-6">
+      <div className="max-w-md mx-auto px-6 py-6">
         {activeMainTab === 'track' ? (
           <>
             {/* Hero Section */}
@@ -126,16 +126,16 @@ const Index = () => {
             </div>
 
             {/* Track Content */}
-            <div className="w-full">
+            <div>
               {activeTrackTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
             </div>
           </>
         ) : activeMainTab === 'chat' ? (
-          <div className="w-full">
+          <div>
             <ChatPage />
           </div>
         ) : (
-          <div className="w-full">
+          <div>
             <HealthProfile />
           </div>
         )}
@@ -143,7 +143,7 @@ const Index = () => {
 
       {/* Bottom Tab Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50" style={{ borderColor: '#D3D3D3' }}>
-        <div className="w-full px-6">
+        <div className="max-w-md mx-auto px-6">
           <div className="grid grid-cols-3 gap-0">
             <button
               onClick={() => setActiveMainTab('track')}
