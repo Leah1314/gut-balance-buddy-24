@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,8 +22,8 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-20 overflow-x-hidden" style={{ backgroundColor: '#F9F8F4' }}>
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-10" style={{ borderColor: '#D3D3D3' }}>
-        <div className="w-full max-w-none px-4 py-4">
+      <header className="bg-white border-b sticky top-0 z-10 w-full" style={{ borderColor: '#D3D3D3' }}>
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 flex items-center justify-center">
@@ -39,11 +40,11 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="w-full px-4 py-6">
+      <div className="px-4 py-6">
         {activeMainTab === 'track' ? (
           <>
             {/* Hero Section */}
-            <div className="text-center mb-6 max-w-4xl mx-auto">
+            <div className="text-center mb-6">
               <h2 className="text-2xl font-semibold mb-1" style={{ color: '#2E2E2E' }}>
                 Track Your Digestive Health
               </h2>
@@ -53,7 +54,7 @@ const Index = () => {
             </div>
 
             {/* Track Sub-Tab Navigation */}
-            <div className="max-w-4xl mx-auto mb-6">
+            <div className="mb-6">
               <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
                 <CardContent className="p-3">
                   <div className="grid grid-cols-2 gap-3">
@@ -142,7 +143,7 @@ const Index = () => {
 
       {/* Bottom Tab Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50" style={{ borderColor: '#D3D3D3' }}>
-        <div className="w-full px-4">
+        <div className="px-4">
           <div className="grid grid-cols-3 gap-0">
             <button
               onClick={() => setActiveMainTab('track')}
