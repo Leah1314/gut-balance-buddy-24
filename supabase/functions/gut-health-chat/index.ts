@@ -66,7 +66,7 @@ When users ask about:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         messages: messages,
         temperature: 0.7,
         max_tokens: 500,
