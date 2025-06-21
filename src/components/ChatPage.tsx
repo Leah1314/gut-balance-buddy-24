@@ -1,10 +1,10 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, Send, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Loader2, Database } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useRAG } from "@/hooks/useRAG";
 
 interface Message {
   id: string;
@@ -14,16 +14,44 @@ interface Message {
 }
 
 const ChatPage = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: "Hi! I'm your gut health coach. I can help you understand your digestive patterns, suggest meal improvements, and answer questions about symptoms. What would you like to know?",
-      role: 'assistant',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasUserData, setHasUserData] = useState({ health_info: false, track_history: false });
+  const { checkUserData, retrieveUserData } = useRAG();
+
+  // Check for user data on component mount
+  useEffect(() => {
+    const checkForUserData = async () => {
+      try {
+        const userDataStatus = await checkUserData();
+        setHasUserData(userDataStatus);
+        
+        // Set initial greeting message with data availability flag
+        const hasAnyData = userDataStatus.health_info || userDataStatus.track_history;
+        const greetingMessage = hasAnyData 
+          ? "Hi! I'm your gut health coach. I can see you have some health data stored. I can help you understand your digestive patterns, suggest meal improvements, and answer questions about your symptoms. What would you like to know? {we_have_your_data}"
+          : "Hi! I'm your gut health coach. I can help you understand your digestive patterns, suggest meal improvements, and answer questions about symptoms. You can add more information in the 'Track' or 'Health' tabs to get more personalized advice. What would you like to know?";
+
+        setMessages([{
+          id: '1',
+          content: greetingMessage,
+          role: 'assistant',
+          timestamp: new Date()
+        }]);
+      } catch (error) {
+        // Fallback to default greeting
+        setMessages([{
+          id: '1',
+          content: "Hi! I'm your gut health coach. I can help you understand your digestive patterns, suggest meal improvements, and answer questions about symptoms. What would you like to know?",
+          role: 'assistant',
+          timestamp: new Date()
+        }]);
+      }
+    };
+
+    checkForUserData();
+  }, []);
 
   const quickPrompts = [
     "Analyze my recent meal patterns",
@@ -43,13 +71,38 @@ const ChatPage = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const originalMessage = inputMessage;
     setInputMessage("");
     setIsLoading(true);
 
     try {
+      // Retrieve relevant user data from RAG system
+      let contextualQuery = originalMessage;
+      
+      if (hasUserData.health_info || hasUserData.track_history) {
+        try {
+          const ragData = await retrieveUserData(originalMessage);
+          
+          // Append user context to the query
+          let contextAddition = "\n\n--- User Context ---\n";
+          
+          if (ragData.health_info.length > 0) {
+            contextAddition += "Health Profile:\n" + ragData.health_info.join('\n') + "\n";
+          }
+          
+          if (ragData.track_history.length > 0) {
+            contextAddition += "Recent Tracking History:\n" + ragData.track_history.join('\n') + "\n";
+          }
+          
+          contextualQuery = originalMessage + contextAddition;
+        } catch (error) {
+          console.log('RAG retrieval failed, proceeding with original message');
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: { 
-          message: inputMessage,
+          message: contextualQuery,
           conversationHistory: messages 
         }
       });
@@ -92,6 +145,9 @@ const ChatPage = () => {
           <h2 className="text-2xl font-semibold" style={{ color: '#2E2E2E' }}>
             Gut Health Coach
           </h2>
+          {(hasUserData.health_info || hasUserData.track_history) && (
+            <Database className="w-5 h-5" style={{ color: '#4A7C59' }} title="Your data is available" />
+          )}
         </div>
         <p className="text-base leading-tight" style={{ color: '#2E2E2E', opacity: 0.6 }}>
           Get personalized advice for your digestive wellness
@@ -117,7 +173,9 @@ const ChatPage = () => {
                 color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
               }}
             >
-              <p className="text-sm leading-relaxed">{message.content}</p>
+              <p className="text-sm leading-relaxed">
+                {message.content.replace('{we_have_your_data}', '')}
+              </p>
               <p className="text-xs mt-2 opacity-70">
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
