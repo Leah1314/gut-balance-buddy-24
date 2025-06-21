@@ -20,11 +20,11 @@ const Index = () => {
   const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool'>('food');
 
   return (
-    <div className="min-h-screen pb-20 overflow-x-hidden" style={{ backgroundColor: '#F9F8F4' }}>
+    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F9F8F4' }}>
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-10 w-full" style={{ borderColor: '#D3D3D3' }}>
-        <div className="px-4 py-4">
-          <div className="flex items-center justify-between w-full">
+        <div className="w-full px-6 py-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 flex items-center justify-center">
                 <img 
@@ -40,7 +40,7 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="px-4 py-6">
+      <div className="w-full px-6 py-6">
         {activeMainTab === 'track' ? (
           <>
             {/* Hero Section */}
@@ -143,7 +143,7 @@ const Index = () => {
 
       {/* Bottom Tab Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50" style={{ borderColor: '#D3D3D3' }}>
-        <div className="px-4">
+        <div className="w-full px-6">
           <div className="grid grid-cols-3 gap-0">
             <button
               onClick={() => setActiveMainTab('track')}
