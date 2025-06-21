@@ -9,6 +9,7 @@ import { User, Heart, Scale, Ruler, Calendar, AlertCircle, Plus, X, Save, FileTe
 import { useHealthProfile } from "@/hooks/useHealthProfileWithRAG";
 import { toast } from "sonner";
 import TestResultsUpload from "./TestResultsUpload";
+
 const HealthProfile = () => {
   const {
     healthProfile: profile,
@@ -202,12 +203,25 @@ const HealthProfile = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
-            {activityLevels.map(level => <Button key={level.value} variant={formData.activity_level === level.value ? "default" : "outline"} onClick={() => handleInputChange('activity_level', level.value)} className="">
-                <div className="bg-neutral-50 text-slate-950">
-                  <p className="font-medium my-[8px]">{level.value.charAt(0).toUpperCase() + level.value.slice(1)}</p>
-                  <p className="text-sm opacity-80">{level.label}</p>
-                </div>
-              </Button>)}
+            {activityLevels.map(level => <Button 
+              key={level.value} 
+              variant={formData.activity_level === level.value ? "default" : "outline"} 
+              onClick={() => handleInputChange('activity_level', level.value)} 
+              className={`h-auto py-4 px-4 text-left whitespace-normal ${
+                formData.activity_level === level.value 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <div className="w-full">
+                <p className="font-medium text-sm leading-tight mb-1">
+                  {level.value.charAt(0).toUpperCase() + level.value.slice(1).replace('_', ' ')}
+                </p>
+                <p className="text-xs opacity-80 leading-tight">
+                  {level.label.split('(')[1]?.replace(')', '') || level.label}
+                </p>
+              </div>
+            </Button>)}
           </div>
         </CardContent>
       </Card>
@@ -315,4 +329,5 @@ const HealthProfile = () => {
       </div>
     </div>;
 };
+
 export default HealthProfile;
