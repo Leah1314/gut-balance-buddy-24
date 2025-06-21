@@ -152,24 +152,24 @@ const TestResultsUpload = () => {
       </Card>
 
       {analysisResult && (
-        <Card className="bg-white shadow-sm border border-gray-300">
+        <Card className="bg-gray-800 shadow-sm border border-gray-600">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <CheckCircle className="w-5 h-5 text-green-400" />
               Analysis Results
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h4 className="font-semibold mb-2 text-gray-900">Test Type: {analysisResult.testType}</h4>
-              <p className="text-sm text-gray-700">
+              <h4 className="font-semibold mb-2 text-white">Test Type: {analysisResult.testType}</h4>
+              <p className="text-sm text-gray-300">
                 {analysisResult.summary}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-gray-700" />
-              <span className="font-medium text-gray-900">Concern Level: </span>
+              <AlertTriangle className="w-4 h-4 text-gray-300" />
+              <span className="font-medium text-white">Concern Level: </span>
               <span className={`font-semibold ${getConcernLevelColor(analysisResult.concernLevel)}`}>
                 {analysisResult.concernLevel.charAt(0).toUpperCase() + analysisResult.concernLevel.slice(1)}
               </span>
@@ -177,20 +177,20 @@ const TestResultsUpload = () => {
 
             {analysisResult.values && analysisResult.values.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2 text-gray-900">Test Values:</h5>
+                <h5 className="font-semibold mb-2 text-white">Test Values:</h5>
                 <div className="space-y-2">
                   {analysisResult.values.map((value, index) => (
-                    <div key={index} className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <div key={index} className="bg-gray-700 p-3 rounded-md border border-gray-600">
                       <div className="flex justify-between items-center">
-                        <span className="font-medium text-gray-900">{value.parameter}</span>
+                        <span className="font-medium text-white">{value.parameter}</span>
                         <span className={`font-semibold ${getStatusColor(value.status)}`}>
                           {value.status.toUpperCase()}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-300">
                         Value: {value.value} {value.unit}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-300">
                         Reference: {value.referenceRange}
                       </div>
                     </div>
@@ -201,10 +201,10 @@ const TestResultsUpload = () => {
 
             {analysisResult.keyFindings && analysisResult.keyFindings.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2 text-gray-900">Key Findings:</h5>
+                <h5 className="font-semibold mb-2 text-white">Key Findings:</h5>
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.keyFindings.map((finding, index) => (
-                    <li key={index} className="text-sm text-gray-700">
+                    <li key={index} className="text-sm text-gray-300">
                       {finding}
                     </li>
                   ))}
@@ -214,10 +214,10 @@ const TestResultsUpload = () => {
 
             {analysisResult.recommendations && analysisResult.recommendations.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2 text-gray-900">Recommendations:</h5>
+                <h5 className="font-semibold mb-2 text-white">Recommendations:</h5>
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.recommendations.map((recommendation, index) => (
-                    <li key={index} className="text-sm text-gray-700">
+                    <li key={index} className="text-sm text-gray-300">
                       {recommendation}
                     </li>
                   ))}
