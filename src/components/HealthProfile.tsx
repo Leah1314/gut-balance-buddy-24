@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,10 @@ const HealthProfile = () => {
       }
     } catch (error) {
       console.error('Error loading health profile:', error);
-      toast.error("Failed to load health profile");
+      toast({
+        variant: "destructive",
+        title: "Failed to load health profile"
+      });
     } finally {
       setIsLoading(false);
     }
