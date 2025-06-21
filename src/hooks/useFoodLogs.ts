@@ -10,8 +10,8 @@ interface FoodLog {
   food_name: string;
   description?: string;
   image_url?: string;
-  timestamp: string;
-  entry_type: string;
+  timestamp?: string;
+  entry_type?: string;
   notes?: string;
   analysis_result?: any;
   created_at: string;
@@ -31,7 +31,7 @@ export const useFoodLogs = () => {
         .from('food_logs')
         .select('*')
         .eq('user_id', user.id)
-        .order('timestamp', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setFoodLogs(data || []);

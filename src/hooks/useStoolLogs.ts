@@ -12,7 +12,7 @@ interface StoolLog {
   consistency?: string;
   notes?: string;
   image_url?: string;
-  timestamp: string;
+  timestamp?: string;
   created_at: string;
 }
 
@@ -30,7 +30,7 @@ export const useStoolLogs = () => {
         .from('stool_logs')
         .select('*')
         .eq('user_id', user.id)
-        .order('timestamp', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setStoolLogs(data || []);
