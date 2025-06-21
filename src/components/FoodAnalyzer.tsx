@@ -205,9 +205,11 @@ const FoodAnalyzer = () => {
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 placeholder="Enter food items (e.g., grilled chicken, brown rice, broccoli)"
-                className="focus:ring-2 focus:ring-offset-2"
+                className="focus:ring-2 focus:ring-offset-2 placeholder:text-white"
                 style={{
                   borderColor: '#D3D3D3',
+                  backgroundColor: '#A0A0A0',
+                  color: '#FFFFFF',
                   '--tw-ring-color': '#4A7C59'
                 } as React.CSSProperties}
               />
