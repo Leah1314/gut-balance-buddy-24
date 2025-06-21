@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -317,8 +316,7 @@ const HealthProfile = () => {
               <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                 <span>{condition}</span>
                 <button
-                  onClick={() => remov
-                  eMedicalCondition(index)}
+                  onClick={() => removeMedicalCondition(index)}
                   className="ml-1 hover:text-red-600"
                 >
                   <X className="w-3 h-3" />
