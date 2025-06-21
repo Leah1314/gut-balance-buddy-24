@@ -20,10 +20,10 @@ const Index = () => {
   const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool'>('food');
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F9F8F4' }}>
+    <div className="min-h-screen pb-20 overflow-x-hidden" style={{ backgroundColor: '#F9F8F4' }}>
       {/* Header */}
-      <header className="bg-white border-b" style={{ borderColor: '#D3D3D3' }}>
-        <div className="container mx-auto px-4 py-4">
+      <header className="bg-white border-b sticky top-0 z-10" style={{ borderColor: '#D3D3D3' }}>
+        <div className="w-full px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-center space-x-3">
               <div className="w-8 h-8 flex items-center justify-center">
@@ -40,11 +40,11 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-6 max-w-2xl">
+      <div className="w-full px-4 py-6">
         {activeMainTab === 'track' ? (
           <>
             {/* Hero Section */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-6 max-w-4xl mx-auto">
               <h2 className="text-2xl font-semibold mb-1" style={{ color: '#2E2E2E' }}>
                 Track Your Digestive Health
               </h2>
@@ -54,88 +54,96 @@ const Index = () => {
             </div>
 
             {/* Track Sub-Tab Navigation */}
-            <Card className="mb-6 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-              <CardContent className="p-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={() => setActiveTrackTab('food')}
-                    variant="ghost"
-                    className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
-                      activeTrackTab === 'food' 
-                        ? 'text-white border-transparent hover:opacity-90' 
-                        : 'border-opacity-100 hover:border-opacity-100'
-                    }`}
-                    style={{
-                      backgroundColor: activeTrackTab === 'food' ? '#4A7C59' : 'transparent',
-                      borderColor: activeTrackTab === 'food' ? '#4A7C59' : '#D3D3D3',
-                      color: activeTrackTab === 'food' ? '#FFFFFF' : '#2E2E2E'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (activeTrackTab === 'food') {
-                        e.currentTarget.style.backgroundColor = '#5B8C6B';
-                      } else {
-                        e.currentTarget.style.backgroundColor = '#F9F8F4';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (activeTrackTab === 'food') {
-                        e.currentTarget.style.backgroundColor = '#4A7C59';
-                      } else {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                  >
-                    <Utensils className={`w-4 h-4 stroke-2 ${activeTrackTab === 'food' ? 'scale-105' : ''} transition-transform`} />
-                    <span className="font-medium">Food In</span>
-                  </Button>
-                  <Button
-                    onClick={() => setActiveTrackTab('stool')}
-                    variant="ghost"
-                    className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
-                      activeTrackTab === 'stool' 
-                        ? 'text-white border-transparent hover:opacity-90' 
-                        : 'border-opacity-100 hover:border-opacity-100'
-                    }`}
-                    style={{
-                      backgroundColor: activeTrackTab === 'stool' ? '#4A7C59' : 'transparent',
-                      borderColor: activeTrackTab === 'stool' ? '#4A7C59' : '#D3D3D3',
-                      color: activeTrackTab === 'stool' ? '#FFFFFF' : '#2E2E2E'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (activeTrackTab === 'stool') {
-                        e.currentTarget.style.backgroundColor = '#5B8C6B';
-                      } else {
-                        e.currentTarget.style.backgroundColor = '#F9F8F4';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (activeTrackTab === 'stool') {
-                        e.currentTarget.style.backgroundColor = '#4A7C59';
-                      } else {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                  >
-                    <Scroll className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
-                    <span className="font-medium">Stool Out</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="max-w-4xl mx-auto mb-6">
+              <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+                <CardContent className="p-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      onClick={() => setActiveTrackTab('food')}
+                      variant="ghost"
+                      className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
+                        activeTrackTab === 'food' 
+                          ? 'text-white border-transparent hover:opacity-90' 
+                          : 'border-opacity-100 hover:border-opacity-100'
+                      }`}
+                      style={{
+                        backgroundColor: activeTrackTab === 'food' ? '#4A7C59' : 'transparent',
+                        borderColor: activeTrackTab === 'food' ? '#4A7C59' : '#D3D3D3',
+                        color: activeTrackTab === 'food' ? '#FFFFFF' : '#2E2E2E'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeTrackTab === 'food') {
+                          e.currentTarget.style.backgroundColor = '#5B8C6B';
+                        } else {
+                          e.currentTarget.style.backgroundColor = '#F9F8F4';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTrackTab === 'food') {
+                          e.currentTarget.style.backgroundColor = '#4A7C59';
+                        } else {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <Utensils className={`w-4 h-4 stroke-2 ${activeTrackTab === 'food' ? 'scale-105' : ''} transition-transform`} />
+                      <span className="font-medium">Food In</span>
+                    </Button>
+                    <Button
+                      onClick={() => setActiveTrackTab('stool')}
+                      variant="ghost"
+                      className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${
+                        activeTrackTab === 'stool' 
+                          ? 'text-white border-transparent hover:opacity-90' 
+                          : 'border-opacity-100 hover:border-opacity-100'
+                      }`}
+                      style={{
+                        backgroundColor: activeTrackTab === 'stool' ? '#4A7C59' : 'transparent',
+                        borderColor: activeTrackTab === 'stool' ? '#4A7C59' : '#D3D3D3',
+                        color: activeTrackTab === 'stool' ? '#FFFFFF' : '#2E2E2E'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeTrackTab === 'stool') {
+                          e.currentTarget.style.backgroundColor = '#5B8C6B';
+                        } else {
+                          e.currentTarget.style.backgroundColor = '#F9F8F4';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTrackTab === 'stool') {
+                          e.currentTarget.style.backgroundColor = '#4A7C59';
+                        } else {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <Scroll className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
+                      <span className="font-medium">Stool Out</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Track Content */}
-            {activeTrackTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
+            <div className="w-full">
+              {activeTrackTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
+            </div>
           </>
         ) : activeMainTab === 'chat' ? (
-          <ChatPage />
+          <div className="w-full">
+            <ChatPage />
+          </div>
         ) : (
-          <HealthProfile />
+          <div className="w-full">
+            <HealthProfile />
+          </div>
         )}
       </div>
 
       {/* Bottom Tab Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50" style={{ borderColor: '#D3D3D3' }}>
-        <div className="container mx-auto px-4">
+        <div className="w-full px-4">
           <div className="grid grid-cols-3 gap-0">
             <button
               onClick={() => setActiveMainTab('track')}
