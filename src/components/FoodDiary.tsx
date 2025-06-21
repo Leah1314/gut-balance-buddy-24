@@ -17,13 +17,13 @@ import {
   Camera
 } from "lucide-react";
 import FoodImageAnalyzer from "./FoodImageAnalyzer";
-import { useFoodLogs } from "@/hooks/useFoodLogs";
+import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
 import { toast } from "sonner";
 
 const FoodDiary = () => {
   const [newFood, setNewFood] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
-  const { addFoodLog, foodLogs } = useFoodLogs();
+  const { addFoodLog, foodLogs } = useFoodLogsWithRAG();
 
   const mealTypes = [
     { id: "breakfast", label: "Breakfast", icon: Coffee },

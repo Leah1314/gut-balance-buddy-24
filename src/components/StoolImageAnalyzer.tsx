@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useStoolLogs } from "@/hooks/useStoolLogs";
+import { useStoolLogs } from "@/hooks/useStoolLogsWithRAG";
 
 interface StoolAnalysisData {
   bristolType: number;

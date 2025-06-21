@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,7 @@ import { ColorSelector } from "./stool/ColorSelector";
 import { PhotoUpload } from "./stool/PhotoUpload";
 import { NotesSection } from "./stool/NotesSection";
 import StoolImageAnalyzer from "./StoolImageAnalyzer";
-import { useStoolLogs } from "@/hooks/useStoolLogs";
+import { useStoolLogsWithRAG } from "@/hooks/useStoolLogsWithRAG";
 
 const StoolTracker = () => {
   const [selectedType, setSelectedType] = useState<number | null>(null);
@@ -27,7 +26,7 @@ const StoolTracker = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
-  const { addStoolLog } = useStoolLogs();
+  const { addStoolLog } = useStoolLogsWithRAG();
 
   const handleSave = async () => {
     if (!selectedType || !selectedConsistency || !selectedColor) {
