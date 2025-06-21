@@ -6,14 +6,16 @@ import {
   Activity,
   MessageCircle,
   Utensils,
-  ArrowRight
+  ArrowRight,
+  User
 } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
 import ChatPage from "@/components/ChatPage";
+import HealthProfile from "@/components/HealthProfile";
 
 const Index = () => {
-  const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat'>('track');
+  const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat' | 'health'>('track');
   const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool'>('food');
 
   return (
@@ -120,15 +122,17 @@ const Index = () => {
             {/* Track Content */}
             {activeTrackTab === 'food' ? <FoodAnalyzer /> : <StoolTracker />}
           </>
-        ) : (
+        ) : activeMainTab === 'chat' ? (
           <ChatPage />
+        ) : (
+          <HealthProfile />
         )}
       </div>
 
       {/* Bottom Tab Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50" style={{ borderColor: '#D3D3D3' }}>
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 gap-0">
+          <div className="grid grid-cols-3 gap-0">
             <button
               onClick={() => setActiveMainTab('track')}
               className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${
@@ -152,6 +156,18 @@ const Index = () => {
             >
               <MessageCircle className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'chat' ? 'scale-105' : ''} transition-transform`} />
               <span className="text-xs font-medium">Chat</span>
+            </button>
+            <button
+              onClick={() => setActiveMainTab('health')}
+              className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${
+                activeMainTab === 'health' ? 'opacity-100' : 'opacity-60'
+              }`}
+              style={{
+                color: activeMainTab === 'health' ? '#4A7C59' : '#2E2E2E'
+              }}
+            >
+              <User className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'health' ? 'scale-105' : ''} transition-transform`} />
+              <span className="text-xs font-medium">Health</span>
             </button>
           </div>
         </div>
