@@ -30,6 +30,7 @@ const StoolImageAnalyzer = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [analysisData, setAnalysisData] = useState<StoolAnalysisData | null>(null);
   const { addStoolLog } = useStoolLogsWithRAG();
 
@@ -105,24 +106,39 @@ const StoolImageAnalyzer = () => {
       return;
     }
 
-    const imageUrl = URL.createObjectURL(selectedImage);
-    
-    const stoolLogData = {
-      bristol_type: analysisData.bristolType,
-      consistency: analysisData.consistency,
-      color: analysisData.color,
-      notes: `AI Analysis - Health Score: ${analysisData.healthScore}/10. Insights: ${analysisData.insights.join('. ')}`,
-      image_url: imageUrl
-    };
+    setIsSaving(true);
 
-    const result = await addStoolLog(stoolLogData);
-    
-    if (result) {
-      toast.success("Analysis saved to your log!");
-      // Reset form
-      setSelectedImage(null);
-      setImagePreview(null);
-      setAnalysisData(null);
+    try {
+      const imageUrl = URL.createObjectURL(selectedImage);
+      
+      const stoolLogData = {
+        bristol_type: analysisData.bristolType,
+        consistency: analysisData.consistency,
+        color: analysisData.color,
+        notes: `AI Analysis - Health Score: ${analysisData.healthScore}/10. Insights: ${analysisData.insights.join('. ')}`,
+        image_url: imageUrl
+      };
+
+      console.log('Saving AI analysis to log:', stoolLogData);
+      const result = await addStoolLog(stoolLogData);
+      
+      if (result) {
+        toast.success("Analysis saved to your log!");
+        console.log('AI analysis saved:', result);
+        
+        // Reset form
+        setSelectedImage(null);
+        setImagePreview(null);
+        setAnalysisData(null);
+      } else {
+        toast.error("Failed to save analysis. Please try again.");
+        console.error('Failed to save AI analysis');
+      }
+    } catch (error) {
+      console.error('Error saving AI analysis:', error);
+      toast.error("An error occurred while saving. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -299,19 +315,24 @@ const StoolImageAnalyzer = () => {
           <div className="text-center pt-4">
             <Button 
               onClick={saveAnalysisToLog}
-              className="px-8 py-3 text-white font-medium transition-colors"
+              disabled={isSaving}
+              className="px-8 py-3 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 backgroundColor: '#4A7C59'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#5B8C6B';
+                if (!isSaving) {
+                  e.currentTarget.style.backgroundColor = '#5B8C6B';
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#4A7C59';
+                if (!isSaving) {
+                  e.currentTarget.style.backgroundColor = '#4A7C59';
+                }
               }}
             >
               <Save className="w-4 h-4 mr-2 stroke-2" />
-              Save to My Log
+              {isSaving ? 'Saving...' : 'Save to My Log'}
             </Button>
           </div>
         </div>
