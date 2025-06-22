@@ -39,7 +39,7 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async (messageText: string, includeUserData: boolean = false) => {
+  const sendMessage = async (messageText: string, includeUserData: boolean = true) => {
     if (!messageText.trim() || isLoading) return;
 
     const userMessage: Message = {
@@ -112,12 +112,12 @@ const ChatPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await sendMessage(input);
+    await sendMessage(input, true); // Always include user data
   };
 
   const handleQuickQuestion = async (question: string) => {
     console.log('Quick question selected:', question);
-    await sendMessage(question, true);
+    await sendMessage(question, true); // Always include user data for quick questions
   };
 
   if (!user) {
