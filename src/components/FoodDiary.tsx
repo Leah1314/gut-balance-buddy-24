@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Apple, Clock, Coffee, UtensilsCrossed, Search, Star, AlertTriangle, Camera, CheckCircle, ArrowLeft } from "lucide-react";
+import { Plus, Apple, Coffee, UtensilsCrossed, Camera, Edit } from "lucide-react";
 import FoodImageAnalyzer from "./FoodImageAnalyzer";
 import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { toast } from "sonner";
@@ -14,12 +15,7 @@ const FoodDiary = () => {
   const [newFood, setNewFood] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
-  const [showLoggedState, setShowLoggedState] = useState(false);
-  const [lastLoggedSummary, setLastLoggedSummary] = useState<{foods: string[], mealType: string} | null>(null);
-  const {
-    addFoodLog,
-    foodLogs
-  } = useFoodLogs();
+  const { addFoodLog } = useFoodLogs();
 
   const mealTypes = [{
     id: "breakfast",
@@ -40,20 +36,6 @@ const FoodDiary = () => {
   }];
 
   const commonFoods = ["Banana", "Apple", "Yogurt", "Oatmeal", "Salad", "Chicken", "Rice", "Vegetables", "Nuts", "Bread", "Pasta", "Fish"];
-
-  const triggerFoods = [{
-    food: "Dairy",
-    frequency: 4,
-    severity: "High"
-  }, {
-    food: "Spicy Foods",
-    frequency: 3,
-    severity: "Medium"
-  }, {
-    food: "Beans",
-    frequency: 2,
-    severity: "Low"
-  }];
 
   const handleAddFood = async () => {
     if (!newFood.trim()) {
@@ -112,100 +94,34 @@ const FoodDiary = () => {
       }
     }
 
-    // Show success and transition to logged state
+    // Show success and reset form
     toast.success(`✅ Successfully logged ${selectedFoods.length} food item${selectedFoods.length > 1 ? 's' : ''} to your ${selectedMeal}!`);
-    
-    setLastLoggedSummary({
-      foods: [...selectedFoods],
-      mealType: selectedMeal
-    });
-    
     setSelectedFoods([]);
-    setShowLoggedState(true);
-    
-    // Auto-hide logged state after 3 seconds
-    setTimeout(() => {
-      setShowLoggedState(false);
-    }, 3000);
   };
-
-  const getRatingStars = (rating: number) => {
-    return Array.from({
-      length: 5
-    }, (_, i) => <Star key={i} className={`w-3 h-3 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />);
-  };
-
-  // Group today's food logs by meal type based on description
-  const todayMeals = (foodLogs || []).filter(log => {
-    const today = new Date().toDateString();
-    const logDate = new Date(log.created_at).toDateString();
-    return today === logDate;
-  }).reduce((acc, log) => {
-    // Extract meal type from description if it contains meal info
-    const mealType = log.description?.toLowerCase().includes('breakfast') ? 'breakfast' :
-                    log.description?.toLowerCase().includes('lunch') ? 'lunch' :
-                    log.description?.toLowerCase().includes('dinner') ? 'dinner' :
-                    log.description?.toLowerCase().includes('snack') ? 'snack' : 'other';
-    
-    if (!acc[mealType]) {
-      acc[mealType] = [];
-    }
-    acc[mealType].push(log);
-    return acc;
-  }, {} as Record<string, any[]>);
-
-  // Get unique foods from user's history for personal food database
-  const userFoodDatabase = (foodLogs || []).map(log => log.food_name).filter((food, index, array) => array.indexOf(food) === index).sort();
-
-  if (showLoggedState && lastLoggedSummary) {
-    return (
-      <div className="space-y-6">
-        <Card className="bg-green-50 border-green-200 shadow-lg">
-          <CardContent className="p-8 text-center">
-            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-green-800 mb-2">Food Logged Successfully!</h2>
-            <p className="text-green-700 mb-4">
-              You've logged {lastLoggedSummary.foods.length} item{lastLoggedSummary.foods.length > 1 ? 's' : ''} for {lastLoggedSummary.mealType}
-            </p>
-            <div className="space-y-2 mb-6">
-              <p className="font-medium text-green-800">Logged Items:</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {lastLoggedSummary.foods.map((food, index) => (
-                  <Badge key={index} className="bg-green-100 text-green-800 border-green-300">
-                    {food}
-                  </Badge>
-                ))}
-              </div>
-              <p className="text-sm text-green-600 capitalize">
-                Meal Type: {lastLoggedSummary.mealType}
-              </p>
-            </div>
-            <Button 
-              onClick={() => setShowLoggedState(false)}
-              className="bg-green-600 text-white hover:bg-green-700"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Food Diary
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="manual" className="w-full">
+      <Tabs defaultValue="camera" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm">
-          <TabsTrigger value="manual" className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
-            <Plus className="w-4 h-4" />
-            <span>Manual Entry</span>
-          </TabsTrigger>
-          <TabsTrigger value="camera" className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
+          <TabsTrigger 
+            value="camera" 
+            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+          >
             <Camera className="w-4 h-4" />
             <span>AI Analysis</span>
           </TabsTrigger>
+          <TabsTrigger 
+            value="manual" 
+            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Manual Entry</span>
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="camera">
+          <FoodImageAnalyzer />
+        </TabsContent>
 
         <TabsContent value="manual" className="space-y-6">
           {/* Add Food Entry */}
@@ -302,121 +218,7 @@ const FoodDiary = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="camera">
-          <FoodImageAnalyzer />
-        </TabsContent>
       </Tabs>
-
-      {/* Today's Meals */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <UtensilsCrossed className="w-5 h-5 text-blue-600" />
-            <span>Today's Meals</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Object.keys(todayMeals).length === 0 ? (
-            <p className="text-gray-500 text-center py-4">No meals logged today. Start by adding some food!</p>
-          ) : (
-            Object.entries(todayMeals).map(([mealType, logs]) => (
-              <div key={mealType} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-medium text-gray-900 capitalize">{mealType}</h3>
-                    <div className="flex items-center space-x-1 text-sm text-gray-600">
-                      <Clock className="w-3 h-3" />
-                      <span>{logs.length} item{logs.length > 1 ? 's' : ''}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-1">
-                    {logs.map((log, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {log.food_name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Potential Trigger Foods */}
-      <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <AlertTriangle className="w-5 h-5 text-orange-600" />
-            <span>Potential Trigger Foods</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {triggerFoods.map((trigger, index) => (
-            <div key={index} className="flex items-start justify-between p-3 bg-white rounded-lg">
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="font-medium text-gray-900 text-left">{trigger.food}</p>
-                  <Badge variant={trigger.severity === "High" ? "destructive" : trigger.severity === "Medium" ? "default" : "secondary"}>
-                    {trigger.severity}
-                  </Badge>
-                </div>
-                <p className="text-sm text-gray-600 text-left">
-                  Associated with symptoms {trigger.frequency} times this week
-                </p>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Personal Food Database */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Search className="w-5 h-5 text-purple-600" />
-            <span>Your Food History</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {userFoodDatabase.length === 0 ? (
-            <div className="text-center py-8">
-              <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">
-                No foods logged yet. Start tracking your meals to build your personal food database!
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Foods you've logged previously ({userFoodDatabase.length} items):
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {userFoodDatabase.slice(0, 20).map((food, index) => (
-                  <Button 
-                    key={index} 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleQuickAdd(food)} 
-                    className="text-xs bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
-                  >
-                    {food}
-                  </Button>
-                ))}
-              </div>
-              {userFoodDatabase.length > 20 && (
-                <p className="text-xs text-gray-500">
-                  Showing first 20 items. You have {userFoodDatabase.length - 20} more foods in your history.
-                </p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 };
