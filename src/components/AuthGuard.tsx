@@ -14,7 +14,8 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth');
+      console.log('No user found, redirecting to auth');
+      navigate('/auth', { replace: true });
     }
   }, [user, loading, navigate]);
 
@@ -30,7 +31,13 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   }
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9F8F4' }}>
+        <div className="text-center">
+          <p style={{ color: '#2E2E2E' }}>Redirecting to login...</p>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;
