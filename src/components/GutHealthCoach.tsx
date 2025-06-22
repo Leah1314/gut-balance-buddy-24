@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,24 +86,26 @@ const GutHealthCoach = () => {
       // Fetch fresh stool logs for the request
       const stoolLogs = await getStoolLogs();
       
-      // Determine if we have user data
-      const hasHealthData = Boolean(healthProfile);
-      const hasFoodData = Boolean(foodLogs && foodLogs.length > 0);
-      const hasStoolData = Boolean(stoolLogs && stoolLogs.length > 0);
-      const hasUserData = hasHealthData || hasFoodData || hasStoolData;
+      // Prepare user data - ensure we have proper boolean values
+      const hasHealthProfile = healthProfile !== null && healthProfile !== undefined;
+      const hasFoodLogs = Array.isArray(foodLogs) && foodLogs.length > 0;
+      const hasStoolLogs = Array.isArray(stoolLogs) && stoolLogs.length > 0;
+      const hasUserData = hasHealthProfile || hasFoodLogs || hasStoolLogs;
 
-      // Prepare user data with explicit structure
       const userData = {
-        healthProfile: healthProfile || null,
-        foodLogs: foodLogs || [],
-        stoolLogs: stoolLogs || []
+        healthProfile: hasHealthProfile ? healthProfile : null,
+        foodLogs: hasFoodLogs ? foodLogs : [],
+        stoolLogs: hasStoolLogs ? stoolLogs : []
       };
 
       console.log('Sending message to gut-health-chat function:', {
         message: textToSend,
-        hasUserData: hasUserData,
-        userDataSummary: {
-          hasHealthProfile: hasHealthData,
+        hasUserData,
+        userData: hasUserData ? 'data included' : 'no user data',
+        dataBreakdown: {
+          hasHealthProfile,
+          hasFoodLogs,
+          hasStoolLogs,
           foodLogsCount: foodLogs?.length || 0,
           stoolLogsCount: stoolLogs?.length || 0
         }
@@ -117,8 +118,8 @@ const GutHealthCoach = () => {
             role: msg.role,
             content: msg.content
           })),
-          hasUserData: hasUserData,
-          userData: userData
+          hasUserData,
+          userData
         }
       });
 
