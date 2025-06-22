@@ -58,7 +58,7 @@ const TestResultsUpload = () => {
           recommendations: result.recommendations,
           concern_level: result.concernLevel,
           summary: result.summary,
-          raw_analysis: result
+          raw_analysis: result as any
         })
         .select()
         .single();
@@ -276,7 +276,7 @@ const TestResultsUpload = () => {
                     </li>
                   ))}
                 </ul>
-                </div>
+              </div>
             )}
           </CardContent>
         </Card>
