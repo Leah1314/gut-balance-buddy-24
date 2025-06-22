@@ -33,6 +33,7 @@ const HealthProfile = () => {
   // Load profile data when it's available
   useEffect(() => {
     if (profile) {
+      console.log('Loading profile data:', profile);
       setFormData({
         age: profile.age?.toString() || '',
         weight_kg: profile.weight_kg?.toString() || '',
@@ -84,6 +85,7 @@ const HealthProfile = () => {
       toast.error("Please enter a medical condition");
       return;
     }
+    console.log('Adding medical condition:', newCondition);
     setFormData(prev => ({
       ...prev,
       medical_conditions: [...prev.medical_conditions, newCondition.trim()]
@@ -136,14 +138,14 @@ const HealthProfile = () => {
         symptoms_notes: formData.symptoms_notes || null,
         custom_restrictions: formData.custom_restrictions || null
       };
-      console.log('Saving health profile:', profileData);
+      
+      console.log('Saving health profile with data:', profileData);
       const result = await updateProfile(profileData);
       if (result) {
         toast.success("✅ Health profile saved successfully!");
-        console.log('Health profile saved:', result);
+        console.log('Health profile saved successfully:', result);
       } else {
         toast.error("❌ Failed to save health profile. Please try again.");
-        console.error('Failed to save health profile');
       }
     } catch (error) {
       console.error('Error saving profile:', error);

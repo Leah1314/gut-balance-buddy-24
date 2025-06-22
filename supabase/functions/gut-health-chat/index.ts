@@ -99,7 +99,30 @@ serve(async (req) => {
             let userDataContext = "\n\nUser Data Context:\n";
             
             if (healthProfile) {
-              userDataContext += `Health Profile: Age ${healthProfile.age}, conditions: ${healthProfile.health_conditions || 'None'}, medications: ${healthProfile.medications || 'None'}, allergies: ${healthProfile.allergies || 'None'}.\n`;
+              userDataContext += `Health Profile: `;
+              if (healthProfile.age) userDataContext += `Age ${healthProfile.age}, `;
+              if (healthProfile.medical_conditions && healthProfile.medical_conditions.length > 0) {
+                userDataContext += `medical conditions: ${healthProfile.medical_conditions.join(', ')}, `;
+              } else {
+                userDataContext += `medical conditions: None, `;
+              }
+              if (healthProfile.medications && healthProfile.medications.length > 0) {
+                userDataContext += `medications: ${healthProfile.medications.join(', ')}, `;
+              } else {
+                userDataContext += `medications: None, `;
+              }
+              if (healthProfile.dietary_restrictions && Object.keys(healthProfile.dietary_restrictions).length > 0) {
+                const restrictions = Object.entries(healthProfile.dietary_restrictions)
+                  .filter(([_, value]) => value === true)
+                  .map(([key, _]) => key);
+                if (restrictions.length > 0) {
+                  userDataContext += `dietary restrictions: ${restrictions.join(', ')}, `;
+                }
+              }
+              if (healthProfile.symptoms_notes) {
+                userDataContext += `symptoms/notes: ${healthProfile.symptoms_notes}, `;
+              }
+              userDataContext += '.\n';
             }
             
             if (foodLogs && foodLogs.length > 0) {
@@ -132,8 +155,9 @@ serve(async (req) => {
             }
             
             if (userDataContext.length > 30) {
-              systemPrompt += userDataContext + "\nUse this information to provide personalized advice when relevant. Analyze patterns, suggest improvements, and provide specific recommendations based on the user's data.";
+              systemPrompt += userDataContext + "\nUse this information to provide personalized advice when relevant. Analyze patterns, suggest improvements, and provide specific recommendations based on the user's data. IMPORTANT: Pay special attention to any medical conditions mentioned as they significantly affect dietary recommendations.";
               console.log('Enhanced system prompt with user data');
+              console.log('Medical conditions found:', healthProfile?.medical_conditions || 'None');
             } else {
               console.log('No significant user data found');
             }
