@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,22 +57,25 @@ const TestResultsUpload = () => {
       console.log('Saving test result to database...');
       const currentTime = new Date().toISOString();
       
+      // Convert the result to a plain object that can be serialized as JSON
+      const insertData = {
+        user_id: user.id,
+        file_name: selectedFile.name,
+        file_type: selectedFile.type,
+        test_type: result.testType,
+        key_findings: result.keyFindings,
+        test_values: result.values as any, // Cast to any to satisfy Json type
+        recommendations: result.recommendations,
+        concern_level: result.concernLevel,
+        summary: result.summary,
+        raw_analysis: result as any, // Cast to any to satisfy Json type
+        created_at: currentTime,
+        updated_at: currentTime
+      };
+
       const { data, error } = await supabase
         .from('test_results')
-        .insert({
-          user_id: user.id,
-          file_name: selectedFile.name,
-          file_type: selectedFile.type,
-          test_type: result.testType,
-          key_findings: result.keyFindings,
-          test_values: result.values,
-          recommendations: result.recommendations,
-          concern_level: result.concernLevel,
-          summary: result.summary,
-          raw_analysis: result,
-          created_at: currentTime,
-          updated_at: currentTime
-        })
+        .insert(insertData)
         .select()
         .single();
 
