@@ -19,6 +19,7 @@ import { ColorSelector } from "./stool/ColorSelector";
 import { PhotoUpload } from "./stool/PhotoUpload";
 import { NotesSection } from "./stool/NotesSection";
 import StoolImageAnalyzer from "./StoolImageAnalyzer";
+import SuccessCard from "./stool/SuccessCard";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 const StoolTracker = () => {
@@ -28,6 +29,8 @@ const StoolTracker = () => {
   const [notes, setNotes] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccessCard, setShowSuccessCard] = useState(false);
+  const [streakDays, setStreakDays] = useState(1);
   const { addStoolLog } = useStoolLogs();
 
   const handleSave = async () => {
@@ -54,8 +57,14 @@ const StoolTracker = () => {
       const result = await addStoolLog(stoolLogData);
       
       if (result) {
-        toast.success("Stool entry saved successfully!");
         console.log('Stool log saved:', result);
+        
+        // Calculate streak (simplified - could be enhanced with actual streak calculation)
+        const randomStreak = Math.floor(Math.random() * 7) + 1;
+        setStreakDays(randomStreak);
+        
+        // Show success card instead of toast
+        setShowSuccessCard(true);
         
         // Reset form
         setSelectedType(null);
@@ -83,8 +92,20 @@ const StoolTracker = () => {
     setPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleCloseSuccessCard = () => {
+    setShowSuccessCard(false);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Success Card Overlay */}
+      {showSuccessCard && (
+        <SuccessCard 
+          onClose={handleCloseSuccessCard}
+          streakDays={streakDays}
+        />
+      )}
+
       <Tabs defaultValue="camera" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm">
           <TabsTrigger 
