@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle, Info } from "lucide-react";
+import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle, Info, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +28,7 @@ const TestResultsUpload = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<TestResult | null>(null);
+  const [savedResultId, setSavedResultId] = useState<string | null>(null);
   const { user } = useAuth();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +37,7 @@ const TestResultsUpload = () => {
       if (file.type.startsWith('image/') || file.type === 'application/pdf') {
         setSelectedFile(file);
         setAnalysisResult(null);
+        setSavedResultId(null);
         
         // Show info toast for PDF files
         if (file.type === 'application/pdf') {
@@ -54,6 +56,8 @@ const TestResultsUpload = () => {
 
     try {
       console.log('Saving test result to database...');
+      const currentTime = new Date().toISOString();
+      
       const { data, error } = await supabase
         .from('test_results')
         .insert({
@@ -66,7 +70,9 @@ const TestResultsUpload = () => {
           recommendations: result.recommendations,
           concern_level: result.concernLevel,
           summary: result.summary,
-          raw_analysis: JSON.parse(JSON.stringify(result))
+          raw_analysis: result,
+          created_at: currentTime,
+          updated_at: currentTime
         })
         .select()
         .single();
@@ -78,7 +84,8 @@ const TestResultsUpload = () => {
       }
 
       console.log('Test result saved to database:', data);
-      toast.success("Test result saved successfully!");
+      setSavedResultId(data.id);
+      toast.success("Test result analyzed and saved successfully!");
       return data;
     } catch (error) {
       console.error('Error saving test result:', error);
@@ -136,11 +143,7 @@ const TestResultsUpload = () => {
           setAnalysisResult(data);
           
           // Save the result to database
-          const savedResult = await saveTestResultToDatabase(data);
-          
-          if (savedResult) {
-            toast.success("Test results analyzed and saved successfully!");
-          }
+          await saveTestResultToDatabase(data);
           
         } catch (innerError) {
           console.error('Error in file processing:', innerError);
@@ -161,6 +164,26 @@ const TestResultsUpload = () => {
       console.error('Error in analyzeTestResults:', error);
       toast.error("Failed to analyze test results");
       setIsAnalyzing(false);
+    }
+  };
+
+  const getHealthCoachAdvice = () => {
+    if (!savedResultId || !analysisResult) return;
+    
+    // Focus on the health coach chat and send a message about the test results
+    const chatTrigger = document.querySelector('[data-testid="health-coach-trigger"]') as HTMLButtonElement;
+    if (chatTrigger) {
+      chatTrigger.click();
+      
+      // Wait a moment for the chat to open, then send a message
+      setTimeout(() => {
+        const event = new CustomEvent('sendHealthCoachMessage', {
+          detail: {
+            message: `I just uploaded and analyzed my test results. Here's a summary: ${analysisResult.summary}. The concern level is ${analysisResult.concernLevel}. Can you provide personalized advice based on these results and my health profile?`
+          }
+        });
+        window.dispatchEvent(event);
+      }, 500);
     }
   };
 
@@ -249,10 +272,17 @@ const TestResultsUpload = () => {
       {analysisResult && (
         <Card className="bg-white shadow-sm border-gray-200">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base text-gray-900">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              Analysis Results
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base text-gray-900">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                Analysis Results
+              </CardTitle>
+              {savedResultId && (
+                <div className="text-xs text-gray-500">
+                  Saved: {new Date().toLocaleString()}
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -319,6 +349,18 @@ const TestResultsUpload = () => {
                     </li>
                   ))}
                 </ul>
+              </div>
+            )}
+
+            {savedResultId && (
+              <div className="pt-3 border-t border-gray-200">
+                <Button
+                  onClick={getHealthCoachAdvice}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium h-10"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Get Personalized Health Coach Advice
+                </Button>
               </div>
             )}
           </CardContent>

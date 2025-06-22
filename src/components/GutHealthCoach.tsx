@@ -32,6 +32,25 @@ const GutHealthCoach = () => {
     }
   }, [isOpen, messages.length]);
 
+  // Listen for custom events from test results
+  useEffect(() => {
+    const handleSendMessage = (event: CustomEvent) => {
+      if (event.detail?.message) {
+        setIsOpen(true);
+        // Wait for the sheet to open, then send the message
+        setTimeout(() => {
+          sendMessage(event.detail.message);
+        }, 300);
+      }
+    };
+
+    window.addEventListener('sendHealthCoachMessage', handleSendMessage as EventListener);
+    
+    return () => {
+      window.removeEventListener('sendHealthCoachMessage', handleSendMessage as EventListener);
+    };
+  }, []);
+
   const sendMessage = async (messageText?: string) => {
     const textToSend = messageText || inputMessage;
     if (!textToSend.trim() || isLoading) return;
@@ -111,6 +130,7 @@ const GutHealthCoach = () => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button
+          data-testid="health-coach-trigger"
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50"
           style={{
             backgroundColor: '#4A7C59',
