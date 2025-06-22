@@ -55,22 +55,19 @@ const TestResultsUpload = () => {
 
     try {
       console.log('Saving test result to database...');
-      const currentTime = new Date().toISOString();
       
-      // Convert the result to a plain object that can be serialized as JSON
+      // Prepare the data for insertion - let database handle timestamps
       const insertData = {
         user_id: user.id,
         file_name: selectedFile.name,
         file_type: selectedFile.type,
         test_type: result.testType,
         key_findings: result.keyFindings,
-        test_values: result.values as any, // Cast to any to satisfy Json type
+        test_values: result.values as any,
         recommendations: result.recommendations,
         concern_level: result.concernLevel,
         summary: result.summary,
-        raw_analysis: result as any, // Cast to any to satisfy Json type
-        created_at: currentTime,
-        updated_at: currentTime
+        raw_analysis: result as any
       };
 
       const { data, error } = await supabase
@@ -144,8 +141,14 @@ const TestResultsUpload = () => {
 
           setAnalysisResult(data);
           
-          // Save the result to database
-          await saveTestResultToDatabase(data);
+          // Save the result to database and automatically trigger health coach advice
+          const savedResult = await saveTestResultToDatabase(data);
+          if (savedResult) {
+            // Automatically open health coach and send the results
+            setTimeout(() => {
+              getHealthCoachAdvice(data);
+            }, 1000); // Small delay to ensure UI updates
+          }
           
         } catch (innerError) {
           console.error('Error in file processing:', innerError);
@@ -169,8 +172,11 @@ const TestResultsUpload = () => {
     }
   };
 
-  const getHealthCoachAdvice = () => {
-    if (!savedResultId || !analysisResult) return;
+  const getHealthCoachAdvice = (resultData?: TestResult) => {
+    const dataToUse = resultData || analysisResult;
+    if (!savedResultId && !resultData) return;
+    
+    console.log('Opening health coach with test results...');
     
     // Focus on the health coach chat and send a message about the test results
     const chatTrigger = document.querySelector('[data-testid="health-coach-trigger"]') as HTMLButtonElement;
@@ -179,13 +185,17 @@ const TestResultsUpload = () => {
       
       // Wait a moment for the chat to open, then send a message
       setTimeout(() => {
+        const message = `I just uploaded and analyzed my test results. Here's a summary: ${dataToUse?.summary}. The concern level is ${dataToUse?.concernLevel}. Can you provide personalized advice based on these results and my health profile?`;
+        
         const event = new CustomEvent('sendHealthCoachMessage', {
-          detail: {
-            message: `I just uploaded and analyzed my test results. Here's a summary: ${analysisResult.summary}. The concern level is ${analysisResult.concernLevel}. Can you provide personalized advice based on these results and my health profile?`
-          }
+          detail: { message }
         });
         window.dispatchEvent(event);
+        
+        toast.success("Health coach opened with your test results!");
       }, 500);
+    } else {
+      toast.error("Could not open health coach. Please try clicking the chat button manually.");
     }
   };
 
@@ -357,11 +367,11 @@ const TestResultsUpload = () => {
             {savedResultId && (
               <div className="pt-3 border-t border-gray-200">
                 <Button
-                  onClick={getHealthCoachAdvice}
+                  onClick={() => getHealthCoachAdvice()}
                   className="w-full bg-green-600 hover:bg-green-700 text-white font-medium h-10"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
-                  Get Personalized Health Coach Advice
+                  Get More Health Coach Advice
                 </Button>
               </div>
             )}
