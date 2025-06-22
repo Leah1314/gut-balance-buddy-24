@@ -71,6 +71,9 @@ const GutHealthCoach = () => {
     const textToSend = messageText || inputMessage;
     if (!textToSend.trim() || isLoading) return;
 
+    console.log('=== STARTING MESSAGE SEND ===');
+    console.log('Message to send:', textToSend);
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content: textToSend,
@@ -84,7 +87,9 @@ const GutHealthCoach = () => {
 
     try {
       // Fetch fresh stool logs for the request
+      console.log('Fetching stool logs...');
       const stoolLogs = await getStoolLogs();
+      console.log('Stool logs fetched:', stoolLogs?.length || 0, 'entries');
       
       // Prepare user data - ensure we have proper boolean values
       const hasHealthProfile = healthProfile !== null && healthProfile !== undefined;
@@ -92,41 +97,56 @@ const GutHealthCoach = () => {
       const hasStoolLogs = Array.isArray(stoolLogs) && stoolLogs.length > 0;
       const hasUserData = hasHealthProfile || hasFoodLogs || hasStoolLogs;
 
-      const userData = {
+      console.log('Data check:', {
+        hasHealthProfile,
+        hasFoodLogs,
+        hasStoolLogs,
+        hasUserData,
+        foodLogsCount: foodLogs?.length || 0,
+        stoolLogsCount: stoolLogs?.length || 0
+      });
+
+      const userData = hasUserData ? {
         healthProfile: hasHealthProfile ? healthProfile : null,
         foodLogs: hasFoodLogs ? foodLogs : [],
         stoolLogs: hasStoolLogs ? stoolLogs : []
+      } : null;
+
+      const requestPayload = { 
+        message: textToSend,
+        conversationHistory: messages.slice(-5).map(msg => ({
+          role: msg.role,
+          content: msg.content
+        })),
+        hasUserData,
+        userData
       };
 
-      console.log('Sending message to gut-health-chat function:', {
-        message: textToSend,
+      console.log('=== CALLING SUPABASE FUNCTION ===');
+      console.log('Request payload:', {
+        message: textToSend.substring(0, 50) + '...',
+        conversationHistoryLength: requestPayload.conversationHistory.length,
         hasUserData,
-        userData: hasUserData ? 'data included' : 'no user data',
-        dataBreakdown: {
-          hasHealthProfile,
-          hasFoodLogs,
-          hasStoolLogs,
-          foodLogsCount: foodLogs?.length || 0,
-          stoolLogsCount: stoolLogs?.length || 0
-        }
+        userDataPresent: userData !== null
       });
 
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
-        body: { 
-          message: textToSend,
-          conversationHistory: messages.slice(-5).map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
-          hasUserData,
-          userData
-        }
+        body: requestPayload
       });
 
-      console.log('Supabase function response:', { data, error });
+      console.log('=== SUPABASE FUNCTION RESPONSE ===');
+      console.log('Raw response data:', data);
+      console.log('Raw response error:', error);
+      console.log('Response type:', typeof data);
+      console.log('Response keys:', data ? Object.keys(data) : 'no data');
 
       if (error) {
-        console.error('Supabase function error:', error);
+        console.error('Supabase function error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         throw new Error(`Function error: ${error.message || 'Unknown error'}`);
       }
 
@@ -135,21 +155,33 @@ const GutHealthCoach = () => {
         throw new Error('No response data received from AI service');
       }
 
-      if (!data.response) {
-        console.error('No response field in data:', data);
+      console.log('Checking response structure...');
+      if (!data.response && !data.message && !data.content) {
+        console.error('Invalid response structure:', data);
         throw new Error('Invalid response format from AI service');
       }
 
+      // Try different response field names
+      const responseContent = data.response || data.message || data.content || JSON.stringify(data);
+      console.log('Final response content:', responseContent);
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: responseContent,
         role: 'assistant',
         timestamp: new Date()
       };
 
+      console.log('Adding assistant message:', assistantMessage);
       setMessages(prev => [...prev, assistantMessage]);
+
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('=== CHAT ERROR ===');
+      console.error('Error details:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+      
       const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
       toast.error(`Sorry, I'm having trouble connecting: ${errorMsg}`);
       
@@ -162,6 +194,7 @@ const GutHealthCoach = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      console.log('=== MESSAGE SEND COMPLETE ===');
     }
   };
 
