@@ -19,7 +19,7 @@ import { ColorSelector } from "./stool/ColorSelector";
 import { PhotoUpload } from "./stool/PhotoUpload";
 import { NotesSection } from "./stool/NotesSection";
 import StoolImageAnalyzer from "./StoolImageAnalyzer";
-import { useStoolLogsWithRAG } from "@/hooks/useStoolLogsWithRAG";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 const StoolTracker = () => {
   const [selectedType, setSelectedType] = useState<number | null>(null);
@@ -28,7 +28,7 @@ const StoolTracker = () => {
   const [notes, setNotes] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const { addStoolLog } = useStoolLogsWithRAG();
+  const { addStoolLog } = useStoolLogs();
 
   const handleSave = async () => {
     if (!selectedType || !selectedConsistency || !selectedColor) {

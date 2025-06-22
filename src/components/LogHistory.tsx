@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Utensils, Scroll, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 import { format } from "date-fns";
 
@@ -21,7 +22,7 @@ const LogHistory = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
   
-  const { foodLogs, refreshFoodLogs } = useFoodLogsWithRAG();
+  const { foodLogs, refreshFoodLogs } = useFoodLogs();
   const { getStoolLogs } = useStoolLogs();
 
   const fetchStoolLogs = async () => {

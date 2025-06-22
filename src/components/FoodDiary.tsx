@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Apple, Clock, Coffee, UtensilsCrossed, Search, Star, AlertTriangle, Camera, CheckCircle, ArrowLeft } from "lucide-react";
 import FoodImageAnalyzer from "./FoodImageAnalyzer";
-import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { toast } from "sonner";
 
 const FoodDiary = () => {
@@ -20,7 +19,7 @@ const FoodDiary = () => {
   const {
     addFoodLog,
     foodLogs
-  } = useFoodLogsWithRAG();
+  } = useFoodLogs();
 
   const mealTypes = [{
     id: "breakfast",

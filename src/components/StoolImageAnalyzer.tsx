@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useStoolLogsWithRAG } from "@/hooks/useStoolLogsWithRAG";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 interface StoolAnalysisData {
   bristolType: number;
@@ -32,7 +32,7 @@ const StoolImageAnalyzer = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [analysisData, setAnalysisData] = useState<StoolAnalysisData | null>(null);
-  const { addStoolLog } = useStoolLogsWithRAG();
+  const { addStoolLog } = useStoolLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

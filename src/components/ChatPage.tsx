@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { MessageCircle, Send, Loader2, Database } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useRAG } from "@/hooks/useRAG";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 interface Message {
   id: string;
@@ -23,12 +24,30 @@ const ChatPage = () => {
     track_history: false
   });
   
-  const { checkUserData, retrieveUserData } = useRAG();
+  const { foodLogs } = useFoodLogs();
+  const { getStoolLogs } = useStoolLogs();
 
   useEffect(() => {
     const checkForUserData = async () => {
       try {
-        const userDataStatus = await checkUserData();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Check for health profile
+        const { data: healthProfile } = await supabase
+          .from('user_health_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        // Check for tracking data
+        const stoolLogs = await getStoolLogs();
+        
+        const userDataStatus = {
+          health_info: !!healthProfile,
+          track_history: !!(foodLogs?.length > 0 || stoolLogs?.length > 0)
+        };
+        
         setHasUserData(userDataStatus);
 
         const hasAnyData = userDataStatus.health_info || userDataStatus.track_history;
@@ -54,7 +73,7 @@ const ChatPage = () => {
     };
     
     checkForUserData();
-  }, [checkUserData]);
+  }, [foodLogs, getStoolLogs]);
 
   const quickPrompts = [
     "Analyze my recent meal patterns", 
@@ -79,33 +98,9 @@ const ChatPage = () => {
     setIsLoading(true);
 
     try {
-      // Retrieve relevant user data from RAG system
-      let contextualQuery = originalMessage;
-      
-      if (hasUserData.health_info || hasUserData.track_history) {
-        try {
-          console.log('Enriching query with RAG data...');
-          const ragData = await retrieveUserData(originalMessage);
-
-          if (ragData.health_info.length > 0 || ragData.track_history.length > 0) {
-            let contextAddition = "\n\n--- User Context ---\n";
-            if (ragData.health_info.length > 0) {
-              contextAddition += "Health Profile:\n" + ragData.health_info.join('\n') + "\n";
-            }
-            if (ragData.track_history.length > 0) {
-              contextAddition += "Recent Tracking History:\n" + ragData.track_history.join('\n') + "\n";
-            }
-            contextualQuery = originalMessage + contextAddition;
-            console.log('Query enriched with user context');
-          }
-        } catch (error) {
-          console.log('RAG retrieval failed, proceeding with original message:', error);
-        }
-      }
-
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: {
-          message: contextualQuery,
+          message: originalMessage,
           conversationHistory: messages
         }
       });

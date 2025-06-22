@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { User, Heart, Scale, Ruler, Calendar, AlertCircle, Plus, X, Save, FileText } from "lucide-react";
-import { useHealthProfile } from "@/hooks/useHealthProfileWithRAG";
+import { useHealthProfile } from "@/hooks/useHealthProfile";
 import { toast } from "sonner";
 import TestResultsUpload from "./TestResultsUpload";
 
@@ -46,6 +46,7 @@ const HealthProfile = () => {
       });
     }
   }, [profile]);
+
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Low-FODMAP', 'Keto', 'Mediterranean'];
   const activityLevels = [{
     value: 'sedentary',
@@ -149,7 +150,9 @@ const HealthProfile = () => {
       toast.error("❌ Failed to save health profile. Please try again.");
     }
   };
-  return <div className="space-y-6">
+
+  return (
+    <div className="space-y-6">
       {/* Header */}
       <div className="text-center mb-6">
         <h2 className="text-2xl font-semibold mb-1 text-gray-900">Health Profile</h2>
@@ -203,25 +206,27 @@ const HealthProfile = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
-            {activityLevels.map(level => <Button 
-              key={level.value} 
-              variant={formData.activity_level === level.value ? "default" : "outline"} 
-              onClick={() => handleInputChange('activity_level', level.value)} 
-              className={`h-auto py-4 px-4 text-left whitespace-normal ${
-                formData.activity_level === level.value 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <div className="w-full text-left">
-                <p className="font-medium text-sm leading-tight mb-1">
-                  {level.value.charAt(0).toUpperCase() + level.value.slice(1).replace('_', ' ')}
-                </p>
-                <p className="text-xs opacity-80 leading-tight">
-                  {level.label.split('(')[1]?.replace(')', '') || level.label}
-                </p>
-              </div>
-            </Button>)}
+            {activityLevels.map(level => (
+              <Button 
+                key={level.value} 
+                variant={formData.activity_level === level.value ? "default" : "outline"} 
+                onClick={() => handleInputChange('activity_level', level.value)} 
+                className={`h-auto py-4 px-4 text-left whitespace-normal ${
+                  formData.activity_level === level.value 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <div className="w-full text-left">
+                  <p className="font-medium text-sm leading-tight mb-1">
+                    {level.value.charAt(0).toUpperCase() + level.value.slice(1).replace('_', ' ')}
+                  </p>
+                  <p className="text-xs opacity-80 leading-tight">
+                    {level.label.split('(')[1]?.replace(')', '') || level.label}
+                  </p>
+                </div>
+              </Button>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -233,9 +238,16 @@ const HealthProfile = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {dietaryOptions.map(option => <Button key={option} variant={formData.dietary_restrictions[option] ? "default" : "outline"} onClick={() => handleDietaryRestrictionToggle(option)} className={`text-sm ${formData.dietary_restrictions[option] ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}>
+            {dietaryOptions.map(option => (
+              <Button 
+                key={option} 
+                variant={formData.dietary_restrictions[option] ? "default" : "outline"} 
+                onClick={() => handleDietaryRestrictionToggle(option)} 
+                className={`text-sm ${formData.dietary_restrictions[option] ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}
+              >
                 {option}
-              </Button>)}
+              </Button>
+            ))}
           </div>
           
           <div className="space-y-2">
@@ -256,22 +268,24 @@ const HealthProfile = () => {
         <CardContent className="space-y-4">
           <div className="flex space-x-2">
             <Input placeholder="Add medical condition..." value={newCondition} onChange={e => setNewCondition(e.target.value)} onKeyPress={e => {
-            if (e.key === 'Enter') {
-              addMedicalCondition();
-            }
-          }} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+              if (e.key === 'Enter') {
+                addMedicalCondition();
+              }
+            }} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
             <Button onClick={addMedicalCondition} disabled={!newCondition.trim()} className="bg-green-600 text-white hover:bg-green-700">
               <Plus className="w-4 h-4" />
             </Button>
           </div>
           
           <div className="flex flex-wrap gap-2">
-            {formData.medical_conditions.map((condition, index) => <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+            {formData.medical_conditions.map((condition, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                 <span>{condition}</span>
                 <button onClick={() => removeMedicalCondition(index)} className="ml-1 hover:text-red-600">
                   <X className="w-3 h-3" />
                 </button>
-              </Badge>)}
+              </Badge>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -284,22 +298,24 @@ const HealthProfile = () => {
         <CardContent className="space-y-4">
           <div className="flex space-x-2">
             <Input placeholder="Add medication..." value={newMedication} onChange={e => setNewMedication(e.target.value)} onKeyPress={e => {
-            if (e.key === 'Enter') {
-              addMedication();
-            }
-          }} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+              if (e.key === 'Enter') {
+                addMedication();
+              }
+            }} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
             <Button onClick={addMedication} disabled={!newMedication.trim()} className="bg-green-600 text-white hover:bg-green-700">
               <Plus className="w-4 h-4" />
             </Button>
           </div>
           
           <div className="flex flex-wrap gap-2">
-            {formData.medications.map((medication, index) => <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+            {formData.medications.map((medication, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                 <span>{medication}</span>
                 <button onClick={() => removeMedication(index)} className="ml-1 hover:text-red-600">
                   <X className="w-3 h-3" />
                 </button>
-              </Badge>)}
+              </Badge>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -327,7 +343,8 @@ const HealthProfile = () => {
           {loading ? 'Saving...' : 'Save Health Profile'}
         </Button>
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default HealthProfile;

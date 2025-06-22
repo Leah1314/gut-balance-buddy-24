@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
 
 interface NutritionData {
   foodItems: string[];
@@ -36,7 +35,7 @@ const FoodImageAnalyzer = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [nutritionData, setNutritionData] = useState<NutritionData | null>(null);
-  const { addFoodLog } = useFoodLogsWithRAG();
+  const { addFoodLog } = useFoodLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
