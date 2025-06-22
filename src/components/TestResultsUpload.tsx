@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle, Info, MessageCircle } from "lucide-react";
+import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle, Info } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -141,14 +142,8 @@ const TestResultsUpload = () => {
 
           setAnalysisResult(data);
           
-          // Save the result to database and automatically trigger health coach advice
-          const savedResult = await saveTestResultToDatabase(data);
-          if (savedResult) {
-            // Automatically open health coach and send the results
-            setTimeout(() => {
-              getHealthCoachAdvice(data);
-            }, 1000); // Small delay to ensure UI updates
-          }
+          // Save the result to database
+          await saveTestResultToDatabase(data);
           
         } catch (innerError) {
           console.error('Error in file processing:', innerError);
@@ -169,33 +164,6 @@ const TestResultsUpload = () => {
       console.error('Error in analyzeTestResults:', error);
       toast.error("Failed to analyze test results");
       setIsAnalyzing(false);
-    }
-  };
-
-  const getHealthCoachAdvice = (resultData?: TestResult) => {
-    const dataToUse = resultData || analysisResult;
-    if (!savedResultId && !resultData) return;
-    
-    console.log('Opening health coach with test results...');
-    
-    // Focus on the health coach chat and send a message about the test results
-    const chatTrigger = document.querySelector('[data-testid="health-coach-trigger"]') as HTMLButtonElement;
-    if (chatTrigger) {
-      chatTrigger.click();
-      
-      // Wait a moment for the chat to open, then send a message
-      setTimeout(() => {
-        const message = `I just uploaded and analyzed my test results. Here's a summary: ${dataToUse?.summary}. The concern level is ${dataToUse?.concernLevel}. Can you provide personalized advice based on these results and my health profile?`;
-        
-        const event = new CustomEvent('sendHealthCoachMessage', {
-          detail: { message }
-        });
-        window.dispatchEvent(event);
-        
-        toast.success("Health coach opened with your test results!");
-      }, 500);
-    } else {
-      toast.error("Could not open health coach. Please try clicking the chat button manually.");
     }
   };
 
@@ -361,18 +329,6 @@ const TestResultsUpload = () => {
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
-
-            {savedResultId && (
-              <div className="pt-3 border-t border-gray-200">
-                <Button
-                  onClick={() => getHealthCoachAdvice()}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium h-10"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Get More Health Coach Advice
-                </Button>
               </div>
             )}
           </CardContent>
