@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +9,10 @@ import {
   User, Heart, Scale, Ruler, Calendar, AlertCircle, Plus, X, Save, 
   FileText, ChevronDown, ChevronUp 
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useHealthProfile } from "@/hooks/useHealthProfile";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import TestResultsUpload from "./TestResultsUpload";
 
 const HealthProfile = () => {
@@ -75,7 +74,8 @@ const HealthProfile = () => {
   const genderOptions = [
     { value: 'male', label: 'Male' },
     { value: 'female', label: 'Female' },
-    { value: 'non-binary', label: 'Other' },
+    { value: 'non-binary', label: 'Non-binary' },
+    { value: 'prefer-not-to-say', label: 'Prefer not to say' },
   ];
 
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Low-FODMAP', 'Keto', 'Mediterranean'];
@@ -241,7 +241,7 @@ const HealthProfile = () => {
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Basic Information */}
         <Collapsible open={expandedSection === 'basic'} onOpenChange={() => toggleSection('basic')}>
           <Card className="bg-white border-gray-200 shadow-sm">
@@ -262,73 +262,69 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-4 pb-4">
-                <div className="space-y-4">
-                  {/* Age and Gender Row */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700 flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        Age
-                      </Label>
-                      <Input 
-                        type="number" 
-                        placeholder="Age" 
-                        value={formData.age} 
-                        onChange={e => handleInputChange('age', e.target.value)} 
-                        className="h-10 text-sm"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">Gender</Label>
-                      <ToggleGroup 
-                        type="single" 
-                        value={formData.gender} 
-                        onValueChange={(value) => value && handleInputChange('gender', value)}
-                        className="justify-start"
-                      >
-                        {genderOptions.map(option => (
-                          <ToggleGroupItem
-                            key={option.value}
-                            value={option.value}
-                            className="text-xs px-3 py-2 h-10 data-[state=on]:bg-blue-600 data-[state=on]:text-white"
-                          >
-                            {option.label}
-                          </ToggleGroupItem>
-                        ))}
-                      </ToggleGroup>
-                    </div>
+              <CardContent className="px-4 pb-6">
+                <div className="space-y-6">
+                  {/* Age - Full width on mobile */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700 flex items-center">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Age
+                    </Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter your age" 
+                      value={formData.age} 
+                      onChange={e => handleInputChange('age', e.target.value)} 
+                      className="h-12 text-sm"
+                    />
                   </div>
 
-                  {/* Weight and Height Row */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700 flex items-center">
-                        <Scale className="w-3 h-3 mr-1" />
-                        Weight (kg)
-                      </Label>
-                      <Input 
-                        type="number" 
-                        step="0.1" 
-                        placeholder="Weight" 
-                        value={formData.weight_kg} 
-                        onChange={e => handleInputChange('weight_kg', e.target.value)} 
-                        className="h-10 text-sm"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700 flex items-center">
-                        <Ruler className="w-3 h-3 mr-1" />
-                        Height (cm)
-                      </Label>
-                      <Input 
-                        type="number" 
-                        placeholder="Height" 
-                        value={formData.height_cm} 
-                        onChange={e => handleInputChange('height_cm', e.target.value)} 
-                        className="h-10 text-sm"
-                      />
-                    </div>
+                  {/* Gender - Dropdown */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">Gender</Label>
+                    <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {genderOptions.map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Weight - Full width on mobile */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700 flex items-center">
+                      <Scale className="w-4 h-4 mr-2" />
+                      Weight (kg)
+                    </Label>
+                    <Input 
+                      type="number" 
+                      step="0.1" 
+                      placeholder="Enter your weight in kg" 
+                      value={formData.weight_kg} 
+                      onChange={e => handleInputChange('weight_kg', e.target.value)} 
+                      className="h-12 text-sm"
+                    />
+                  </div>
+
+                  {/* Height - Full width on mobile */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700 flex items-center">
+                      <Ruler className="w-4 h-4 mr-2" />
+                      Height (cm)
+                    </Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter your height in cm" 
+                      value={formData.height_cm} 
+                      onChange={e => handleInputChange('height_cm', e.target.value)} 
+                      className="h-12 text-sm"
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -588,12 +584,12 @@ const HealthProfile = () => {
       {/* Floating Save Button */}
       {showSaveButton && (
         <div className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 ${
-          hasUnsavedChanges ? 'opacity-100 scale-100' : 'opacity-60 scale-95'
+          hasUnsavedChanges ? 'opacity-100 scale-100' : 'opacity-40 scale-95'
         }`}>
           <Button 
             onClick={handleSave} 
             disabled={loading || !hasUnsavedChanges} 
-            className={`px-4 py-2 h-12 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 ${
+            className={`px-4 py-2 h-10 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 ${
               hasUnsavedChanges 
                 ? 'bg-green-600/90 hover:bg-green-700 text-white' 
                 : 'bg-green-400/60 text-green-800 cursor-not-allowed'
