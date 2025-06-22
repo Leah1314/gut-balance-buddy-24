@@ -1,5 +1,5 @@
 # Gut Balance Buddy
-
+# Project Details
 ## Rationale Behind the App
 Gut Balance Buddy was developed to empower users with personalized insights into their gut health, leveraging an image recognition model (ChatGPT-4.1) for food and stool analysis, and embedding models (openai/gpt-4o-mini) to understand user data contextually. We incorporated Retrieval-Augmented Generation (RAG) to tailor recommendations and advice based on individual user profiles and food history, ensuring a highly personalized experience——we believe at least user health record and food-stool history contextualises the gut health chat. Vibe coding (lovable) played a crucial role in rapidly prototyping and iterating on the app's user interface, allowing us to create an intuitive and engaging platform that resonates with users' needs.
 
