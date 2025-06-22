@@ -47,7 +47,7 @@ const HealthProfile = () => {
       console.log('Loading profile data:', profile);
       setFormData({
         age: profile.age?.toString() || '',
-        gender: profile.gender || '',
+        gender: '', // Keep gender in form but don't save to DB
         weight_kg: profile.weight_kg?.toString() || '',
         height_cm: profile.height_cm?.toString() || '',
         activity_level: profile.activity_level || '',
@@ -173,7 +173,7 @@ const HealthProfile = () => {
     try {
       const profileData = {
         age: formData.age ? parseInt(formData.age) : null,
-        gender: formData.gender || null,
+        // Remove gender from the data being saved to database
         weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
         height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
         activity_level: formData.activity_level || null,
@@ -264,10 +264,10 @@ const HealthProfile = () => {
             <CollapsibleContent>
               <CardContent className="px-4 pb-6">
                 <div className="space-y-6">
-                  {/* Age - Full width on mobile */}
+                  {/* Age */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 flex items-center">
-                      <Calendar className="w-4 h-4 mr-2" />
+                      <Calendar className="w-4 h-4 mr-2 text-blue-500" />
                       Age
                     </Label>
                     <Input 
@@ -279,12 +279,15 @@ const HealthProfile = () => {
                     />
                   </div>
 
-                  {/* Gender - Dropdown */}
+                  {/* Gender */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">Gender</Label>
+                    <Label className="text-sm font-medium text-gray-700 flex items-center">
+                      <User className="w-4 h-4 mr-2 text-purple-500" />
+                      Gender
+                    </Label>
                     <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
                       <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Select gender" />
+                        <SelectValue placeholder="Select Gender" />
                       </SelectTrigger>
                       <SelectContent>
                         {genderOptions.map(option => (
@@ -296,10 +299,10 @@ const HealthProfile = () => {
                     </Select>
                   </div>
 
-                  {/* Weight - Full width on mobile */}
+                  {/* Weight */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 flex items-center">
-                      <Scale className="w-4 h-4 mr-2" />
+                      <Scale className="w-4 h-4 mr-2 text-green-500" />
                       Weight (kg)
                     </Label>
                     <Input 
@@ -312,10 +315,10 @@ const HealthProfile = () => {
                     />
                   </div>
 
-                  {/* Height - Full width on mobile */}
+                  {/* Height */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 flex items-center">
-                      <Ruler className="w-4 h-4 mr-2" />
+                      <Ruler className="w-4 h-4 mr-2 text-orange-500" />
                       Height (cm)
                     </Label>
                     <Input 
