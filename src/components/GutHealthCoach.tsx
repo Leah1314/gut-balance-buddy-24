@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,7 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { MessageCircle, Send, Loader2, Database } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 interface Message {
@@ -36,7 +37,7 @@ const GutHealthCoach = () => {
     email: ''
   });
   
-  const { foodLogs } = useFoodLogsWithRAG();
+  const { foodLogs } = useFoodLogs();
   const { getStoolLogs } = useStoolLogs();
 
   // Fetch all user data including health profile, food logs, and stool logs
@@ -153,54 +154,19 @@ const GutHealthCoach = () => {
     setIsLoading(true);
 
     try {
-      // Prepare comprehensive user context
-      let contextualMessage = textToSend;
-      
-      // Add health profile context if available
-      if (allUserData.healthProfile) {
-        const profile = allUserData.healthProfile;
-        contextualMessage += '\n\n--- Health Profile Context ---\n';
-        if (profile.age) contextualMessage += `Age: ${profile.age}\n`;
-        if (profile.medical_conditions) contextualMessage += `Medical Conditions: ${profile.medical_conditions.join(', ')}\n`;
-        if (profile.dietary_restrictions) contextualMessage += `Dietary Restrictions: ${JSON.stringify(profile.dietary_restrictions)}\n`;
-        if (profile.medications) contextualMessage += `Medications: ${profile.medications.join(', ')}\n`;
-        if (profile.symptoms_notes) contextualMessage += `Symptoms Notes: ${profile.symptoms_notes}\n`;
-      }
-
-      // Add recent food logs context
-      if (allUserData.foodLogs && allUserData.foodLogs.length > 0) {
-        contextualMessage += '\n--- Recent Food Logs ---\n';
-        const recentFoodLogs = allUserData.foodLogs.slice(0, 5); // Last 5 entries
-        recentFoodLogs.forEach((log: any) => {
-          contextualMessage += `Food: ${log.food_name}`;
-          if (log.description) contextualMessage += ` - ${log.description}`;
-          if (log.analysis_result) contextualMessage += ` [AI Analysis: ${typeof log.analysis_result === 'string' ? log.analysis_result : JSON.stringify(log.analysis_result)}]`;
-          contextualMessage += `\n`;
-        });
-      }
-
-      // Add recent stool logs context
-      if (allUserData.stoolLogs && allUserData.stoolLogs.length > 0) {
-        contextualMessage += '\n--- Recent Stool Logs ---\n';
-        const recentStoolLogs = allUserData.stoolLogs.slice(0, 5); // Last 5 entries
-        recentStoolLogs.forEach((log: any) => {
-          contextualMessage += `Bristol Type: ${log.bristol_type}, Color: ${log.color}, Consistency: ${log.consistency}`;
-          if (log.notes) contextualMessage += ` - Notes: ${log.notes}`;
-          contextualMessage += `\n`;
-        });
-      }
-
-      console.log('Sending contextual message to AI:', {
-        originalMessage: textToSend,
-        hasHealthProfile: !!allUserData.healthProfile,
-        foodLogsCount: allUserData.foodLogs?.length || 0,
-        stoolLogsCount: allUserData.stoolLogs?.length || 0,
-        contextualMessageLength: contextualMessage.length
+      console.log('Sending message to gut-health-chat function:', {
+        message: textToSend,
+        hasUserData: !!(allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0),
+        userDataSummary: {
+          hasHealthProfile: !!allUserData.healthProfile,
+          foodLogsCount: allUserData.foodLogs?.length || 0,
+          stoolLogsCount: allUserData.stoolLogs?.length || 0
+        }
       });
 
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: { 
-          message: contextualMessage,
+          message: textToSend,
           conversationHistory: messages.slice(-5), // Last 5 messages for context
           hasUserData: !!(allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0),
           userData: allUserData
