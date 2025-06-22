@@ -97,7 +97,7 @@ const SuccessCard = ({ onClose, streakDays = 1 }: SuccessCardProps) => {
             ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
           `}>
             <h3 className="text-xl font-bold text-gray-800 mb-2">
-              Entry Saved! 🎉
+              Entry Saved! 😄🎉
             </h3>
             <p className="text-lg text-gray-700 leading-relaxed">
               {randomMessage}
