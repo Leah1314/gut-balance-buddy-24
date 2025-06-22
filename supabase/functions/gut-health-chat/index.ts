@@ -16,30 +16,36 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory } = await req.json();
+    const { message, conversationHistory, hasUserData, userData } = await req.json();
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
+    console.log('Received chat request:', { 
+      messageLength: message?.length, 
+      hasUserData, 
+      userDataKeys: userData ? Object.keys(userData) : [] 
+    });
+
     // Build conversation context
-    const systemPrompt = `You are a concise gut health coach. Keep responses brief and actionable.
+    const systemPrompt = `You are a knowledgeable gut health coach. You provide personalized advice based on user data when available.
 
 Your role:
-- Provide short, practical gut health advice
-- Give 2-3 key points maximum per response
-- Use bullet points for clarity
-- Be supportive but direct
-- Always recommend consulting doctors for persistent issues
+- Analyze user's health profile, food logs, and stool logs to provide tailored advice
+- Give practical, actionable recommendations for gut health improvement
+- Be supportive but professional
+- Always recommend consulting healthcare providers for serious concerns
+- Keep responses focused and helpful (2-4 paragraphs max)
 
 Guidelines:
-- Keep responses under 3 sentences when possible
-- Focus on ONE main topic per response
-- Ask follow-up questions to stay engaged
-- Use simple language
-- Prioritize actionable advice over theory
+- Use the provided user context to give personalized advice
+- Reference specific patterns you notice in their data
+- Suggest practical next steps
+- Ask follow-up questions to gather more relevant information
+- Be encouraging and supportive
 
-Response style: Brief, friendly, practical.`;
+Response style: Professional, caring, evidence-based, and personalized.`;
 
     // Convert conversation history to OpenAI format
     const messages = [
@@ -51,7 +57,7 @@ Response style: Brief, friendly, practical.`;
       { role: 'user', content: message }
     ];
 
-    console.log('Sending request to OpenAI with message:', message);
+    console.log('Sending request to OpenAI with message length:', message.length);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -60,23 +66,23 @@ Response style: Brief, friendly, practical.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-mini',
+        model: 'gpt-4o-mini',
         messages: messages,
         temperature: 0.7,
-        max_tokens: 200,
+        max_tokens: 500,
       }),
     });
 
     if (!response.ok) {
       const error = await response.text();
       console.error('OpenAI API error:', error);
-      throw new Error('Failed to get response from AI');
+      throw new Error(`OpenAI API error: ${response.status} - ${error}`);
     }
 
     const data = await response.json();
     const aiResponse = data.choices[0].message.content;
 
-    console.log('AI response:', aiResponse);
+    console.log('AI response generated successfully, length:', aiResponse.length);
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -85,7 +91,8 @@ Response style: Brief, friendly, practical.`;
   } catch (error) {
     console.error('Error in gut-health-chat function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message || 'An unexpected error occurred' 
+      error: error.message || 'An unexpected error occurred',
+      details: 'Please check the console logs for more information'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

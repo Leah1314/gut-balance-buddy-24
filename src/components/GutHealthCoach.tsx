@@ -197,12 +197,15 @@ const GutHealthCoach = () => {
         }
       });
 
+      console.log('Supabase function response:', { data, error });
+
       if (error) {
         console.error('Supabase function error:', error);
         throw error;
       }
 
       if (!data || !data.response) {
+        console.error('No response received from AI service:', data);
         throw new Error('No response received from AI service');
       }
 
@@ -300,7 +303,7 @@ const GutHealthCoach = () => {
                     color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
                   }}
                 >
-                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                   <p className="text-xs mt-1 opacity-70">
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
