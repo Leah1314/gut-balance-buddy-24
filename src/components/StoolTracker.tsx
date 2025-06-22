@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,7 @@ const StoolTracker = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessCard, setShowSuccessCard] = useState(false);
   const [streakDays, setStreakDays] = useState(1);
-  const { addStoolLog } = useStoolLogs();
+  const { addStoolLog, calculateCurrentStreak } = useStoolLogs();
 
   const handleSave = async () => {
     if (!selectedType || !selectedConsistency || !selectedColor) {
@@ -59,9 +58,9 @@ const StoolTracker = () => {
       if (result) {
         console.log('Stool log saved:', result);
         
-        // Calculate streak (simplified - could be enhanced with actual streak calculation)
-        const randomStreak = Math.floor(Math.random() * 7) + 1;
-        setStreakDays(randomStreak);
+        // Calculate real streak after saving
+        const currentStreak = await calculateCurrentStreak();
+        setStreakDays(currentStreak);
         
         // Show success card instead of toast
         setShowSuccessCard(true);

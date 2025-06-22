@@ -84,9 +84,63 @@ export const useStoolLogs = () => {
     }
   };
 
+  const calculateCurrentStreak = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        return 0;
+      }
+
+      const { data, error } = await supabase
+        .from('stool_logs')
+        .select('created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        return 0;
+      }
+
+      // Group logs by date (ignoring time)
+      const logsByDate = new Map<string, boolean>();
+      data.forEach(log => {
+        const date = new Date(log.created_at).toDateString();
+        logsByDate.set(date, true);
+      });
+
+      // Calculate streak starting from today
+      let streak = 0;
+      const today = new Date();
+      
+      for (let i = 0; i < 365; i++) { // Check up to a year back
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() - i);
+        const dateString = checkDate.toDateString();
+        
+        if (logsByDate.has(dateString)) {
+          streak++;
+        } else {
+          // If we miss a day, break the streak
+          // But allow for today not being logged yet if it's the first day
+          if (i === 0) {
+            continue; // Skip today if no log yet
+          }
+          break;
+        }
+      }
+
+      return streak;
+    } catch (error) {
+      console.error('Error calculating streak:', error);
+      return 0;
+    }
+  };
+
   return {
     addStoolLog,
     getStoolLogs,
+    calculateCurrentStreak,
     isLoading
   };
 };
