@@ -1,13 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { MessageCircle, Send, Loader2, Database } from "lucide-react";
+import { MessageCircle, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useFoodLogs } from "@/hooks/useFoodLogs";
-import { useStoolLogs } from "@/hooks/useStoolLogs";
-import { useHealthProfile } from "@/hooks/useHealthProfile";
 
 interface Message {
   id: string;
@@ -21,58 +19,25 @@ const GutHealthCoach = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
-  const { foodLogs } = useFoodLogs();
-  const { getStoolLogs } = useStoolLogs();
-  const { healthProfile } = useHealthProfile();
 
   useEffect(() => {
-    const initializeChat = async () => {
-      try {
-        const stoolLogs = await getStoolLogs();
-        const hasData = Boolean(healthProfile || (foodLogs && foodLogs.length > 0) || (stoolLogs && stoolLogs.length > 0));
-        
-        const welcomeMessage = {
-          id: '1',
-          content: `Hi! I'm your gut health coach. ${
-            hasData 
-              ? "I can see you have health data and tracking history. I'll use this information to provide personalized advice!" 
-              : "I can help you understand digestive patterns and suggest improvements. Start tracking your food and symptoms to get personalized insights!"
-          } What would you like to know about your gut health?`,
-          role: 'assistant' as const,
-          timestamp: new Date()
-        };
-        
-        setMessages([welcomeMessage]);
-      } catch (error) {
-        console.error('Failed to initialize chat:', error);
-        setMessages([{
-          id: '1',
-          content: "Hi! I'm your gut health coach. I can help you understand your digestive patterns and answer questions about symptoms. What would you like to know?",
-          role: 'assistant',
-          timestamp: new Date()
-        }]);
-      }
-    };
-
-    if (isOpen) {
-      initializeChat();
+    if (isOpen && messages.length === 0) {
+      const welcomeMessage = {
+        id: '1',
+        content: "Hi! I'm your gut health coach. I can help you with digestive health questions and nutrition advice. What would you like to know?",
+        role: 'assistant' as const,
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
     }
-  }, [isOpen, foodLogs, healthProfile]);
-
-  const quickPrompts = [
-    "Analyze my recent meal patterns",
-    "Help me understand my symptoms", 
-    "Suggest foods for better digestion",
-    "What should I track daily?"
-  ];
+  }, [isOpen, messages.length]);
 
   const sendMessage = async (messageText?: string) => {
     const textToSend = messageText || inputMessage;
     if (!textToSend.trim() || isLoading) return;
 
-    console.log('=== STARTING MESSAGE SEND ===');
-    console.log('Message to send:', textToSend);
+    console.log('=== SENDING MESSAGE ===');
+    console.log('Message:', textToSend);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -86,88 +51,32 @@ const GutHealthCoach = () => {
     setIsLoading(true);
 
     try {
-      // Fetch fresh stool logs for the request
-      console.log('Fetching stool logs...');
-      const stoolLogs = await getStoolLogs();
-      console.log('Stool logs fetched:', stoolLogs?.length || 0, 'entries');
-      
-      // Prepare user data - ensure we have proper boolean values
-      const hasHealthProfile = healthProfile !== null && healthProfile !== undefined;
-      const hasFoodLogs = Array.isArray(foodLogs) && foodLogs.length > 0;
-      const hasStoolLogs = Array.isArray(stoolLogs) && stoolLogs.length > 0;
-      const hasUserData = hasHealthProfile || hasFoodLogs || hasStoolLogs;
-
-      console.log('Data check:', {
-        hasHealthProfile,
-        hasFoodLogs,
-        hasStoolLogs,
-        hasUserData,
-        foodLogsCount: foodLogs?.length || 0,
-        stoolLogsCount: stoolLogs?.length || 0
-      });
-
-      const userData = hasUserData ? {
-        healthProfile: hasHealthProfile ? healthProfile : null,
-        foodLogs: hasFoodLogs ? foodLogs : [],
-        stoolLogs: hasStoolLogs ? stoolLogs : []
-      } : null;
-
+      // Simple request - just the message
       const requestPayload = { 
-        message: textToSend,
-        conversationHistory: messages.slice(-5).map(msg => ({
-          role: msg.role,
-          content: msg.content
-        })),
-        hasUserData,
-        userData
+        message: textToSend
       };
 
-      console.log('=== CALLING SUPABASE FUNCTION ===');
-      console.log('Request payload:', {
-        message: textToSend.substring(0, 50) + '...',
-        conversationHistoryLength: requestPayload.conversationHistory.length,
-        hasUserData,
-        userDataPresent: userData !== null
-      });
+      console.log('Calling Supabase function with:', requestPayload);
 
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: requestPayload
       });
 
-      console.log('=== SUPABASE FUNCTION RESPONSE ===');
-      console.log('Raw response data:', data);
-      console.log('Raw response error:', error);
-      console.log('Response type:', typeof data);
-      console.log('Response keys:', data ? Object.keys(data) : 'no data');
+      console.log('Supabase response:', { data, error });
 
       if (error) {
-        console.error('Supabase function error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
-        throw new Error(`Function error: ${error.message || 'Unknown error'}`);
+        console.error('Supabase function error:', error);
+        throw new Error(`Function error: ${error.message}`);
       }
 
-      if (!data) {
-        console.error('No data received from function');
-        throw new Error('No response data received from AI service');
+      if (!data || !data.response) {
+        console.error('No response data:', data);
+        throw new Error('No response received from AI service');
       }
-
-      console.log('Checking response structure...');
-      if (!data.response && !data.message && !data.content) {
-        console.error('Invalid response structure:', data);
-        throw new Error('Invalid response format from AI service');
-      }
-
-      // Try different response field names
-      const responseContent = data.response || data.message || data.content || JSON.stringify(data);
-      console.log('Final response content:', responseContent);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: responseContent,
+        content: data.response,
         role: 'assistant',
         timestamp: new Date()
       };
@@ -176,14 +85,8 @@ const GutHealthCoach = () => {
       setMessages(prev => [...prev, assistantMessage]);
 
     } catch (error) {
-      console.error('=== CHAT ERROR ===');
-      console.error('Error details:', error);
-      console.error('Error type:', typeof error);
-      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
-      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
-      
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
-      toast.error(`Sorry, I'm having trouble connecting: ${errorMsg}`);
+      console.error('Chat error:', error);
+      toast.error(`Sorry, I'm having trouble connecting: ${error instanceof Error ? error.message : 'Unknown error'}`);
       
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -194,12 +97,7 @@ const GutHealthCoach = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
-      console.log('=== MESSAGE SEND COMPLETE ===');
     }
-  };
-
-  const handleQuickPrompt = (prompt: string) => {
-    sendMessage(prompt);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -208,8 +106,6 @@ const GutHealthCoach = () => {
       sendMessage();
     }
   };
-
-  const hasData = Boolean(healthProfile || (foodLogs && foodLogs.length > 0));
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -235,17 +131,9 @@ const GutHealthCoach = () => {
       
       <SheetContent className="w-full sm:max-w-md bg-white" style={{ borderColor: '#D3D3D3' }}>
         <SheetHeader className="pb-4" style={{ borderBottomColor: '#D3D3D3' }}>
-          <SheetTitle className="flex items-center justify-between" style={{ color: '#2E2E2E' }}>
-            <div className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
-              Gut Health Coach
-            </div>
-            {hasData && (
-              <div className="flex items-center gap-1 text-xs text-green-600">
-                <Database className="w-3 h-3" />
-                <span>Data Connected</span>
-              </div>
-            )}
+          <SheetTitle className="flex items-center gap-2" style={{ color: '#2E2E2E' }}>
+            <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
+            Gut Health Coach
           </SheetTitle>
         </SheetHeader>
 
@@ -288,44 +176,11 @@ const GutHealthCoach = () => {
                   }}
                 >
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Analyzing your data...</span>
+                  <span className="text-sm">Thinking...</span>
                 </div>
               </div>
             )}
           </div>
-
-          {/* Quick Prompts */}
-          {messages.length === 1 && (
-            <div className="py-4 border-t" style={{ borderColor: '#D3D3D3' }}>
-              <p className="text-sm font-medium mb-2" style={{ color: '#2E2E2E' }}>Quick questions:</p>
-              <div className="grid grid-cols-1 gap-2">
-                {quickPrompts.map((prompt, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickPrompt(prompt)}
-                    className="text-left justify-start h-auto p-2 text-xs"
-                    style={{
-                      borderColor: '#D3D3D3',
-                      color: '#2E2E2E',
-                      backgroundColor: 'transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#F9F8F4';
-                      e.currentTarget.style.borderColor = '#4A7C59';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.borderColor = '#D3D3D3';
-                    }}
-                  >
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Input */}
           <div className="pt-4 border-t" style={{ borderColor: '#D3D3D3' }}>
@@ -334,7 +189,7 @@ const GutHealthCoach = () => {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask me about your gut health..."
+                placeholder="Ask me about gut health..."
                 className="flex-1"
                 style={{
                   borderColor: '#D3D3D3',
