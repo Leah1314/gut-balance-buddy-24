@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
+import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle, Info } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,8 +36,15 @@ const TestResultsUpload = () => {
       if (file.type.startsWith('image/') || file.type === 'application/pdf') {
         setSelectedFile(file);
         setAnalysisResult(null);
+        
+        // Show info toast for PDF files
+        if (file.type === 'application/pdf') {
+          toast.info("PDF files have limited analysis. For best results, please upload an image (JPG/PNG) of your test results.", {
+            duration: 5000
+          });
+        }
       } else {
-        toast.error("Please select an image or PDF file");
+        toast.error("Please select an image (JPG, PNG) or PDF file");
       }
     }
   };
@@ -46,6 +53,7 @@ const TestResultsUpload = () => {
     if (!user || !selectedFile) return null;
 
     try {
+      console.log('Saving test result to database...');
       const { data, error } = await supabase
         .from('test_results')
         .insert({
@@ -58,7 +66,7 @@ const TestResultsUpload = () => {
           recommendations: result.recommendations,
           concern_level: result.concernLevel,
           summary: result.summary,
-          raw_analysis: result as any
+          raw_analysis: JSON.parse(JSON.stringify(result))
         })
         .select()
         .single();
@@ -91,41 +99,67 @@ const TestResultsUpload = () => {
     }
 
     setIsAnalyzing(true);
+    
     try {
+      console.log('Starting test results analysis...');
+      
       // Convert file to base64
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const base64 = e.target?.result as string;
-        const base64Data = base64.split(',')[1];
+        try {
+          const base64 = e.target?.result as string;
+          const base64Data = base64.split(',')[1];
 
-        console.log('Calling analyze-test-results function...');
-        
-        const { data, error } = await supabase.functions.invoke('analyze-test-results', {
-          body: { 
-            image: base64Data,
-            fileType: selectedFile.type
+          console.log('Calling analyze-test-results function...');
+          console.log('File type:', selectedFile.type);
+          
+          const { data, error } = await supabase.functions.invoke('analyze-test-results', {
+            body: { 
+              image: base64Data,
+              fileType: selectedFile.type
+            }
+          });
+
+          if (error) {
+            console.error('Error analyzing test results:', error);
+            toast.error(`Failed to analyze test results: ${error.message || 'Unknown error'}`);
+            return;
           }
-        });
 
-        if (error) {
-          console.error('Error analyzing test results:', error);
-          toast.error("Failed to analyze test results");
-          return;
+          console.log('Analysis result received:', data);
+          
+          if (!data) {
+            toast.error("No analysis data received");
+            return;
+          }
+
+          setAnalysisResult(data);
+          
+          // Save the result to database
+          const savedResult = await saveTestResultToDatabase(data);
+          
+          if (savedResult) {
+            toast.success("Test results analyzed and saved successfully!");
+          }
+          
+        } catch (innerError) {
+          console.error('Error in file processing:', innerError);
+          toast.error("Failed to process the file");
+        } finally {
+          setIsAnalyzing(false);
         }
-
-        console.log('Analysis result received:', data);
-        setAnalysisResult(data);
-        
-        // Save the result to database
-        await saveTestResultToDatabase(data);
-        
-        toast.success("Test results analyzed and saved successfully!");
       };
+
+      reader.onerror = () => {
+        console.error('Error reading file');
+        toast.error("Failed to read the file");
+        setIsAnalyzing(false);
+      };
+
       reader.readAsDataURL(selectedFile);
     } catch (error) {
-      console.error('Error analyzing test results:', error);
+      console.error('Error in analyzeTestResults:', error);
       toast.error("Failed to analyze test results");
-    } finally {
       setIsAnalyzing(false);
     }
   };
@@ -160,7 +194,7 @@ const TestResultsUpload = () => {
         <CardContent className="space-y-3">
           <div>
             <Label htmlFor="test-file" className="text-sm font-medium text-gray-700">
-              Select Test Result File (Image or PDF)
+              Select Test Result File
             </Label>
             <Input
               id="test-file"
@@ -178,6 +212,15 @@ const TestResultsUpload = () => {
                 )}
                 <p className="text-sm text-gray-600">
                   Selected: {selectedFile.name}
+                </p>
+              </div>
+            )}
+            
+            {selectedFile?.type === 'application/pdf' && (
+              <div className="flex items-start gap-2 mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">
+                  <strong>PDF Note:</strong> For best analysis results, consider taking a clear photo of your test results instead of uploading a PDF.
                 </p>
               </div>
             )}

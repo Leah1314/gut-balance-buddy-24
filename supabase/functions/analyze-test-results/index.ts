@@ -28,29 +28,58 @@ serve(async (req) => {
     console.log('Analyzing test results file with OpenAI...');
     console.log('File type:', fileType);
 
-    // Determine the appropriate media type for OpenAI
-    let mediaType = 'image/jpeg';
-    if (fileType === 'application/pdf') {
-      mediaType = 'application/pdf';
-    } else if (fileType?.startsWith('image/')) {
-      mediaType = fileType;
-    }
+    let response;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `Analyze this medical test result file and provide a structured summary. Return ONLY a JSON object with this exact structure:
+    if (fileType === 'application/pdf') {
+      // For PDFs, we'll use a text-based approach since vision API doesn't support PDFs
+      // We'll ask the user to describe what's in the PDF or convert it to image
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a medical test results analyzer. Since you cannot directly read PDF files, you'll need to provide a general response asking the user to convert their PDF to an image format or provide text content. Return ONLY a JSON object with this exact structure:
+{
+  "testType": "PDF Document (Unable to read)",
+  "keyFindings": ["PDF files cannot be directly analyzed. Please convert to image format (JPG, PNG) or provide test results as text."],
+  "values": [],
+  "recommendations": ["Convert PDF to image format", "Take a clear photo of the test results", "Ensure all text is readable in the image"],
+  "concernLevel": "low",
+  "summary": "PDF file detected but cannot be analyzed directly. Please provide test results in image format for accurate analysis."
+}`
+            },
+            {
+              role: 'user',
+              content: 'A user has uploaded a PDF file with test results. Please provide the standard response asking them to convert to image format.'
+            }
+          ],
+          max_tokens: 800,
+          temperature: 0.3
+        }),
+      });
+    } else if (fileType?.startsWith('image/')) {
+      // For images, use the vision API
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: `Analyze this medical test result image and provide a structured summary. Return ONLY a JSON object with this exact structure:
 {
   "testType": "type of test (blood work, urine, etc.)",
   "keyFindings": ["list of key findings"],
@@ -60,21 +89,24 @@ serve(async (req) => {
   "summary": "brief overall summary"
 }
 
-Focus on extracting specific values, identifying any abnormal results, and providing health insights. If this is a PDF, extract all readable text and medical data from it.`
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:${mediaType};base64,${image}`
+Focus on extracting specific values, identifying any abnormal results, and providing health insights.`
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:${fileType};base64,${image}`
+                  }
                 }
-              }
-            ]
-          }
-        ],
-        max_tokens: 1500,
-        temperature: 0.3
-      }),
-    });
+              ]
+            }
+          ],
+          max_tokens: 1500,
+          temperature: 0.3
+        }),
+      });
+    } else {
+      throw new Error('Unsupported file type. Please use image files (JPG, PNG) or PDF.');
+    }
 
     if (!response.ok) {
       const errorData = await response.json();
