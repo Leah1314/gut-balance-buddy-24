@@ -6,7 +6,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { MessageCircle, Send, Loader2, Database } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useRAG } from "@/hooks/useRAG";
 import { useFoodLogsWithRAG } from "@/hooks/useFoodLogsWithRAG";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 
@@ -22,10 +21,8 @@ const GutHealthCoach = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [hasUserData, setHasUserData] = useState({ health_info: false, track_history: false });
   const [allUserData, setAllUserData] = useState<any>({});
   
-  const { checkUserData, retrieveUserData } = useRAG();
   const { foodLogs } = useFoodLogsWithRAG();
   const { getStoolLogs } = useStoolLogs();
 
@@ -33,7 +30,9 @@ const GutHealthCoach = () => {
   const fetchAllUserData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) return {};
+
+      console.log('Fetching user data for chat...');
 
       // Fetch health profile
       const { data: healthProfile } = await supabase
@@ -55,7 +54,11 @@ const GutHealthCoach = () => {
       };
 
       setAllUserData(userData);
-      console.log('All user data fetched:', userData);
+      console.log('User data fetched for chat:', {
+        hasHealthProfile: !!userData.healthProfile,
+        foodLogsCount: userData.foodLogs.length,
+        stoolLogsCount: userData.stoolLogs.length
+      });
       
       return userData;
     } catch (error) {
@@ -68,16 +71,14 @@ const GutHealthCoach = () => {
     const initializeChat = async () => {
       try {
         // Fetch all user data first
-        await fetchAllUserData();
+        const userData = await fetchAllUserData();
         
-        // Check RAG data status
-        const dataStatus = await checkUserData();
-        setHasUserData(dataStatus);
+        const hasData = !!(userData.healthProfile || userData.foodLogs?.length > 0 || userData.stoolLogs?.length > 0);
         
         const welcomeMessage = {
           id: '1',
           content: `Hi! I'm your gut health coach. ${
-            dataStatus.health_info || dataStatus.track_history 
+            hasData 
               ? "I can see you have health data and tracking history. I'll use this information to provide personalized advice!" 
               : "I can help you understand digestive patterns and suggest improvements. Start tracking your food and symptoms to get personalized insights!"
           } What would you like to know about your gut health?`,
@@ -162,37 +163,19 @@ const GutHealthCoach = () => {
         });
       }
 
-      // Try to get additional RAG context
-      if (hasUserData.health_info || hasUserData.track_history) {
-        try {
-          console.log('Enriching query with RAG data...');
-          const ragData = await retrieveUserData(textToSend, 3);
-          
-          if (ragData.health_info.length > 0 || ragData.track_history.length > 0) {
-            contextualMessage += '\n\n--- Additional Context from RAG ---\n';
-            
-            if (ragData.health_info.length > 0) {
-              contextualMessage += 'Health Info:\n' + ragData.health_info.join('\n') + '\n';
-            }
-            
-            if (ragData.track_history.length > 0) {
-              contextualMessage += 'Tracking History:\n' + ragData.track_history.join('\n') + '\n';
-            }
-            
-            console.log('Query enriched with RAG data');
-          }
-        } catch (error) {
-          console.error('Failed to enrich query with RAG data:', error);
-        }
-      }
-
-      console.log('Sending contextual message to AI:', contextualMessage);
+      console.log('Sending contextual message to AI:', {
+        originalMessage: textToSend,
+        hasHealthProfile: !!allUserData.healthProfile,
+        foodLogsCount: allUserData.foodLogs?.length || 0,
+        stoolLogsCount: allUserData.stoolLogs?.length || 0,
+        contextualMessageLength: contextualMessage.length
+      });
 
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: { 
           message: contextualMessage,
           conversationHistory: messages.slice(-5), // Last 5 messages for context
-          hasUserData: hasUserData,
+          hasUserData: !!(allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0),
           userData: allUserData
         }
       });
@@ -274,7 +257,7 @@ const GutHealthCoach = () => {
               <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
               Gut Health Coach
             </div>
-            {(hasUserData.health_info || hasUserData.track_history || allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0) && (
+            {(allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0) && (
               <div className="flex items-center gap-1 text-xs text-green-600">
                 <Database className="w-3 h-3" />
                 <span>Data Connected</span>
