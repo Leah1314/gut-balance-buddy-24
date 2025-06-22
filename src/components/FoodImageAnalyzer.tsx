@@ -48,7 +48,6 @@ const FoodImageAnalyzer = () => {
       reader.readAsDataURL(file);
       setNutritionData(null);
       
-      // Show success message for image upload
       toast.success(`✅ Image uploaded successfully! Ready for analysis.`);
       console.log('Image uploaded:', file.name, file.size, 'bytes');
     }
@@ -59,7 +58,7 @@ const FoodImageAnalyzer = () => {
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = reader.result as string;
-        resolve(base64.split(',')[1]); // Remove data:image/jpeg;base64, prefix
+        resolve(base64.split(',')[1]);
       };
       reader.onerror = reject;
       reader.readAsDataURL(file);
@@ -128,7 +127,6 @@ const FoodImageAnalyzer = () => {
     if (result) {
       toast.success("✅ Food analysis saved to your log successfully!");
       console.log('Analysis saved to log:', result);
-      // Reset form
       setSelectedImage(null);
       setImagePreview(null);
       setNutritionData(null);
@@ -145,11 +143,11 @@ const FoodImageAnalyzer = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Image Upload */}
+    <div className="space-y-4">
+      {/* Image Upload - Mobile optimized */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center space-x-2 text-lg">
             <Camera className="w-5 h-5 text-blue-600" />
             <span>AI Food Image Analysis</span>
           </CardTitle>
@@ -158,11 +156,11 @@ const FoodImageAnalyzer = () => {
           <div className="space-y-3">
             <Label className="text-sm font-medium">Upload Food Image</Label>
             <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 active:bg-gray-200 transition-colors">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                  <p className="mb-2 text-sm text-gray-500">
-                    <span className="font-semibold">Click to upload</span> or drag and drop
+                  <Upload className="w-10 h-10 mb-3 text-gray-500" />
+                  <p className="mb-2 text-sm text-gray-500 text-center px-4">
+                    <span className="font-semibold">Tap to upload</span> or drag and drop
                   </p>
                   <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
                 </div>
@@ -177,7 +175,7 @@ const FoodImageAnalyzer = () => {
           </div>
 
           {imagePreview && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <img
                 src={imagePreview}
                 alt="Food preview"
@@ -186,16 +184,16 @@ const FoodImageAnalyzer = () => {
               <Button
                 onClick={analyzeImage}
                 disabled={isAnalyzing}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 h-12 rounded-lg"
               >
                 {isAnalyzing ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Analyzing Image...
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 mr-2" />
+                    <Zap className="w-5 h-5 mr-2" />
                     Analyze with AI
                   </>
                 )}
@@ -205,21 +203,21 @@ const FoodImageAnalyzer = () => {
         </CardContent>
       </Card>
 
-      {/* Nutrition Results */}
+      {/* Nutrition Results - More compact for mobile */}
       {nutritionData && (
         <div className="space-y-4">
           {/* Food Items Identified */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center space-x-2 text-base">
+                <CheckCircle className="w-4 h-4 text-green-600" />
                 <span>Identified Foods</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="flex flex-wrap gap-2">
                 {nutritionData.foodItems.map((item, index) => (
-                  <Badge key={index} variant="secondary" className="text-sm">
+                  <Badge key={index} variant="secondary" className="text-sm px-3 py-1">
                     {item}
                   </Badge>
                 ))}
@@ -227,36 +225,36 @@ const FoodImageAnalyzer = () => {
             </CardContent>
           </Card>
 
-          {/* Nutrition Facts */}
+          {/* Nutrition Facts - Mobile grid */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>Nutrition Facts</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Nutrition Facts</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <p className="text-2xl font-bold text-blue-600">{nutritionData.calories}</p>
-                  <p className="text-sm text-gray-600">Calories</p>
+                  <p className="text-xl font-bold text-blue-600">{nutritionData.calories}</p>
+                  <p className="text-xs text-gray-600">Calories</p>
                 </div>
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">{nutritionData.protein}g</p>
-                  <p className="text-sm text-gray-600">Protein</p>
+                  <p className="text-xl font-bold text-green-600">{nutritionData.protein}g</p>
+                  <p className="text-xs text-gray-600">Protein</p>
                 </div>
                 <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                  <p className="text-2xl font-bold text-yellow-600">{nutritionData.carbs}g</p>
-                  <p className="text-sm text-gray-600">Carbs</p>
+                  <p className="text-xl font-bold text-yellow-600">{nutritionData.carbs}g</p>
+                  <p className="text-xs text-gray-600">Carbs</p>
                 </div>
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <p className="text-2xl font-bold text-purple-600">{nutritionData.fat}g</p>
-                  <p className="text-sm text-gray-600">Fat</p>
+                  <p className="text-xl font-bold text-purple-600">{nutritionData.fat}g</p>
+                  <p className="text-xs text-gray-600">Fat</p>
                 </div>
                 <div className="text-center p-3 bg-orange-50 rounded-lg">
-                  <p className="text-2xl font-bold text-orange-600">{nutritionData.fiber}g</p>
-                  <p className="text-sm text-gray-600">Fiber</p>
+                  <p className="text-xl font-bold text-orange-600">{nutritionData.fiber}g</p>
+                  <p className="text-xs text-gray-600">Fiber</p>
                 </div>
                 <div className="text-center p-3 bg-red-50 rounded-lg">
-                  <p className="text-2xl font-bold text-red-600">{nutritionData.sugar}g</p>
-                  <p className="text-sm text-gray-600">Sugar</p>
+                  <p className="text-xl font-bold text-red-600">{nutritionData.sugar}g</p>
+                  <p className="text-xs text-gray-600">Sugar</p>
                 </div>
               </div>
             </CardContent>
@@ -264,12 +262,12 @@ const FoodImageAnalyzer = () => {
 
           {/* Gut Health Rating */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>Gut Health Rating</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Gut Health Rating</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className={`text-center p-4 rounded-lg ${getRatingColor(nutritionData.gutHealthRating)}`}>
-                <div className="text-3xl font-bold mb-2">
+                <div className="text-2xl font-bold mb-2">
                   {nutritionData.gutHealthRating}/10
                 </div>
                 <p className="text-sm">
@@ -281,17 +279,17 @@ const FoodImageAnalyzer = () => {
             </CardContent>
           </Card>
 
-          {/* AI Insights */}
+          {/* AI Insights - Compact */}
           <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>AI Insights</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">AI Insights</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="space-y-3">
                 {nutritionData.insights.map((insight, index) => (
                   <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                    <p className="text-sm text-gray-700">{insight}</p>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-sm text-gray-700 leading-relaxed">{insight}</p>
                   </div>
                 ))}
               </div>
@@ -299,10 +297,10 @@ const FoodImageAnalyzer = () => {
           </Card>
 
           {/* Save to Log Button */}
-          <div className="text-center pt-4">
+          <div className="text-center pt-2">
             <Button 
               onClick={saveAnalysisToLog}
-              className="px-8 py-3 text-white font-medium transition-colors"
+              className="w-full h-12 text-white font-medium transition-colors rounded-lg"
               style={{
                 backgroundColor: '#4A7C59'
               }}
@@ -313,7 +311,7 @@ const FoodImageAnalyzer = () => {
                 e.currentTarget.style.backgroundColor = '#4A7C59';
               }}
             >
-              <Save className="w-4 h-4 mr-2 stroke-2" />
+              <Save className="w-5 h-5 mr-2 stroke-2" />
               Save to My Log
             </Button>
           </div>

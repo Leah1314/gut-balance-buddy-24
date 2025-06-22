@@ -15,57 +15,56 @@ const Index = () => {
   const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool' | 'history'>('food');
 
   return (
-    <div className="min-h-screen pb-20" style={{
+    <div className="min-h-screen pb-24" style={{
       backgroundColor: '#F9F8F4'
     }}>
-      {/* Header */}
-      <header style={{
+      {/* Header - Fixed with padding for mobile */}
+      <header className="fixed top-0 left-0 right-0 bg-white border-b z-40 px-4 py-3 safe-area-top" style={{
         borderColor: '#D3D3D3'
-      }} className="fixed bg-white border-b sticky top-0 z-10 max-w-full ">
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 w-full">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 flex items-center justify-center">
-                <img src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" alt="Logo" className="w-8 h-8 object-contain" />
-              </div>
-              <h1 className="text-xl font-semibold" style={{
-                color: '#2E2E2E'
-              }}>In and Out</h1>
+      }}>
+        <div className="flex items-center justify-between max-w-screen-md mx-auto">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" alt="Logo" className="w-8 h-8 object-contain" />
             </div>
-            <UserMenu />
+            <h1 className="text-xl font-semibold" style={{
+              color: '#2E2E2E'
+            }}>In and Out</h1>
           </div>
+          <UserMenu />
         </div>
       </header>
 
-      <div className="w-full max-w-screen-md px-4 sm:px-6 lg:px-8 mx-auto py-6">
+      {/* Main Content - Added top padding for fixed header */}
+      <div className="w-full max-w-screen-md px-4 mx-auto pt-20 pb-6">
         {activeMainTab === 'track' ? (
           <>
-            {/* Hero Section */}
+            {/* Hero Section - More compact for mobile */}
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-semibold mb-1" style={{
+              <h2 className="text-xl font-semibold mb-2" style={{
                 color: '#2E2E2E'
               }}>
                 Track Your Digestive Health
               </h2>
-              <p className="text-base leading-tight" style={{
+              <p className="text-sm leading-relaxed px-4" style={{
                 color: '#2E2E2E',
-                opacity: 0.6
+                opacity: 0.7
               }}>
                 Monitor what goes in and what comes out for optimal gut health
               </p>
             </div>
 
-            {/* Track Sub-Tab Navigation */}
+            {/* Track Sub-Tab Navigation - Larger touch targets */}
             <div className="mb-6">
               <Card className="bg-white shadow-sm" style={{
                 borderColor: '#D3D3D3'
               }}>
                 <CardContent className="p-3">
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-2">
                     <Button 
                       onClick={() => setActiveTrackTab('food')} 
                       variant="ghost" 
-                      className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${activeTrackTab === 'food' ? 'text-white border-transparent hover:opacity-90' : 'border-opacity-100 hover:border-opacity-100'}`} 
+                      className={`flex flex-col items-center justify-center space-y-1 h-16 rounded-xl border transition-all duration-200 ${activeTrackTab === 'food' ? 'text-white border-transparent hover:opacity-90' : 'border-opacity-100 hover:border-opacity-100'}`} 
                       style={{
                         backgroundColor: activeTrackTab === 'food' ? '#4A7C59' : 'transparent',
                         borderColor: activeTrackTab === 'food' ? '#4A7C59' : '#D3D3D3',
@@ -86,13 +85,13 @@ const Index = () => {
                         }
                       }}
                     >
-                      <Utensils className={`w-4 h-4 stroke-2 ${activeTrackTab === 'food' ? 'scale-105' : ''} transition-transform`} />
-                      <span className="font-medium">Food In</span>
+                      <Utensils className={`w-5 h-5 stroke-2 ${activeTrackTab === 'food' ? 'scale-105' : ''} transition-transform`} />
+                      <span className="font-medium text-xs">Food In</span>
                     </Button>
                     <Button 
                       onClick={() => setActiveTrackTab('stool')} 
                       variant="ghost" 
-                      className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${activeTrackTab === 'stool' ? 'text-white border-transparent hover:opacity-90' : 'border-opacity-100 hover:border-opacity-100'}`} 
+                      className={`flex flex-col items-center justify-center space-y-1 h-16 rounded-xl border transition-all duration-200 ${activeTrackTab === 'stool' ? 'text-white border-transparent hover:opacity-90' : 'border-opacity-100 hover:border-opacity-100'}`} 
                       style={{
                         backgroundColor: activeTrackTab === 'stool' ? '#4A7C59' : 'transparent',
                         borderColor: activeTrackTab === 'stool' ? '#4A7C59' : '#D3D3D3',
@@ -113,13 +112,13 @@ const Index = () => {
                         }
                       }}
                     >
-                      <Scroll className={`w-4 h-4 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
-                      <span className="font-medium">Stool Out</span>
+                      <Scroll className={`w-5 h-5 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
+                      <span className="font-medium text-xs">Stool Out</span>
                     </Button>
                     <Button 
                       onClick={() => setActiveTrackTab('history')} 
                       variant="ghost" 
-                      className={`flex items-center justify-center space-x-2 h-11 rounded-full border transition-all duration-200 ${activeTrackTab === 'history' ? 'text-white border-transparent hover:opacity-90' : 'border-opacity-100 hover:border-opacity-100'}`} 
+                      className={`flex flex-col items-center justify-center space-y-1 h-16 rounded-xl border transition-all duration-200 ${activeTrackTab === 'history' ? 'text-white border-transparent hover:opacity-90' : 'border-opacity-100 hover:border-opacity-100'}`} 
                       style={{
                         backgroundColor: activeTrackTab === 'history' ? '#4A7C59' : 'transparent',
                         borderColor: activeTrackTab === 'history' ? '#4A7C59' : '#D3D3D3',
@@ -140,8 +139,8 @@ const Index = () => {
                         }
                       }}
                     >
-                      <Calendar className={`w-4 h-4 stroke-2 ${activeTrackTab === 'history' ? 'scale-105' : ''} transition-transform`} />
-                      <span className="font-medium">History</span>
+                      <Calendar className={`w-5 h-5 stroke-2 ${activeTrackTab === 'history' ? 'scale-105' : ''} transition-transform`} />
+                      <span className="font-medium text-xs">History</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -170,15 +169,15 @@ const Index = () => {
         )}
       </div>
 
-      {/* Bottom Tab Navigation */}
-      <div style={{
+      {/* Bottom Tab Navigation - Larger touch targets and better spacing */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 w-full safe-area-bottom" style={{
         borderColor: '#D3D3D3'
-      }} className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 w-full">
-        <div className="w-full max-w-screen-md px-4 sm:px-6 lg:px-8 mx-auto">
+      }}>
+        <div className="w-full max-w-screen-md px-4 mx-auto">
           <div className="grid grid-cols-3 gap-0">
             <button 
               onClick={() => setActiveMainTab('track')} 
-              className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${activeMainTab === 'track' ? 'opacity-100' : 'opacity-60'}`} 
+              className={`flex flex-col items-center justify-center py-4 transition-all duration-200 ${activeMainTab === 'track' ? 'opacity-100' : 'opacity-60'}`} 
               style={{
                 color: activeMainTab === 'track' ? '#4A7C59' : '#2E2E2E'
               }}
@@ -188,7 +187,7 @@ const Index = () => {
             </button>
             <button 
               onClick={() => setActiveMainTab('chat')} 
-              className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${activeMainTab === 'chat' ? 'opacity-100' : 'opacity-60'}`} 
+              className={`flex flex-col items-center justify-center py-4 transition-all duration-200 ${activeMainTab === 'chat' ? 'opacity-100' : 'opacity-60'}`} 
               style={{
                 color: activeMainTab === 'chat' ? '#4A7C59' : '#2E2E2E'
               }}
@@ -198,7 +197,7 @@ const Index = () => {
             </button>
             <button 
               onClick={() => setActiveMainTab('health')} 
-              className={`flex flex-col items-center justify-center py-3 transition-all duration-200 ${activeMainTab === 'health' ? 'opacity-100' : 'opacity-60'}`} 
+              className={`flex flex-col items-center justify-center py-4 transition-all duration-200 ${activeMainTab === 'health' ? 'opacity-100' : 'opacity-60'}`} 
               style={{
                 color: activeMainTab === 'health' ? '#4A7C59' : '#2E2E2E'
               }}

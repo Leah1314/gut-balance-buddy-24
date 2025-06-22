@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -112,12 +111,12 @@ const ChatPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await sendMessage(input, true); // Always include user data
+    await sendMessage(input, true);
   };
 
   const handleQuickQuestion = async (question: string) => {
     console.log('Quick question selected:', question);
-    await sendMessage(question, true); // Always include user data for quick questions
+    await sendMessage(question, true);
   };
 
   if (!user) {
@@ -130,9 +129,9 @@ const ChatPage = () => {
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      {/* Chat Messages */}
+      {/* Chat Messages - Optimized for mobile */}
       <Card className="flex-1 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardContent className="p-4 h-96 overflow-y-auto">
+        <CardContent className="p-3 h-80 overflow-y-auto">
           <div className="space-y-4">
             {messages.map((message) => (
               <div
@@ -140,7 +139,7 @@ const ChatPage = () => {
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  className={`max-w-[85%] rounded-lg px-4 py-3 ${
                     message.role === 'user'
                       ? 'text-white'
                       : 'bg-gray-100'
@@ -150,8 +149,8 @@ const ChatPage = () => {
                     color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
                   }}
                 >
-                  <div className="whitespace-pre-wrap">{message.content}</div>
-                  <div className="text-xs mt-1 opacity-70">
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+                  <div className="text-xs mt-2 opacity-70">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </div>
                 </div>
@@ -159,9 +158,9 @@ const ChatPage = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 rounded-lg px-4 py-2 flex items-center space-x-2">
+                <div className="bg-gray-100 rounded-lg px-4 py-3 flex items-center space-x-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span style={{ color: '#2E2E2E' }}>Thinking...</span>
+                  <span className="text-sm" style={{ color: '#2E2E2E' }}>Thinking...</span>
                 </div>
               </div>
             )}
@@ -173,15 +172,15 @@ const ChatPage = () => {
       {/* Quick Questions */}
       <QuickQuestions onQuestionSelect={handleQuickQuestion} isLoading={isLoading} />
 
-      {/* Message Input */}
+      {/* Message Input - Mobile optimized */}
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <form onSubmit={handleSubmit} className="flex space-x-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me about your gut health..."
-              className="flex-1 min-h-[60px] resize-none"
+              className="flex-1 min-h-[48px] max-h-32 resize-none rounded-lg text-sm"
               style={{
                 borderColor: '#D3D3D3',
                 color: '#2E2E2E'
@@ -196,13 +195,13 @@ const ChatPage = () => {
             <Button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="self-end text-white"
+              className="self-end text-white h-12 w-12 rounded-lg"
               style={{
                 backgroundColor: '#4A7C59',
                 borderColor: '#4A7C59'
               }}
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5" />
             </Button>
           </form>
         </CardContent>

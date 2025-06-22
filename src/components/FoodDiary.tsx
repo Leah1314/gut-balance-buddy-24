@@ -35,7 +35,7 @@ const FoodDiary = () => {
     icon: Apple
   }];
 
-  const commonFoods = ["Banana", "Apple", "Yogurt", "Oatmeal", "Salad", "Chicken", "Rice", "Vegetables", "Nuts", "Bread", "Pasta", "Fish"];
+  const commonFoods = ["Rice", "Chicken", "Salad", "Banana", "Apple", "Yogurt", "Oatmeal", "Vegetables", "Nuts", "Bread", "Pasta", "Fish"];
 
   const handleAddFood = async () => {
     if (!newFood.trim()) {
@@ -77,7 +77,6 @@ const FoodDiary = () => {
       return;
     }
 
-    // Log each selected food
     for (const food of selectedFoods) {
       const foodLogData = {
         food_name: food,
@@ -94,25 +93,24 @@ const FoodDiary = () => {
       }
     }
 
-    // Show success and reset form
     toast.success(`✅ Successfully logged ${selectedFoods.length} food item${selectedFoods.length > 1 ? 's' : ''} to your ${selectedMeal}!`);
     setSelectedFoods([]);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Tabs defaultValue="camera" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm">
+        <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm h-12">
           <TabsTrigger 
             value="camera" 
-            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white h-10 text-sm"
           >
             <Camera className="w-4 h-4" />
             <span>AI Analysis</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manual" 
-            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white h-10 text-sm"
           >
             <Edit className="w-4 h-4" />
             <span>Manual Entry</span>
@@ -123,29 +121,29 @@ const FoodDiary = () => {
           <FoodImageAnalyzer />
         </TabsContent>
 
-        <TabsContent value="manual" className="space-y-6">
-          {/* Add Food Entry */}
+        <TabsContent value="manual" className="space-y-4">
+          {/* Add Food Entry - More mobile friendly */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-lg">
                 <Plus className="w-5 h-5 text-green-600" />
                 <span>Log Food</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-900 text-left block">Meal Type</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {mealTypes.map(meal => (
                     <Button 
                       key={meal.id} 
                       variant={selectedMeal === meal.id ? "default" : "outline"} 
-                      size="sm" 
+                      size="lg" 
                       onClick={() => setSelectedMeal(meal.id)} 
-                      className="text-neutral-950 bg-neutral-50 font-normal"
+                      className="text-neutral-950 bg-neutral-50 font-normal h-12 rounded-lg flex items-center justify-center space-x-2"
                     >
                       <meal.icon className="w-4 h-4" />
-                      <span className="font-normal">{meal.label}</span>
+                      <span className="font-normal text-sm">{meal.label}</span>
                     </Button>
                   ))}
                 </div>
@@ -158,7 +156,7 @@ const FoodDiary = () => {
                     placeholder="Enter food item..." 
                     value={newFood} 
                     onChange={e => setNewFood(e.target.value)} 
-                    className="flex-1 bg-white border-gray-300 text-gray-900 placeholder-gray-500" 
+                    className="flex-1 bg-white border-gray-300 text-gray-900 placeholder-gray-500 h-12 text-sm rounded-lg" 
                     onKeyPress={e => {
                       if (e.key === 'Enter') {
                         handleAddFood();
@@ -168,23 +166,23 @@ const FoodDiary = () => {
                   <Button 
                     onClick={handleAddFood} 
                     disabled={!newFood.trim()} 
-                    className="bg-green-600 text-white hover:bg-green-700"
+                    className="bg-green-600 text-white hover:bg-green-700 h-12 w-12 rounded-lg"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-5 h-5" />
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-900 text-left block">Quick Add</Label>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {commonFoods.map(food => (
                     <Button 
                       key={food} 
                       variant={selectedFoods.includes(food) ? "default" : "outline"}
                       size="sm" 
                       onClick={() => handleQuickAdd(food)} 
-                      className={`text-xs ${selectedFoods.includes(food) ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}
+                      className={`text-xs h-10 rounded-lg ${selectedFoods.includes(food) ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}
                     >
                       {food}
                     </Button>
@@ -192,13 +190,13 @@ const FoodDiary = () => {
                 </div>
                 
                 {selectedFoods.length > 0 && (
-                  <div className="space-y-3 pt-2">
+                  <div className="space-y-4 pt-2">
                     <Label className="text-sm font-medium text-gray-900 text-left block">Selected Foods</Label>
                     <div className="flex flex-wrap gap-2">
                       {selectedFoods.map((food, index) => (
                         <Badge 
                           key={index} 
-                          className="bg-green-100 text-green-800 border-green-300 cursor-pointer hover:bg-green-200"
+                          className="bg-green-100 text-green-800 border-green-300 cursor-pointer hover:bg-green-200 px-3 py-1 text-sm"
                           onClick={() => handleRemoveSelectedFood(food)}
                         >
                           {food} ✕
@@ -207,7 +205,7 @@ const FoodDiary = () => {
                     </div>
                     <Button 
                       onClick={handleLogSelectedFoods}
-                      className="w-full bg-green-600 text-white hover:bg-green-700 font-medium"
+                      className="w-full bg-green-600 text-white hover:bg-green-700 font-medium h-12 rounded-lg"
                       size="lg"
                     >
                       Log Food ({selectedFoods.length} item{selectedFoods.length > 1 ? 's' : ''})
