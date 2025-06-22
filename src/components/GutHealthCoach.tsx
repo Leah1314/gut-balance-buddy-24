@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,12 +15,26 @@ interface Message {
   timestamp: Date;
 }
 
+interface UserData {
+  healthProfile: any;
+  foodLogs: any[];
+  stoolLogs: any[];
+  userId: string;
+  email: string;
+}
+
 const GutHealthCoach = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [allUserData, setAllUserData] = useState<any>({});
+  const [allUserData, setAllUserData] = useState<UserData>({
+    healthProfile: null,
+    foodLogs: [],
+    stoolLogs: [],
+    userId: '',
+    email: ''
+  });
   
   const { foodLogs } = useFoodLogsWithRAG();
   const { getStoolLogs } = useStoolLogs();
@@ -50,7 +63,7 @@ const GutHealthCoach = () => {
         foodLogs: foodLogs || [],
         stoolLogs: stoolLogs || [],
         userId: user.id,
-        email: user.email
+        email: user.email || ''
       };
 
       setAllUserData(userData);
@@ -63,7 +76,13 @@ const GutHealthCoach = () => {
       return userData;
     } catch (error) {
       console.error('Error fetching user data:', error);
-      return {};
+      return {
+        healthProfile: null,
+        foodLogs: [],
+        stoolLogs: [],
+        userId: '',
+        email: ''
+      };
     }
   };
 
