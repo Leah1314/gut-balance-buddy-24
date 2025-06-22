@@ -90,10 +90,19 @@ serve(async (req) => {
               .eq('user_id', user.id)
               .order('created_at', { ascending: false })
               .limit(10);
+
+            // Fetch test results
+            const { data: testResults, error: testError } = await supabase
+              .from('test_results')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(5);
             
             console.log('Health profile:', healthProfile ? 'Found' : 'Not found');
             console.log('Food logs:', foodLogs?.length || 0, 'entries');
             console.log('Stool logs:', stoolLogs?.length || 0, 'entries');
+            console.log('Test results:', testResults?.length || 0, 'entries');
             
             // Build enhanced system prompt with user data
             let userDataContext = "\n\nUser Data Context:\n";
@@ -153,11 +162,40 @@ serve(async (req) => {
               }).join('; ');
               userDataContext += stoolDescriptions + '.\n';
             }
+
+            if (testResults && testResults.length > 0) {
+              userDataContext += `Test Results (last ${testResults.length}): `;
+              const testDescriptions = testResults.map(result => {
+                const date = result.created_at.split('T')[0];
+                let description = `${result.test_type || 'Test'} (${date})`;
+                if (result.summary) {
+                  description += ` - ${result.summary}`;
+                }
+                if (result.concern_level) {
+                  description += ` Concern Level: ${result.concern_level}`;
+                }
+                if (result.key_findings && result.key_findings.length > 0) {
+                  description += ` Key Findings: ${result.key_findings.join(', ')}`;
+                }
+                if (result.recommendations && result.recommendations.length > 0) {
+                  description += ` Recommendations: ${result.recommendations.join(', ')}`;
+                }
+                if (result.test_values && Array.isArray(result.test_values)) {
+                  const abnormalValues = result.test_values.filter(v => v.status && v.status.toLowerCase() !== 'normal');
+                  if (abnormalValues.length > 0) {
+                    description += ` Abnormal Values: ${abnormalValues.map(v => `${v.parameter}: ${v.value} ${v.unit} (${v.status})`).join(', ')}`;
+                  }
+                }
+                return description;
+              }).join('; ');
+              userDataContext += testDescriptions + '.\n';
+            }
             
             if (userDataContext.length > 30) {
-              systemPrompt += userDataContext + "\nUse this information to provide personalized advice when relevant. Analyze patterns, suggest improvements, and provide specific recommendations based on the user's data. IMPORTANT: Pay special attention to any medical conditions mentioned as they significantly affect dietary recommendations.";
-              console.log('Enhanced system prompt with user data');
+              systemPrompt += userDataContext + "\nUse this information to provide personalized advice when relevant. Analyze patterns, suggest improvements, and provide specific recommendations based on the user's data. IMPORTANT: Pay special attention to any medical conditions mentioned as they significantly affect dietary recommendations. When discussing test results, reference specific findings and provide context about what they might mean for gut health.";
+              console.log('Enhanced system prompt with user data including test results');
               console.log('Medical conditions found:', healthProfile?.medical_conditions || 'None');
+              console.log('Test results found:', testResults?.length || 0);
             } else {
               console.log('No significant user data found');
             }
