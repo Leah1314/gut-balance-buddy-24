@@ -31,7 +31,7 @@ const GutHealthCoach = () => {
     const initializeChat = async () => {
       try {
         const stoolLogs = await getStoolLogs();
-        const hasData = !!(healthProfile || foodLogs?.length > 0 || stoolLogs?.length > 0);
+        const hasData = Boolean(healthProfile || (foodLogs && foodLogs.length > 0) || (stoolLogs && stoolLogs.length > 0));
         
         const welcomeMessage = {
           id: '1',
@@ -87,20 +87,24 @@ const GutHealthCoach = () => {
       // Fetch fresh stool logs for the request
       const stoolLogs = await getStoolLogs();
       
-      // Prepare user data
+      // Prepare user data with proper checks
       const userData = {
         healthProfile: healthProfile || null,
         foodLogs: foodLogs || [],
         stoolLogs: stoolLogs || []
       };
 
-      const hasUserData = !!(healthProfile || foodLogs?.length > 0 || stoolLogs?.length > 0);
+      const hasUserData = Boolean(
+        healthProfile || 
+        (foodLogs && foodLogs.length > 0) || 
+        (stoolLogs && stoolLogs.length > 0)
+      );
 
       console.log('Sending message to gut-health-chat function:', {
         message: textToSend,
         hasUserData,
         userDataSummary: {
-          hasHealthProfile: !!healthProfile,
+          hasHealthProfile: Boolean(healthProfile),
           foodLogsCount: foodLogs?.length || 0,
           stoolLogsCount: stoolLogs?.length || 0
         }
@@ -109,7 +113,10 @@ const GutHealthCoach = () => {
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: { 
           message: textToSend,
-          conversationHistory: messages.slice(-5),
+          conversationHistory: messages.slice(-5).map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
           hasUserData,
           userData
         }
@@ -119,12 +126,17 @@ const GutHealthCoach = () => {
 
       if (error) {
         console.error('Supabase function error:', error);
-        throw error;
+        throw new Error(`Function error: ${error.message || 'Unknown error'}`);
       }
 
-      if (!data || !data.response) {
-        console.error('No response received from AI service:', data);
-        throw new Error('No response received from AI service');
+      if (!data) {
+        console.error('No data received from function');
+        throw new Error('No response data received from AI service');
+      }
+
+      if (!data.response) {
+        console.error('No response field in data:', data);
+        throw new Error('Invalid response format from AI service');
       }
 
       const assistantMessage: Message = {
@@ -137,7 +149,8 @@ const GutHealthCoach = () => {
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Chat error:', error);
-      toast.error("Sorry, I'm having trouble connecting to the AI service. Please try again.");
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Sorry, I'm having trouble connecting: ${errorMsg}`);
       
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -161,6 +174,8 @@ const GutHealthCoach = () => {
       sendMessage();
     }
   };
+
+  const hasData = Boolean(healthProfile || (foodLogs && foodLogs.length > 0));
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -191,7 +206,7 @@ const GutHealthCoach = () => {
               <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
               Gut Health Coach
             </div>
-            {(healthProfile || foodLogs?.length > 0) && (
+            {hasData && (
               <div className="flex items-center gap-1 text-xs text-green-600">
                 <Database className="w-3 h-3" />
                 <span>Data Connected</span>
