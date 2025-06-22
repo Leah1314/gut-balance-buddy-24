@@ -40,10 +40,18 @@ const GutHealthCoach = () => {
   const { getStoolLogs } = useStoolLogs();
 
   // Fetch all user data including health profile, food logs, and stool logs
-  const fetchAllUserData = async () => {
+  const fetchAllUserData = async (): Promise<UserData> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return {};
+      if (!user) {
+        return {
+          healthProfile: null,
+          foodLogs: [],
+          stoolLogs: [],
+          userId: '',
+          email: ''
+        };
+      }
 
       console.log('Fetching user data for chat...');
 
@@ -58,7 +66,7 @@ const GutHealthCoach = () => {
       const stoolLogs = await getStoolLogs();
 
       // Combine all user data
-      const userData = {
+      const userData: UserData = {
         healthProfile: healthProfile || null,
         foodLogs: foodLogs || [],
         stoolLogs: stoolLogs || [],
