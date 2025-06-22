@@ -96,6 +96,54 @@ export type Database = {
         }
         Relationships: []
       }
+      test_results: {
+        Row: {
+          concern_level: string | null
+          created_at: string
+          file_name: string
+          file_type: string
+          id: string
+          key_findings: string[] | null
+          raw_analysis: Json | null
+          recommendations: string[] | null
+          summary: string | null
+          test_type: string | null
+          test_values: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          concern_level?: string | null
+          created_at?: string
+          file_name: string
+          file_type: string
+          id?: string
+          key_findings?: string[] | null
+          raw_analysis?: Json | null
+          recommendations?: string[] | null
+          summary?: string | null
+          test_type?: string | null
+          test_values?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          concern_level?: string | null
+          created_at?: string
+          file_name?: string
+          file_type?: string
+          id?: string
+          key_findings?: string[] | null
+          raw_analysis?: Json | null
+          recommendations?: string[] | null
+          summary?: string | null
+          test_type?: string | null
+          test_values?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_health_profiles: {
         Row: {
           activity_level: string | null
@@ -105,6 +153,7 @@ export type Database = {
           dietary_restrictions: Json | null
           height_cm: number | null
           id: string
+          latest_test_results_id: string | null
           medical_conditions: string[] | null
           medications: string[] | null
           recent_tests: Json | null
@@ -121,6 +170,7 @@ export type Database = {
           dietary_restrictions?: Json | null
           height_cm?: number | null
           id?: string
+          latest_test_results_id?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
           recent_tests?: Json | null
@@ -137,6 +187,7 @@ export type Database = {
           dietary_restrictions?: Json | null
           height_cm?: number | null
           id?: string
+          latest_test_results_id?: string | null
           medical_conditions?: string[] | null
           medications?: string[] | null
           recent_tests?: Json | null
@@ -145,7 +196,15 @@ export type Database = {
           user_id?: string
           weight_kg?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_health_profiles_latest_test_results_id_fkey"
+            columns: ["latest_test_results_id"]
+            isOneToOne: false
+            referencedRelation: "test_results"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

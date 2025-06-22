@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TestResult {
   testType: string;
@@ -27,6 +28,7 @@ const TestResultsUpload = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<TestResult | null>(null);
+  const { user } = useAuth();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,9 +42,51 @@ const TestResultsUpload = () => {
     }
   };
 
+  const saveTestResultToDatabase = async (result: TestResult) => {
+    if (!user || !selectedFile) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('test_results')
+        .insert({
+          user_id: user.id,
+          file_name: selectedFile.name,
+          file_type: selectedFile.type,
+          test_type: result.testType,
+          key_findings: result.keyFindings,
+          test_values: result.values,
+          recommendations: result.recommendations,
+          concern_level: result.concernLevel,
+          summary: result.summary,
+          raw_analysis: result
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving test result:', error);
+        toast.error("Failed to save test result to database");
+        return null;
+      }
+
+      console.log('Test result saved to database:', data);
+      toast.success("Test result saved successfully!");
+      return data;
+    } catch (error) {
+      console.error('Error saving test result:', error);
+      toast.error("Failed to save test result");
+      return null;
+    }
+  };
+
   const analyzeTestResults = async () => {
     if (!selectedFile) {
       toast.error("Please select a file first");
+      return;
+    }
+
+    if (!user) {
+      toast.error("You must be logged in to analyze test results");
       return;
     }
 
@@ -54,6 +98,8 @@ const TestResultsUpload = () => {
         const base64 = e.target?.result as string;
         const base64Data = base64.split(',')[1];
 
+        console.log('Calling analyze-test-results function...');
+        
         const { data, error } = await supabase.functions.invoke('analyze-test-results', {
           body: { 
             image: base64Data,
@@ -67,8 +113,13 @@ const TestResultsUpload = () => {
           return;
         }
 
+        console.log('Analysis result received:', data);
         setAnalysisResult(data);
-        toast.success("Test results analyzed successfully!");
+        
+        // Save the result to database
+        await saveTestResultToDatabase(data);
+        
+        toast.success("Test results analyzed and saved successfully!");
       };
       reader.readAsDataURL(selectedFile);
     } catch (error) {
@@ -81,49 +132,51 @@ const TestResultsUpload = () => {
 
   const getConcernLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
-      case 'low': return 'text-green-400';
-      case 'moderate': return 'text-yellow-400';
-      case 'high': return 'text-red-400';
-      default: return 'text-white';
+      case 'low': return 'text-green-600';
+      case 'moderate': return 'text-yellow-600';
+      case 'high': return 'text-red-600';
+      default: return 'text-gray-600';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'normal': return 'text-green-400';
-      case 'high': return 'text-red-400';
-      case 'low': return 'text-orange-400';
-      default: return 'text-white';
+      case 'normal': return 'text-green-600';
+      case 'high': return 'text-red-600';
+      case 'low': return 'text-orange-600';
+      default: return 'text-gray-600';
     }
   };
 
   return (
     <div className="space-y-4">
-      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2" style={{ color: '#2E2E2E' }}>
-            <FileText className="w-5 h-5" style={{ color: '#4A7C59' }} />
+      <Card className="bg-white shadow-sm border-gray-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base text-gray-900">
+            <FileText className="w-4 h-4 text-blue-600" />
             Upload Test Results
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <div>
-            <Label htmlFor="test-file">Select Test Result File (Image or PDF)</Label>
+            <Label htmlFor="test-file" className="text-sm font-medium text-gray-700">
+              Select Test Result File (Image or PDF)
+            </Label>
             <Input
               id="test-file"
               type="file"
               accept="image/*,.pdf"
               onChange={handleFileSelect}
-              className="mt-1 bg-gray-600 text-white border-gray-500 file:bg-gray-700 file:text-white file:border-0"
+              className="mt-1 h-10 text-sm"
             />
             {selectedFile && (
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-2">
                 {selectedFile.type === 'application/pdf' ? (
-                  <FileText className="w-4 h-4" style={{ color: '#4A7C59' }} />
+                  <FileText className="w-4 h-4 text-blue-600" />
                 ) : (
-                  <FileImage className="w-4 h-4" style={{ color: '#4A7C59' }} />
+                  <FileImage className="w-4 h-4 text-blue-600" />
                 )}
-                <p className="text-sm" style={{ color: '#4A7C59' }}>
+                <p className="text-sm text-gray-600">
                   Selected: {selectedFile.name}
                 </p>
               </div>
@@ -132,19 +185,8 @@ const TestResultsUpload = () => {
           
           <Button
             onClick={analyzeTestResults}
-            disabled={!selectedFile || isAnalyzing}
-            className="w-full text-white font-medium"
-            style={{ backgroundColor: '#4A7C59' }}
-            onMouseEnter={(e) => {
-              if (!isAnalyzing && selectedFile) {
-                e.currentTarget.style.backgroundColor = '#5B8C6B';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isAnalyzing && selectedFile) {
-                e.currentTarget.style.backgroundColor = '#4A7C59';
-              }
-            }}
+            disabled={!selectedFile || isAnalyzing || !user}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-10"
           >
             {isAnalyzing ? (
               <>
@@ -162,45 +204,47 @@ const TestResultsUpload = () => {
       </Card>
 
       {analysisResult && (
-        <Card className="bg-gray-800 shadow-sm border border-gray-600">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-white">
-              <CheckCircle className="w-5 h-5 text-green-400" />
+        <Card className="bg-white shadow-sm border-gray-200">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base text-gray-900">
+              <CheckCircle className="w-4 h-4 text-green-600" />
               Analysis Results
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h4 className="font-semibold mb-2 text-white">Test Type: {analysisResult.testType}</h4>
-              <p className="text-sm text-white">
+              <h4 className="font-semibold text-sm text-gray-900 mb-1">
+                Test Type: {analysisResult.testType}
+              </h4>
+              <p className="text-sm text-gray-600">
                 {analysisResult.summary}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-white" />
-              <span className="font-medium text-white">Concern Level: </span>
-              <span className={`font-semibold ${getConcernLevelColor(analysisResult.concernLevel)}`}>
+              <AlertTriangle className="w-4 h-4 text-gray-600" />
+              <span className="font-medium text-sm text-gray-900">Concern Level: </span>
+              <span className={`font-semibold text-sm ${getConcernLevelColor(analysisResult.concernLevel)}`}>
                 {analysisResult.concernLevel.charAt(0).toUpperCase() + analysisResult.concernLevel.slice(1)}
               </span>
             </div>
 
             {analysisResult.values && analysisResult.values.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2 text-white">Test Values:</h5>
+                <h5 className="font-semibold text-sm text-gray-900 mb-2">Test Values:</h5>
                 <div className="space-y-2">
                   {analysisResult.values.map((value, index) => (
-                    <div key={index} className="bg-gray-700 p-3 rounded-md border border-gray-600">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-white">{value.parameter}</span>
-                        <span className={`font-semibold ${getStatusColor(value.status)}`}>
+                    <div key={index} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-medium text-sm text-gray-900">{value.parameter}</span>
+                        <span className={`font-semibold text-xs px-2 py-1 rounded ${getStatusColor(value.status)}`}>
                           {value.status.toUpperCase()}
                         </span>
                       </div>
-                      <div className="text-sm text-white">
+                      <div className="text-xs text-gray-600">
                         Value: {value.value} {value.unit}
                       </div>
-                      <div className="text-sm text-white">
+                      <div className="text-xs text-gray-600">
                         Reference: {value.referenceRange}
                       </div>
                     </div>
@@ -211,10 +255,10 @@ const TestResultsUpload = () => {
 
             {analysisResult.keyFindings && analysisResult.keyFindings.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2 text-white">Key Findings:</h5>
-                <ul className="list-disc pl-5 space-y-1">
+                <h5 className="font-semibold text-sm text-gray-900 mb-2">Key Findings:</h5>
+                <ul className="list-disc pl-4 space-y-1">
                   {analysisResult.keyFindings.map((finding, index) => (
-                    <li key={index} className="text-sm text-white">
+                    <li key={index} className="text-sm text-gray-600">
                       {finding}
                     </li>
                   ))}
@@ -224,15 +268,15 @@ const TestResultsUpload = () => {
 
             {analysisResult.recommendations && analysisResult.recommendations.length > 0 && (
               <div>
-                <h5 className="font-semibold mb-2 text-white">Recommendations:</h5>
-                <ul className="list-disc pl-5 space-y-1">
+                <h5 className="font-semibold text-sm text-gray-900 mb-2">Recommendations:</h5>
+                <ul className="list-disc pl-4 space-y-1">
                   {analysisResult.recommendations.map((recommendation, index) => (
-                    <li key={index} className="text-sm text-white">
+                    <li key={index} className="text-sm text-gray-600">
                       {recommendation}
                     </li>
                   ))}
                 </ul>
-              </div>
+                </div>
             )}
           </CardContent>
         </Card>
