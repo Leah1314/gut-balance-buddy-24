@@ -1,6 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,7 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log('=== SIMPLE EDGE FUNCTION CALLED ===');
+  console.log('=== GUT HEALTH CHAT FUNCTION CALLED ===');
   console.log('Request method:', req.method);
 
   // Handle CORS preflight requests
@@ -22,9 +23,10 @@ serve(async (req) => {
     const requestBody = await req.json();
     console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
-    const { message } = requestBody;
+    const { message, conversationHistory, includeUserData } = requestBody;
     
     console.log('Message received:', message);
+    console.log('Include user data:', includeUserData);
 
     console.log('=== CHECKING OPENAI API KEY ===');
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
@@ -40,8 +42,89 @@ serve(async (req) => {
     }
     console.log('OpenAI API key found');
 
-    // Simple system prompt without user data analysis
-    const systemPrompt = `You are a helpful gut health coach. Provide friendly, supportive advice about digestive health and nutrition. Keep your responses concise and practical.`;
+    let systemPrompt = `You are a helpful gut health coach. Provide friendly, supportive advice about digestive health and nutrition. Keep your responses concise and practical.`;
+    
+    // If user data analysis is requested, fetch and include user data
+    if (includeUserData) {
+      console.log('=== FETCHING USER DATA ===');
+      
+      try {
+        // Get auth header from request
+        const authHeader = req.headers.get('authorization');
+        if (!authHeader) {
+          console.log('No authorization header found');
+        } else {
+          console.log('Authorization header found, fetching user data...');
+          
+          // Initialize Supabase client
+          const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+          const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+          const supabase = createClient(supabaseUrl, supabaseServiceKey);
+          
+          // Get user from JWT
+          const jwt = authHeader.replace('Bearer ', '');
+          const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+          
+          if (user && !userError) {
+            console.log('User found:', user.id);
+            
+            // Fetch user health profile
+            const { data: healthProfile, error: healthError } = await supabase
+              .from('user_health_profiles')
+              .select('*')
+              .eq('user_id', user.id)
+              .single();
+              
+            // Fetch recent food logs
+            const { data: foodLogs, error: foodError } = await supabase
+              .from('food_logs')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(10);
+              
+            // Fetch recent stool logs
+            const { data: stoolLogs, error: stoolError } = await supabase
+              .from('stool_logs')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(10);
+            
+            console.log('Health profile:', healthProfile ? 'Found' : 'Not found');
+            console.log('Food logs:', foodLogs?.length || 0, 'entries');
+            console.log('Stool logs:', stoolLogs?.length || 0, 'entries');
+            
+            // Build enhanced system prompt with user data
+            let userDataContext = "\n\nUser Data Context:\n";
+            
+            if (healthProfile) {
+              userDataContext += `Health Profile: Age ${healthProfile.age}, conditions: ${healthProfile.health_conditions || 'None'}, medications: ${healthProfile.medications || 'None'}, allergies: ${healthProfile.allergies || 'None'}.\n`;
+            }
+            
+            if (foodLogs && foodLogs.length > 0) {
+              userDataContext += `Recent meals: ${foodLogs.map(log => `${log.food_name} (${log.created_at.split('T')[0]})`).join(', ')}.\n`;
+            }
+            
+            if (stoolLogs && stoolLogs.length > 0) {
+              userDataContext += `Recent stool logs: ${stoolLogs.length} entries, latest from ${stoolLogs[0]?.created_at?.split('T')[0]}.\n`;
+            }
+            
+            if (userDataContext.length > 30) {
+              systemPrompt += userDataContext + "\nUse this information to provide personalized advice when relevant.";
+              console.log('Enhanced system prompt with user data');
+            } else {
+              console.log('No significant user data found');
+            }
+          } else {
+            console.log('User not found or error:', userError);
+          }
+        }
+      } catch (dataError) {
+        console.error('Error fetching user data:', dataError);
+        // Continue without user data
+      }
+    }
 
     console.log('=== CALLING OPENAI API ===');
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -54,6 +137,10 @@ serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
+          ...(conversationHistory || []).slice(-5).map((msg: any) => ({
+            role: msg.role,
+            content: msg.content
+          })),
           { role: 'user', content: message }
         ],
         max_tokens: 500,

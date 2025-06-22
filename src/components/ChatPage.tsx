@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
+import QuickQuestions from "./QuickQuestions";
 
 interface Message {
   id: string;
@@ -75,33 +76,29 @@ const ChatPage = () => {
     checkForUserData();
   }, [foodLogs, getStoolLogs]);
 
-  const quickPrompts = [
-    "Analyze my recent meal patterns", 
-    "Help me understand my symptoms", 
-    "Suggest foods for better digestion", 
-    "What should I track daily?"
-  ];
-
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || inputMessage;
+    if (!textToSend.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputMessage,
+      content: textToSend,
       role: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const originalMessage = inputMessage;
-    setInputMessage("");
+    if (!messageText) {
+      setInputMessage("");
+    }
     setIsLoading(true);
 
     try {
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: {
-          message: originalMessage,
-          conversationHistory: messages
+          message: textToSend,
+          conversationHistory: messages,
+          includeUserData: true // Enable user data analysis
         }
       });
 
@@ -121,10 +118,6 @@ const ChatPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleQuickPrompt = (prompt: string) => {
-    setInputMessage(prompt);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -199,33 +192,10 @@ const ChatPage = () => {
       {/* Quick Prompts */}
       {messages.length === 1 && (
         <div className="mb-6">
-          <p className="text-sm font-medium mb-3" style={{ color: '#2E2E2E' }}>Quick questions:</p>
-          <div className="grid grid-cols-1 gap-2">
-            {quickPrompts.map((prompt, index) => (
-              <Button 
-                key={index} 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleQuickPrompt(prompt)} 
-                className="text-left justify-start h-auto p-3 text-sm" 
-                style={{
-                  borderColor: '#D3D3D3',
-                  color: '#2E2E2E',
-                  backgroundColor: 'transparent'
-                }} 
-                onMouseEnter={e => {
-                  e.currentTarget.style.backgroundColor = '#F9F8F4';
-                  e.currentTarget.style.borderColor = '#4A7C59';
-                }} 
-                onMouseLeave={e => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.borderColor = '#D3D3D3';
-                }}
-              >
-                {prompt}
-              </Button>
-            ))}
-          </div>
+          <QuickQuestions 
+            onQuestionSelect={sendMessage}
+            isLoading={isLoading}
+          />
         </div>
       )}
 
@@ -246,7 +216,7 @@ const ChatPage = () => {
             disabled={isLoading} 
           />
           <Button 
-            onClick={sendMessage} 
+            onClick={() => sendMessage()} 
             disabled={!inputMessage.trim() || isLoading} 
             className="shrink-0 px-4" 
             style={{
