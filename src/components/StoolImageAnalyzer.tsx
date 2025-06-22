@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
+import SuccessCard from "./stool/SuccessCard";
 
 interface StoolAnalysisData {
   bristolType: number;
@@ -32,7 +33,9 @@ const StoolImageAnalyzer = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [analysisData, setAnalysisData] = useState<StoolAnalysisData | null>(null);
-  const { addStoolLog } = useStoolLogs();
+  const [showSuccessCard, setShowSuccessCard] = useState(false);
+  const [streakDays, setStreakDays] = useState(1);
+  const { addStoolLog, calculateCurrentStreak } = useStoolLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -123,8 +126,14 @@ const StoolImageAnalyzer = () => {
       const result = await addStoolLog(stoolLogData);
       
       if (result) {
-        toast.success("Analysis saved to your log!");
         console.log('AI analysis saved:', result);
+        
+        // Calculate real streak after saving
+        const currentStreak = await calculateCurrentStreak();
+        setStreakDays(currentStreak);
+        
+        // Show success card instead of toast
+        setShowSuccessCard(true);
         
         // Reset form
         setSelectedImage(null);
@@ -140,6 +149,10 @@ const StoolImageAnalyzer = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleCloseSuccessCard = () => {
+    setShowSuccessCard(false);
   };
 
   const getBristolDescription = (type: number) => {
@@ -163,6 +176,14 @@ const StoolImageAnalyzer = () => {
 
   return (
     <div className="space-y-6">
+      {/* Success Card Overlay */}
+      {showSuccessCard && (
+        <SuccessCard 
+          onClose={handleCloseSuccessCard}
+          streakDays={streakDays}
+        />
+      )}
+
       {/* Image Upload */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
