@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { User, Heart, Scale, Ruler, Calendar, AlertCircle, Plus, X, Save, FileText } from "lucide-react";
+import { 
+  User, Heart, Scale, Ruler, Calendar, AlertCircle, Plus, X, Save, 
+  FileText, ChevronDown, ChevronUp 
+} from "lucide-react";
 import { useHealthProfile } from "@/hooks/useHealthProfile";
 import { toast } from "sonner";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import TestResultsUpload from "./TestResultsUpload";
 
 const HealthProfile = () => {
@@ -16,8 +21,10 @@ const HealthProfile = () => {
     saveHealthProfile: updateProfile,
     loading
   } = useHealthProfile();
+  
   const [formData, setFormData] = useState({
     age: '',
+    gender: '',
     weight_kg: '',
     height_cm: '',
     activity_level: '',
@@ -27,8 +34,18 @@ const HealthProfile = () => {
     symptoms_notes: '',
     custom_restrictions: ''
   });
+  
   const [newCondition, setNewCondition] = useState('');
   const [newMedication, setNewMedication] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    basic: true,
+    activity: false,
+    dietary: false,
+    medical: false,
+    medications: false,
+    uploads: false
+  });
 
   // Load profile data when it's available
   useEffect(() => {
@@ -36,6 +53,7 @@ const HealthProfile = () => {
       console.log('Loading profile data:', profile);
       setFormData({
         age: profile.age?.toString() || '',
+        gender: profile.gender || '',
         weight_kg: profile.weight_kg?.toString() || '',
         height_cm: profile.height_cm?.toString() || '',
         activity_level: profile.activity_level || '',
@@ -45,32 +63,49 @@ const HealthProfile = () => {
         symptoms_notes: profile.symptoms_notes || '',
         custom_restrictions: profile.custom_restrictions || ''
       });
+      setHasUnsavedChanges(false);
     }
   }, [profile]);
 
+  const genderOptions = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
+    { value: 'non-binary', label: 'Non-binary' },
+    { value: 'prefer-not-to-say', label: 'Prefer not to say' }
+  ];
+
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Low-FODMAP', 'Keto', 'Mediterranean'];
+  
   const activityLevels = [{
     value: 'sedentary',
-    label: 'Sedentary (little to no exercise)'
+    label: 'Sedentary',
+    description: 'Little to no exercise'
   }, {
     value: 'light',
-    label: 'Light (1-3 days/week)'
+    label: 'Light',
+    description: '1-3 days/week'
   }, {
     value: 'moderate',
-    label: 'Moderate (3-5 days/week)'
+    label: 'Moderate',
+    description: '3-5 days/week'
   }, {
     value: 'active',
-    label: 'Active (6-7 days/week)'
+    label: 'Active',
+    description: '6-7 days/week'
   }, {
     value: 'very_active',
-    label: 'Very Active (2x/day or intense exercise)'
+    label: 'Very Active',
+    description: '2x/day or intense'
   }];
+
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    setHasUnsavedChanges(true);
   };
+
   const handleDietaryRestrictionToggle = (restriction: string) => {
     setFormData(prev => ({
       ...prev,
@@ -79,30 +114,33 @@ const HealthProfile = () => {
         [restriction]: !prev.dietary_restrictions[restriction]
       }
     }));
+    setHasUnsavedChanges(true);
   };
+
   const addMedicalCondition = () => {
     if (!newCondition.trim()) {
       toast.error("Please enter a medical condition");
       return;
     }
-    console.log('Adding medical condition:', newCondition);
     setFormData(prev => ({
       ...prev,
       medical_conditions: [...prev.medical_conditions, newCondition.trim()]
     }));
     setNewCondition('');
+    setHasUnsavedChanges(true);
     toast.success(`✅ Medical condition "${newCondition}" added successfully!`);
-    console.log('Medical condition added:', newCondition);
   };
+
   const removeMedicalCondition = (index: number) => {
     const condition = formData.medical_conditions[index];
     setFormData(prev => ({
       ...prev,
       medical_conditions: prev.medical_conditions.filter((_, i) => i !== index)
     }));
+    setHasUnsavedChanges(true);
     toast.success(`✅ Medical condition "${condition}" removed successfully!`);
-    console.log('Medical condition removed:', condition);
   };
+
   const addMedication = () => {
     if (!newMedication.trim()) {
       toast.error("Please enter a medication");
@@ -113,22 +151,25 @@ const HealthProfile = () => {
       medications: [...prev.medications, newMedication.trim()]
     }));
     setNewMedication('');
+    setHasUnsavedChanges(true);
     toast.success(`✅ Medication "${newMedication}" added successfully!`);
-    console.log('Medication added:', newMedication);
   };
+
   const removeMedication = (index: number) => {
     const medication = formData.medications[index];
     setFormData(prev => ({
       ...prev,
       medications: prev.medications.filter((_, i) => i !== index)
     }));
+    setHasUnsavedChanges(true);
     toast.success(`✅ Medication "${medication}" removed successfully!`);
-    console.log('Medication removed:', medication);
   };
+
   const handleSave = async () => {
     try {
       const profileData = {
         age: formData.age ? parseInt(formData.age) : null,
+        gender: formData.gender || null,
         weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
         height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
         activity_level: formData.activity_level || null,
@@ -143,6 +184,7 @@ const HealthProfile = () => {
       const result = await updateProfile(profileData);
       if (result) {
         toast.success("✅ Health profile saved successfully!");
+        setHasUnsavedChanges(false);
         console.log('Health profile saved successfully:', result);
       } else {
         toast.error("❌ Failed to save health profile. Please try again.");
@@ -153,196 +195,400 @@ const HealthProfile = () => {
     }
   };
 
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const getSummaryText = (section: string) => {
+    switch (section) {
+      case 'basic':
+        const parts = [];
+        if (formData.age) parts.push(`Age: ${formData.age}`);
+        if (formData.gender) parts.push(`Gender: ${genderOptions.find(g => g.value === formData.gender)?.label}`);
+        if (formData.weight_kg) parts.push(`${formData.weight_kg}kg`);
+        if (formData.height_cm) parts.push(`${formData.height_cm}cm`);
+        return parts.length > 0 ? parts.join(', ') : 'Not filled';
+      case 'activity':
+        return formData.activity_level 
+          ? activityLevels.find(a => a.value === formData.activity_level)?.label || 'Selected'
+          : 'Not selected';
+      case 'dietary':
+        const activeRestrictions = Object.keys(formData.dietary_restrictions).filter(key => formData.dietary_restrictions[key]);
+        return activeRestrictions.length > 0 ? `${activeRestrictions.length} restrictions` : 'None';
+      case 'medical':
+        return formData.medical_conditions.length > 0 ? `${formData.medical_conditions.length} conditions` : 'None';
+      case 'medications':
+        return formData.medications.length > 0 ? `${formData.medications.length} medications` : 'None';
+      default:
+        return '';
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold mb-1 text-gray-900">Health Profile</h2>
-        <p className="text-base leading-tight text-gray-600">
-          Help us personalize your gut health journey
+    <div className="pb-20">
+      {/* Header - More compact */}
+      <div className="text-center mb-4">
+        <h2 className="text-xl font-semibold mb-1 text-gray-900">Health Profile</h2>
+        <p className="text-sm text-gray-600">
+          Personalize your gut health journey
         </p>
       </div>
 
-      {/* Basic Information */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <User className="w-5 h-5 text-blue-600" />
-            <span>Basic Information</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900 flex items-center">
-                <Calendar className="w-4 h-4 mr-2" />
-                Age
-              </Label>
-              <Input type="number" placeholder="Enter your age" value={formData.age} onChange={e => handleInputChange('age', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900 flex items-center">
-                <Scale className="w-4 h-4 mr-2" />
-                Weight (kg)
-              </Label>
-              <Input type="number" step="0.1" placeholder="Enter weight" value={formData.weight_kg} onChange={e => handleInputChange('weight_kg', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900 flex items-center">
-                <Ruler className="w-4 h-4 mr-2" />
-                Height (cm)
-              </Label>
-              <Input type="number" placeholder="Enter height" value={formData.height_cm} onChange={e => handleInputChange('height_cm', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Activity Level */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Heart className="w-5 h-5 text-red-600" />
-            <span>Activity Level</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-3">
-            {activityLevels.map(level => (
-              <Button 
-                key={level.value} 
-                variant={formData.activity_level === level.value ? "default" : "outline"} 
-                onClick={() => handleInputChange('activity_level', level.value)} 
-                className={`h-auto py-4 px-4 text-left whitespace-normal ${
-                  formData.activity_level === level.value 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <div className="w-full text-left">
-                  <p className="font-medium text-sm leading-tight mb-1">
-                    {level.value.charAt(0).toUpperCase() + level.value.slice(1).replace('_', ' ')}
-                  </p>
-                  <p className="text-xs opacity-80 leading-tight">
-                    {level.label.split('(')[1]?.replace(')', '') || level.label}
-                  </p>
+      <div className="space-y-3">
+        {/* Basic Information */}
+        <Collapsible open={expandedSections.basic} onOpenChange={() => toggleSection('basic')}>
+          <Card className="bg-white border-gray-200">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <User className="w-4 h-4 text-blue-600" />
+                    <span>Basic Information</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500 font-normal">
+                      {getSummaryText('basic')}
+                    </span>
+                    {expandedSections.basic ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="px-4 pb-4">
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-700 flex items-center">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      Age
+                    </Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Age" 
+                      value={formData.age} 
+                      onChange={e => handleInputChange('age', e.target.value)} 
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-700">Gender</Label>
+                    <div className="grid grid-cols-2 gap-1">
+                      {genderOptions.map(option => (
+                        <Button
+                          key={option.value}
+                          variant={formData.gender === option.value ? "default" : "outline"}
+                          onClick={() => handleInputChange('gender', option.value)}
+                          className={`h-8 text-xs px-2 ${
+                            formData.gender === option.value 
+                              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {option.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-700 flex items-center">
+                      <Scale className="w-3 h-3 mr-1" />
+                      Weight (kg)
+                    </Label>
+                    <Input 
+                      type="number" 
+                      step="0.1" 
+                      placeholder="Weight" 
+                      value={formData.weight_kg} 
+                      onChange={e => handleInputChange('weight_kg', e.target.value)} 
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-700 flex items-center">
+                      <Ruler className="w-3 h-3 mr-1" />
+                      Height (cm)
+                    </Label>
+                    <Input 
+                      type="number" 
+                      placeholder="Height" 
+                      value={formData.height_cm} 
+                      onChange={e => handleInputChange('height_cm', e.target.value)} 
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
-      {/* Dietary Restrictions */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle>Dietary Restrictions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {dietaryOptions.map(option => (
-              <Button 
-                key={option} 
-                variant={formData.dietary_restrictions[option] ? "default" : "outline"} 
-                onClick={() => handleDietaryRestrictionToggle(option)} 
-                className={`text-sm ${formData.dietary_restrictions[option] ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}
-              >
-                {option}
-              </Button>
-            ))}
-          </div>
-          
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-900">Custom Dietary Notes</Label>
-            <Textarea placeholder="Any other dietary restrictions or preferences..." value={formData.custom_restrictions} onChange={e => handleInputChange('custom_restrictions', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
-          </div>
-        </CardContent>
-      </Card>
+        {/* Activity Level */}
+        <Collapsible open={expandedSections.activity} onOpenChange={() => toggleSection('activity')}>
+          <Card className="bg-white border-gray-200">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <Heart className="w-4 h-4 text-red-600" />
+                    <span>Activity Level</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500 font-normal">
+                      {getSummaryText('activity')}
+                    </span>
+                    {expandedSections.activity ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="px-4 pb-4">
+                <div className="space-y-2">
+                  {activityLevels.map(level => (
+                    <Button 
+                      key={level.value} 
+                      variant={formData.activity_level === level.value ? "default" : "outline"} 
+                      onClick={() => handleInputChange('activity_level', level.value)} 
+                      className={`w-full h-auto py-3 px-3 text-left justify-start ${
+                        formData.activity_level === level.value 
+                          ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                          : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="w-full text-left">
+                        <p className="font-medium text-sm">{level.label}</p>
+                        <p className="text-xs opacity-80">{level.description}</p>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
-      {/* Medical Conditions */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <AlertCircle className="w-5 h-5 text-orange-600" />
-            <span>Medical Conditions</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex space-x-2">
-            <Input placeholder="Add medical condition..." value={newCondition} onChange={e => setNewCondition(e.target.value)} onKeyPress={e => {
-              if (e.key === 'Enter') {
-                addMedicalCondition();
-              }
-            }} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
-            <Button onClick={addMedicalCondition} disabled={!newCondition.trim()} className="bg-green-600 text-white hover:bg-green-700">
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {formData.medical_conditions.map((condition, index) => (
-              <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                <span>{condition}</span>
-                <button onClick={() => removeMedicalCondition(index)} className="ml-1 hover:text-red-600">
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Dietary Restrictions */}
+        <Collapsible open={expandedSections.dietary} onOpenChange={() => toggleSection('dietary')}>
+          <Card className="bg-white border-gray-200">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <span>🥗</span>
+                    <span>Dietary Restrictions</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500 font-normal">
+                      {getSummaryText('dietary')}
+                    </span>
+                    {expandedSections.dietary ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="px-4 pb-4">
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {dietaryOptions.map(option => (
+                    <Button 
+                      key={option} 
+                      variant={formData.dietary_restrictions[option] ? "default" : "outline"} 
+                      onClick={() => handleDietaryRestrictionToggle(option)} 
+                      className={`text-xs h-9 ${formData.dietary_restrictions[option] ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}
+                    >
+                      {option}
+                    </Button>
+                  ))}
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-gray-700">Custom Notes</Label>
+                  <Textarea 
+                    placeholder="Any other dietary restrictions..." 
+                    value={formData.custom_restrictions} 
+                    onChange={e => handleInputChange('custom_restrictions', e.target.value)} 
+                    className="text-sm min-h-[60px]"
+                    rows={2}
+                  />
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
-      {/* Medications */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle>Current Medications</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex space-x-2">
-            <Input placeholder="Add medication..." value={newMedication} onChange={e => setNewMedication(e.target.value)} onKeyPress={e => {
-              if (e.key === 'Enter') {
-                addMedication();
-              }
-            }} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
-            <Button onClick={addMedication} disabled={!newMedication.trim()} className="bg-green-600 text-white hover:bg-green-700">
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {formData.medications.map((medication, index) => (
-              <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                <span>{medication}</span>
-                <button onClick={() => removeMedication(index)} className="ml-1 hover:text-red-600">
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Medical Conditions */}
+        <Collapsible open={expandedSections.medical} onOpenChange={() => toggleSection('medical')}>
+          <Card className="bg-white border-gray-200">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="w-4 h-4 text-orange-600" />
+                    <span>Medical Conditions</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500 font-normal">
+                      {getSummaryText('medical')}
+                    </span>
+                    {expandedSections.medical ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="px-4 pb-4">
+                <div className="flex space-x-2 mb-3">
+                  <Input 
+                    placeholder="Add medical condition..." 
+                    value={newCondition} 
+                    onChange={e => setNewCondition(e.target.value)} 
+                    onKeyPress={e => {
+                      if (e.key === 'Enter') {
+                        addMedicalCondition();
+                      }
+                    }} 
+                    className="h-9 text-sm"
+                  />
+                  <Button 
+                    onClick={addMedicalCondition} 
+                    disabled={!newCondition.trim()} 
+                    className="bg-green-600 text-white hover:bg-green-700 h-9 px-3"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {formData.medical_conditions.map((condition, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center space-x-1 text-xs">
+                      <span>{condition}</span>
+                      <button onClick={() => removeMedicalCondition(index)} className="ml-1 hover:text-red-600">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
-      {/* Symptoms & Notes */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle>Symptoms & Notes</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-900">Current Symptoms or Concerns</Label>
-            <Textarea placeholder="Describe any current digestive symptoms, concerns, or patterns you've noticed..." value={formData.symptoms_notes} onChange={e => handleInputChange('symptoms_notes', e.target.value)} className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" rows={4} />
-          </div>
-        </CardContent>
-      </Card>
+        {/* Medications & Symptoms */}
+        <Collapsible open={expandedSections.medications} onOpenChange={() => toggleSection('medications')}>
+          <Card className="bg-white border-gray-200">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <span>💊</span>
+                    <span>Medications & Symptoms</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500 font-normal">
+                      {getSummaryText('medications')}
+                    </span>
+                    {expandedSections.medications ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="px-4 pb-4">
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700 mb-1 block">Current Medications</Label>
+                    <div className="flex space-x-2 mb-2">
+                      <Input 
+                        placeholder="Add medication..." 
+                        value={newMedication} 
+                        onChange={e => setNewMedication(e.target.value)} 
+                        onKeyPress={e => {
+                          if (e.key === 'Enter') {
+                            addMedication();
+                          }
+                        }} 
+                        className="h-9 text-sm"
+                      />
+                      <Button 
+                        onClick={addMedication} 
+                        disabled={!newMedication.trim()} 
+                        className="bg-green-600 text-white hover:bg-green-700 h-9 px-3"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {formData.medications.map((medication, index) => (
+                        <Badge key={index} variant="secondary" className="flex items-center space-x-1 text-xs">
+                          <span>{medication}</span>
+                          <button onClick={() => removeMedication(index)} className="ml-1 hover:text-red-600">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
 
-      {/* Test Results Upload */}
-      <TestResultsUpload />
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700 mb-1 block">Current Symptoms</Label>
+                    <Textarea 
+                      placeholder="Describe any digestive symptoms or concerns..." 
+                      value={formData.symptoms_notes} 
+                      onChange={e => handleInputChange('symptoms_notes', e.target.value)} 
+                      className="text-sm min-h-[80px]"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
-      {/* Save Button */}
-      <div className="text-center pt-4">
-        <Button onClick={handleSave} disabled={loading} className="px-8 py-3 text-white font-medium transition-colors bg-green-600 hover:bg-green-700">
-          <Save className="w-4 h-4 mr-2 stroke-2" />
-          {loading ? 'Saving...' : 'Save Health Profile'}
+        {/* Test Results Upload */}
+        <Collapsible open={expandedSections.uploads} onOpenChange={() => toggleSection('uploads')}>
+          <Card className="bg-white border-gray-200">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <FileText className="w-4 h-4 text-purple-600" />
+                    <span>Test Results</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500 font-normal">Upload files</span>
+                    {expandedSections.uploads ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </CardTitle>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="px-4 pb-4">
+                <TestResultsUpload />
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      </div>
+
+      {/* Floating Save Button */}
+      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-40">
+        <Button 
+          onClick={handleSave} 
+          disabled={loading || !hasUnsavedChanges} 
+          className={`px-6 py-3 rounded-full shadow-lg transition-all duration-200 ${
+            hasUnsavedChanges 
+              ? 'bg-green-600 hover:bg-green-700 text-white transform scale-105' 
+              : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+          }`}
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {loading ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
         </Button>
       </div>
     </div>
