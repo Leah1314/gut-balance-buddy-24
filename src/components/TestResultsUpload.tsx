@@ -1,10 +1,11 @@
 
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle, Info } from "lucide-react";
+import { FileImage, FileText, Search, Loader2, CheckCircle, AlertTriangle, Info, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +30,7 @@ const TestResultsUpload = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<TestResult | null>(null);
   const [savedResultId, setSavedResultId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +56,7 @@ const TestResultsUpload = () => {
   const saveTestResultToDatabase = async (result: TestResult) => {
     if (!user || !selectedFile) return null;
 
+    setIsSaving(true);
     try {
       console.log('Saving test result to database...');
       
@@ -85,12 +88,14 @@ const TestResultsUpload = () => {
 
       console.log('Test result saved to database:', data);
       setSavedResultId(data.id);
-      toast.success("Test result analyzed and saved successfully!");
+      toast.success("Test result saved successfully!");
       return data;
     } catch (error) {
       console.error('Error saving test result:', error);
       toast.error("Failed to save test result");
       return null;
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -141,9 +146,7 @@ const TestResultsUpload = () => {
           }
 
           setAnalysisResult(data);
-          
-          // Save the result to database
-          await saveTestResultToDatabase(data);
+          toast.success("Test results analyzed successfully! You can now save them to your database.");
           
         } catch (innerError) {
           console.error('Error in file processing:', innerError);
@@ -331,6 +334,28 @@ const TestResultsUpload = () => {
                 </ul>
               </div>
             )}
+
+            {!savedResultId && (
+              <div className="pt-3 border-t border-gray-200">
+                <Button
+                  onClick={() => saveTestResultToDatabase(analysisResult)}
+                  disabled={isSaving}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium h-10"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save to Database
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -339,3 +364,4 @@ const TestResultsUpload = () => {
 };
 
 export default TestResultsUpload;
+
