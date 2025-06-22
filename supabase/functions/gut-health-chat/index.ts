@@ -18,7 +18,13 @@ serve(async (req) => {
     console.log('Gut health chat function called');
     
     const { message, conversationHistory, hasUserData, userData } = await req.json();
-    console.log('Request data:', { message: message?.substring(0, 100), hasUserData, userData: userData ? 'present' : 'missing' });
+    console.log('Request data:', { 
+      message: message?.substring(0, 100), 
+      hasUserData: hasUserData, 
+      userData: userData ? 'present' : 'missing',
+      userDataType: typeof userData,
+      hasUserDataType: typeof hasUserData
+    });
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
@@ -47,8 +53,8 @@ Guidelines:
 - Always recommend consulting a doctor for serious concerns
 - Focus on practical, actionable advice`;
 
-    // Add user context if available
-    if (hasUserData && userData) {
+    // Add user context if available - check for actual boolean value
+    if (hasUserData === true && userData) {
       systemPrompt += `\n\nUser Context:`;
       
       if (userData.healthProfile) {
@@ -66,6 +72,9 @@ Guidelines:
       
       if (userData.foodLogs?.length > 0) {
         systemPrompt += `\nRecent food entries: ${userData.foodLogs.length} items logged`;
+        // Add recent food items for context
+        const recentFoods = userData.foodLogs.slice(0, 5).map((log: any) => log.food_name).join(', ');
+        systemPrompt += ` (Recent foods: ${recentFoods})`;
       }
       
       if (userData.stoolLogs?.length > 0) {
@@ -82,7 +91,7 @@ Guidelines:
       { role: 'user', content: message }
     ];
 
-    console.log('Calling OpenAI API...');
+    console.log('Calling OpenAI API with system prompt length:', systemPrompt.length);
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -104,7 +113,7 @@ Guidelines:
     }
 
     const data = await response.json();
-    console.log('OpenAI response received');
+    console.log('OpenAI response received, choices:', data.choices?.length || 0);
 
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       console.error('Invalid OpenAI response structure:', data);
@@ -112,6 +121,7 @@ Guidelines:
     }
 
     const aiResponse = data.choices[0].message.content;
+    console.log('AI response length:', aiResponse?.length || 0);
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

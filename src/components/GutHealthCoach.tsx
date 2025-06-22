@@ -87,24 +87,24 @@ const GutHealthCoach = () => {
       // Fetch fresh stool logs for the request
       const stoolLogs = await getStoolLogs();
       
-      // Prepare user data with proper checks
+      // Determine if we have user data
+      const hasHealthData = Boolean(healthProfile);
+      const hasFoodData = Boolean(foodLogs && foodLogs.length > 0);
+      const hasStoolData = Boolean(stoolLogs && stoolLogs.length > 0);
+      const hasUserData = hasHealthData || hasFoodData || hasStoolData;
+
+      // Prepare user data with explicit structure
       const userData = {
         healthProfile: healthProfile || null,
         foodLogs: foodLogs || [],
         stoolLogs: stoolLogs || []
       };
 
-      const hasUserData = Boolean(
-        healthProfile || 
-        (foodLogs && foodLogs.length > 0) || 
-        (stoolLogs && stoolLogs.length > 0)
-      );
-
       console.log('Sending message to gut-health-chat function:', {
         message: textToSend,
-        hasUserData,
+        hasUserData: hasUserData,
         userDataSummary: {
-          hasHealthProfile: Boolean(healthProfile),
+          hasHealthProfile: hasHealthData,
           foodLogsCount: foodLogs?.length || 0,
           stoolLogsCount: stoolLogs?.length || 0
         }
@@ -117,8 +117,8 @@ const GutHealthCoach = () => {
             role: msg.role,
             content: msg.content
           })),
-          hasUserData,
-          userData
+          hasUserData: hasUserData,
+          userData: userData
         }
       });
 
