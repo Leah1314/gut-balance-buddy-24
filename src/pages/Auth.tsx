@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,22 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Mail, Lock, Chrome } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    user,
-    signUp,
-    signIn,
-    signInWithGoogle
-  } = useAuth();
+  const { toast } = useToast();
+  const { user, signUp, signIn } = useAuth();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -30,13 +25,12 @@ const Auth = () => {
       navigate('/');
     }
   }, [user, navigate]);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const {
-        error
-      } = isLogin ? await signIn(email, password) : await signUp(email, password);
+      const { error } = isLogin ? await signIn(email, password) : await signUp(email, password);
       if (error) {
         // Handle specific error messages
         let errorMessage = error.message;
@@ -71,24 +65,9 @@ const Auth = () => {
       setLoading(false);
     }
   };
-  const handleGoogleAuth = async () => {
-    setLoading(true);
-    try {
-      const {
-        error
-      } = await signInWithGoogle();
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: "Authentication Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-  return <div className="min-h-screen bg-brand-background flex flex-col">
+
+  return (
+    <div className="min-h-screen bg-brand-background flex flex-col">
       {/* Mobile-first full screen layout */}
       <div className="flex-1 flex flex-col px-6 py-8 max-w-sm mx-auto w-full">
         {/* Logo and branding section */}
@@ -104,21 +83,6 @@ const Auth = () => {
 
         {/* Main content area */}
         <div className="flex-1 flex flex-col space-y-4">
-          {/* Google Sign In */}
-          <Button onClick={handleGoogleAuth} disabled={loading} variant="outline" className="w-full h-12 flex items-center justify-center space-x-3 text-base border-brand-border bg-brand-surface">
-            <Chrome className="w-5 h-5" />
-            <span>Continue with Google</span>
-          </Button>
-          
-          <div className="relative py-2">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full bg-brand-border" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-brand-background px-3 text-gray-500">── Or continue with email ──</span>
-            </div>
-          </div>
-
           {/* Email/Password Form */}
           <form onSubmit={handleEmailAuth} className="space-y-6">
             <div className="space-y-3">
@@ -126,7 +90,15 @@ const Auth = () => {
                 <Mail className="w-4 h-4 inline mr-2" />
                 Email
               </Label>
-              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text" placeholder="Enter your email" />
+              <Input 
+                id="email" 
+                type="email" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                required 
+                className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text" 
+                placeholder="Enter your email" 
+              />
             </div>
             
             <div className="space-y-3">
@@ -134,10 +106,23 @@ const Auth = () => {
                 <Lock className="w-4 h-4 inline mr-2" />
                 Password
               </Label>
-              <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text" placeholder={isLogin ? "Enter your password" : "Create a password (min. 6 characters)"} minLength={isLogin ? undefined : 6} />
+              <Input 
+                id="password" 
+                type="password" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                required 
+                className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text" 
+                placeholder={isLogin ? "Enter your password" : "Create a password (min. 6 characters)"} 
+                minLength={isLogin ? undefined : 6} 
+              />
             </div>
             
-            <Button type="submit" className="w-full h-12 text-white font-semibold text-base bg-brand-accent hover:bg-brand-accent-hover" disabled={loading}>
+            <Button 
+              type="submit" 
+              className="w-full h-12 text-white font-semibold text-base bg-brand-accent hover:bg-brand-accent-hover" 
+              disabled={loading}
+            >
               {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
             </Button>
           </form>
@@ -145,11 +130,18 @@ const Auth = () => {
 
         {/* Bottom section */}
         <div className="mt-8 text-center">
-          <Button variant="ghost" onClick={() => setIsLogin(!isLogin)} className="text-base text-brand-text hover:bg-transparent" disabled={loading}>
+          <Button 
+            variant="ghost" 
+            onClick={() => setIsLogin(!isLogin)} 
+            className="text-base text-brand-text hover:bg-transparent" 
+            disabled={loading}
+          >
             {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
           </Button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Auth;
