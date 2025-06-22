@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu,
@@ -10,17 +11,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const UserMenu = () => {
   const { user, signOut } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSignOut = async () => {
     setIsLoggingOut(true);
     try {
       await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out."
+      });
+      navigate('/auth', { replace: true });
     } catch (error) {
       console.error('Error signing out:', error);
+      toast({
+        title: "Sign out error",
+        description: "There was an error signing out. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoggingOut(false);
     }
