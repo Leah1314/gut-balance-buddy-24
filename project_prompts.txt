@@ -1,0 +1,44 @@
+
+# Project Prompts for Gut Balance Buddy
+
+This file contains the prompts and requests made during the development of this project.
+
+## Authentication & UI Changes
+
+1. **Remove Google Sign-in Option**
+   - Request: "Please remove the continue with google option on the sign in page"
+   - Action: Removed Google OAuth button and separator from the Auth.tsx page
+
+2. **Fix Sign-out Functionality**
+   - Request: "seems when i clicked on sign out button, it didn't work, can you fix it, it should go back to the log in page"
+   - Action: Updated UserMenu component to properly handle sign-out with navigation and toast notifications
+   - Updated useAuth hook to clear local state properly
+
+3. **Fix Sign-out Error Handling**
+   - Request: "it said sign out error" (with screenshot showing AuthSessionMissingError)
+   - Action: Enhanced error handling in useAuth.tsx signOut function to handle missing session errors gracefully
+   - Added checks for existing session before attempting sign out
+   - Added fallback to clear local state even when session errors occur
+
+4. **Create Documentation File**
+   - Request: "create a file 'project_prompts.txt' with the prompts used and save it to the repo"
+   - Action: Created this documentation file to track development prompts and changes
+
+## Technical Notes
+
+- The app uses Supabase for authentication
+- Sign-out errors were occurring due to session state mismatches
+- Error handling was improved to gracefully handle AuthSessionMissingError
+- Local state is now properly cleared regardless of Supabase session state
+
+## App Context
+
+This is a gut health tracking application called "Gut Balance Buddy" (also referred to as "In and Out") that includes:
+- Food diary tracking
+- Stool analysis with Bristol Stool Chart
+- Symptom tracking
+- AI-powered gut health coaching
+- Test results upload
+- Educational resources
+
+Built with: React, TypeScript, Vite, Tailwind CSS, Shadcn UI, Supabase
