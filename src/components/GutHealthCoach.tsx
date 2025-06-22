@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
+import { useHealthProfile } from "@/hooks/useHealthProfile";
 
 interface Message {
   id: string;
@@ -16,92 +17,21 @@ interface Message {
   timestamp: Date;
 }
 
-interface UserData {
-  healthProfile: any;
-  foodLogs: any[];
-  stoolLogs: any[];
-  userId: string;
-  email: string;
-}
-
 const GutHealthCoach = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [allUserData, setAllUserData] = useState<UserData>({
-    healthProfile: null,
-    foodLogs: [],
-    stoolLogs: [],
-    userId: '',
-    email: ''
-  });
   
   const { foodLogs } = useFoodLogs();
   const { getStoolLogs } = useStoolLogs();
-
-  // Fetch all user data including health profile, food logs, and stool logs
-  const fetchAllUserData = async (): Promise<UserData> => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        return {
-          healthProfile: null,
-          foodLogs: [],
-          stoolLogs: [],
-          userId: '',
-          email: ''
-        };
-      }
-
-      console.log('Fetching user data for chat...');
-
-      // Fetch health profile
-      const { data: healthProfile } = await supabase
-        .from('user_health_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      // Fetch stool logs
-      const stoolLogs = await getStoolLogs();
-
-      // Combine all user data
-      const userData: UserData = {
-        healthProfile: healthProfile || null,
-        foodLogs: foodLogs || [],
-        stoolLogs: stoolLogs || [],
-        userId: user.id,
-        email: user.email || ''
-      };
-
-      setAllUserData(userData);
-      console.log('User data fetched for chat:', {
-        hasHealthProfile: !!userData.healthProfile,
-        foodLogsCount: userData.foodLogs.length,
-        stoolLogsCount: userData.stoolLogs.length
-      });
-      
-      return userData;
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      return {
-        healthProfile: null,
-        foodLogs: [],
-        stoolLogs: [],
-        userId: '',
-        email: ''
-      };
-    }
-  };
+  const { healthProfile } = useHealthProfile();
 
   useEffect(() => {
     const initializeChat = async () => {
       try {
-        // Fetch all user data first
-        const userData = await fetchAllUserData();
-        
-        const hasData = !!(userData.healthProfile || userData.foodLogs?.length > 0 || userData.stoolLogs?.length > 0);
+        const stoolLogs = await getStoolLogs();
+        const hasData = !!(healthProfile || foodLogs?.length > 0 || stoolLogs?.length > 0);
         
         const welcomeMessage = {
           id: '1',
@@ -129,7 +59,7 @@ const GutHealthCoach = () => {
     if (isOpen) {
       initializeChat();
     }
-  }, [isOpen, foodLogs]);
+  }, [isOpen, foodLogs, healthProfile]);
 
   const quickPrompts = [
     "Analyze my recent meal patterns",
@@ -154,22 +84,34 @@ const GutHealthCoach = () => {
     setIsLoading(true);
 
     try {
+      // Fetch fresh stool logs for the request
+      const stoolLogs = await getStoolLogs();
+      
+      // Prepare user data
+      const userData = {
+        healthProfile: healthProfile || null,
+        foodLogs: foodLogs || [],
+        stoolLogs: stoolLogs || []
+      };
+
+      const hasUserData = !!(healthProfile || foodLogs?.length > 0 || stoolLogs?.length > 0);
+
       console.log('Sending message to gut-health-chat function:', {
         message: textToSend,
-        hasUserData: !!(allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0),
+        hasUserData,
         userDataSummary: {
-          hasHealthProfile: !!allUserData.healthProfile,
-          foodLogsCount: allUserData.foodLogs?.length || 0,
-          stoolLogsCount: allUserData.stoolLogs?.length || 0
+          hasHealthProfile: !!healthProfile,
+          foodLogsCount: foodLogs?.length || 0,
+          stoolLogsCount: stoolLogs?.length || 0
         }
       });
 
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: { 
           message: textToSend,
-          conversationHistory: messages.slice(-5), // Last 5 messages for context
-          hasUserData: !!(allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0),
-          userData: allUserData
+          conversationHistory: messages.slice(-5),
+          hasUserData,
+          userData
         }
       });
 
@@ -197,7 +139,6 @@ const GutHealthCoach = () => {
       console.error('Chat error:', error);
       toast.error("Sorry, I'm having trouble connecting to the AI service. Please try again.");
       
-      // Add error message to chat
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
@@ -250,7 +191,7 @@ const GutHealthCoach = () => {
               <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
               Gut Health Coach
             </div>
-            {(allUserData.healthProfile || allUserData.foodLogs?.length > 0 || allUserData.stoolLogs?.length > 0) && (
+            {(healthProfile || foodLogs?.length > 0) && (
               <div className="flex items-center gap-1 text-xs text-green-600">
                 <Database className="w-3 h-3" />
                 <span>Data Connected</span>
