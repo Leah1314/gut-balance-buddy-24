@@ -17,6 +17,7 @@ const QuickQuestions = ({ onQuestionSelect, isLoading }: QuickQuestionsProps) =>
   ];
 
   const handleClick = async (question: string) => {
+    console.log('Quick question clicked:', question);
     setLoadingQuestion(question);
     await onQuestionSelect(question);
     setLoadingQuestion(null);

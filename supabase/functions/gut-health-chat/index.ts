@@ -103,15 +103,36 @@ serve(async (req) => {
             }
             
             if (foodLogs && foodLogs.length > 0) {
-              userDataContext += `Recent meals: ${foodLogs.map(log => `${log.food_name} (${log.created_at.split('T')[0]})`).join(', ')}.\n`;
+              userDataContext += `Recent meals (last ${foodLogs.length}): `;
+              const mealDescriptions = foodLogs.map(log => {
+                const date = log.created_at.split('T')[0];
+                let description = `${log.food_name} (${date})`;
+                if (log.description) {
+                  description += ` - ${log.description}`;
+                }
+                if (log.notes) {
+                  description += ` Notes: ${log.notes}`;
+                }
+                return description;
+              }).join('; ');
+              userDataContext += mealDescriptions + '.\n';
             }
             
             if (stoolLogs && stoolLogs.length > 0) {
-              userDataContext += `Recent stool logs: ${stoolLogs.length} entries, latest from ${stoolLogs[0]?.created_at?.split('T')[0]}.\n`;
+              userDataContext += `Recent stool logs (last ${stoolLogs.length}): `;
+              const stoolDescriptions = stoolLogs.map(log => {
+                const date = log.created_at.split('T')[0];
+                let description = `Type ${log.bristol_type}, ${log.consistency}, ${log.color} (${date})`;
+                if (log.notes) {
+                  description += ` Notes: ${log.notes}`;
+                }
+                return description;
+              }).join('; ');
+              userDataContext += stoolDescriptions + '.\n';
             }
             
             if (userDataContext.length > 30) {
-              systemPrompt += userDataContext + "\nUse this information to provide personalized advice when relevant.";
+              systemPrompt += userDataContext + "\nUse this information to provide personalized advice when relevant. Analyze patterns, suggest improvements, and provide specific recommendations based on the user's data.";
               console.log('Enhanced system prompt with user data');
             } else {
               console.log('No significant user data found');

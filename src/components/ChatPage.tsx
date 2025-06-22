@@ -31,24 +31,39 @@ const ChatPage = () => {
   useEffect(() => {
     const checkForUserData = async () => {
       try {
+        console.log('Checking for user data...');
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          console.log('No user found');
+          return;
+        }
+
+        console.log('User found:', user.id);
 
         // Check for health profile
-        const { data: healthProfile } = await supabase
+        const { data: healthProfile, error: healthError } = await supabase
           .from('user_health_profiles')
           .select('*')
           .eq('user_id', user.id)
           .single();
 
+        if (healthError) {
+          console.log('Health profile error:', healthError);
+        } else {
+          console.log('Health profile found:', healthProfile);
+        }
+
         // Check for tracking data
         const stoolLogs = await getStoolLogs();
+        console.log('Food logs count:', foodLogs?.length || 0);
+        console.log('Stool logs count:', stoolLogs?.length || 0);
         
         const userDataStatus = {
           health_info: !!healthProfile,
           track_history: !!(foodLogs?.length > 0 || stoolLogs?.length > 0)
         };
         
+        console.log('User data status:', userDataStatus);
         setHasUserData(userDataStatus);
 
         const hasAnyData = userDataStatus.health_info || userDataStatus.track_history;
@@ -80,6 +95,9 @@ const ChatPage = () => {
     const textToSend = messageText || inputMessage;
     if (!textToSend.trim() || isLoading) return;
 
+    console.log('=== SENDING MESSAGE ===');
+    console.log('Message:', textToSend);
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content: textToSend,
@@ -94,6 +112,7 @@ const ChatPage = () => {
     setIsLoading(true);
 
     try {
+      console.log('Calling gut-health-chat function...');
       const { data, error } = await supabase.functions.invoke('gut-health-chat', {
         body: {
           message: textToSend,
@@ -102,7 +121,17 @@ const ChatPage = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('Function response:', { data, error });
+
+      if (error) {
+        console.error('Function error:', error);
+        throw error;
+      }
+
+      if (!data || !data.response) {
+        console.error('No response data:', data);
+        throw new Error('No response received from AI service');
+      }
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -111,10 +140,19 @@ const ChatPage = () => {
         timestamp: new Date()
       };
 
+      console.log('Adding assistant message:', assistantMessage);
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Chat error:', error);
-      toast.error("Sorry, I'm having trouble responding right now. Please try again.");
+      toast.error(`Sorry, I'm having trouble responding: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        role: 'assistant',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +197,7 @@ const ChatPage = () => {
               }} 
               className="py-[16px] px-[16px] rounded-md max-w-[80%]"
             >
-              <p className="text-sm leading-relaxed text-left">
+              <p className="text-sm leading-relaxed text-left whitespace-pre-wrap">
                 {message.content}
               </p>
               <p className="text-xs mt-2 opacity-70 text-left">
