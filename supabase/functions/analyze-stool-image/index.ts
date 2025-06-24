@@ -40,7 +40,7 @@ serve(async (req) => {
 CRITICAL INSTRUCTIONS:
 1. You MUST respond with ONLY a valid JSON object, no other text, no markdown formatting
 2. Analyze the image to determine if it shows stool/feces
-3. If it's NOT stool, return: {"error": "This image does not appear to show stool. Please upload a clear image of stool for analysis."}
+3. If it's NOT stool, describe what you see in the image in a friendly way and return: {"error": "I can see [describe what's in the image briefly], but this doesn't appear to be stool. Please upload a stool sample for analysis.", "imageDescription": "brief description of what's actually in the image"}
 4. If it IS stool, classify it using the Bristol Stool Chart (1-7) and provide analysis
 
 Bristol Stool Chart Reference:
@@ -75,7 +75,7 @@ For valid stool images, respond with this exact JSON structure:
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this stool image using the Bristol Stool Chart. Determine the Bristol type, consistency, color, and provide health insights. Respond with only the JSON format specified.'
+                text: 'Please analyze this image. If it shows stool, classify it using the Bristol Stool Chart. If it doesn\'t show stool, describe what you see and ask for a stool sample. Respond with only the JSON format specified.'
               },
               {
                 type: 'image_url',
@@ -125,6 +125,7 @@ For valid stool images, respond with this exact JSON structure:
       console.log('Image rejected by AI:', analysisResult.error);
       return new Response(JSON.stringify({ 
         error: analysisResult.error,
+        imageDescription: analysisResult.imageDescription || '',
         isNotStool: true 
       }), {
         status: 200, // Changed from 400 to 200 so frontend handles it properly

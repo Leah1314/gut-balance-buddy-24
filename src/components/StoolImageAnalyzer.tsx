@@ -13,7 +13,7 @@ import {
   Zap,
   Heart,
   Save,
-  XCircle
+  Info
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -269,13 +269,13 @@ const StoolImageAnalyzer = () => {
 
       {/* Not Stool Image Message */}
       {isNotStoolImage && (
-        <Card className="bg-red-50 border-red-200 shadow-sm">
+        <Card className="bg-blue-50 border-blue-200 shadow-sm">
           <CardContent className="p-6 text-center">
-            <XCircle className="w-8 h-8 mx-auto mb-3 text-red-500" />
-            <h3 className="text-lg font-semibold mb-2 text-red-700">Image Not Recognized</h3>
-            <p className="text-red-600 mb-4">{notStoolMessage}</p>
-            <p className="text-sm text-red-500">
-              Please upload a clear image of stool for proper analysis. The AI can only analyze stool samples.
+            <Info className="w-8 h-8 mx-auto mb-3 text-blue-500" />
+            <h3 className="text-lg font-semibold mb-2 text-blue-700">Not Stool</h3>
+            <p className="text-blue-600 mb-4">{notStoolMessage}</p>
+            <p className="text-sm text-blue-500">
+              Please only upload stool samples for analysis.
             </p>
           </CardContent>
         </Card>
