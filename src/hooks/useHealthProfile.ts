@@ -8,6 +8,7 @@ interface HealthProfile {
   id: string;
   user_id: string;
   age?: number;
+  gender?: string; // Add gender field
   weight_kg?: number;
   height_cm?: number;
   activity_level?: string;
@@ -50,6 +51,7 @@ export const useHealthProfile = () => {
 
   const saveHealthProfile = async (profileData: {
     age?: number;
+    gender?: string; // Add gender to the interface
     weight_kg?: number;
     height_cm?: number;
     activity_level?: string;

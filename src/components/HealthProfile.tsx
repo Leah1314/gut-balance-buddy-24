@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ const HealthProfile = () => {
   const [newCondition, setNewCondition] = useState('');
   const [newMedication, setNewMedication] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string>('basic');
+  const [expandedSection, setExpandedSection] = useState<string>(''); // Changed from 'basic' to empty string
   const [showSaveButton, setShowSaveButton] = useState(false);
 
   // Load profile data when it's available
@@ -47,7 +48,7 @@ const HealthProfile = () => {
       console.log('Loading profile data:', profile);
       setFormData({
         age: profile.age?.toString() || '',
-        gender: '', // Keep gender in form but don't save to DB
+        gender: profile.gender || '', // Load gender from profile
         weight_kg: profile.weight_kg?.toString() || '',
         height_cm: profile.height_cm?.toString() || '',
         activity_level: profile.activity_level || '',
@@ -173,7 +174,7 @@ const HealthProfile = () => {
     try {
       const profileData = {
         age: formData.age ? parseInt(formData.age) : null,
-        // Remove gender from the data being saved to database
+        gender: formData.gender || null, // Include gender in save operation
         weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
         height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
         activity_level: formData.activity_level || null,
