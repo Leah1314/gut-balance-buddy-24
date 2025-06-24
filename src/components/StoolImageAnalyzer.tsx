@@ -47,6 +47,7 @@ const StoolImageAnalyzer = () => {
       };
       reader.readAsDataURL(file);
       setAnalysisData(null);
+      toast.success("Image uploaded successfully!");
     }
   };
 
@@ -71,29 +72,36 @@ const StoolImageAnalyzer = () => {
     setIsAnalyzing(true);
     
     try {
-      // Mock analysis for now - in a real app this would call an AI service
-      const mockData: StoolAnalysisData = {
-        bristolType: 4,
-        consistency: "Normal",
-        color: "Brown",
-        healthScore: 8,
-        insights: [
-          "Bristol Type 4 indicates healthy bowel movement",
-          "Normal consistency suggests good hydration",
-          "Color appears within healthy range"
-        ],
-        recommendations: [
-          "Continue current diet and hydration habits",
-          "Maintain regular fiber intake",
-          "Keep monitoring for any changes"
-        ]
-      };
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Converting image to base64...');
+      const base64Image = await convertImageToBase64(selectedImage);
       
-      setAnalysisData(mockData);
-      toast.success("Stool analysis complete!");
+      console.log('Calling Supabase edge function for stool analysis...');
+      
+      const { data, error } = await supabase.functions.invoke('analyze-stool-image', {
+        body: {
+          image: base64Image
+        }
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to analyze image');
+      }
+
+      if (!data) {
+        throw new Error('No data received from analysis');
+      }
+
+      // Check if the response indicates it's not a stool image
+      if (data.error) {
+        toast.error(data.error);
+        console.log('Image rejected by AI:', data.error);
+        return;
+      }
+
+      console.log('Stool analysis result:', data);
+      setAnalysisData(data);
+      toast.success("Stool analysis completed successfully!");
       
     } catch (error) {
       console.error('Analysis error:', error);
@@ -226,7 +234,7 @@ const StoolImageAnalyzer = () => {
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing Image...
+                    Analyzing Image with AI...
                   </>
                 ) : (
                   <>
