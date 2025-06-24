@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,8 @@ import {
   CheckCircle,
   Zap,
   Heart,
-  Save
+  Save,
+  XCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +37,8 @@ const StoolImageAnalyzer = () => {
   const [analysisData, setAnalysisData] = useState<StoolAnalysisData | null>(null);
   const [showSuccessCard, setShowSuccessCard] = useState(false);
   const [streakDays, setStreakDays] = useState(1);
+  const [isNotStoolImage, setIsNotStoolImage] = useState(false);
+  const [notStoolMessage, setNotStoolMessage] = useState("");
   const { addStoolLog, calculateCurrentStreak } = useStoolLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +51,8 @@ const StoolImageAnalyzer = () => {
       };
       reader.readAsDataURL(file);
       setAnalysisData(null);
+      setIsNotStoolImage(false);
+      setNotStoolMessage("");
       toast.success("Image uploaded successfully!");
     }
   };
@@ -93,14 +99,25 @@ const StoolImageAnalyzer = () => {
       }
 
       // Check if the response indicates it's not a stool image
+      if (data.error && data.isNotStool) {
+        setIsNotStoolImage(true);
+        setNotStoolMessage(data.error);
+        setAnalysisData(null);
+        console.log('Image rejected by AI:', data.error);
+        return;
+      }
+
+      // Check for other errors
       if (data.error) {
         toast.error(data.error);
-        console.log('Image rejected by AI:', data.error);
+        console.log('Analysis error:', data.error);
         return;
       }
 
       console.log('Stool analysis result:', data);
       setAnalysisData(data);
+      setIsNotStoolImage(false);
+      setNotStoolMessage("");
       toast.success("Stool analysis completed successfully!");
       
     } catch (error) {
@@ -147,6 +164,8 @@ const StoolImageAnalyzer = () => {
         setSelectedImage(null);
         setImagePreview(null);
         setAnalysisData(null);
+        setIsNotStoolImage(false);
+        setNotStoolMessage("");
       } else {
         toast.error("Failed to save analysis. Please try again.");
         console.error('Failed to save AI analysis');
@@ -223,7 +242,7 @@ const StoolImageAnalyzer = () => {
             <div className="space-y-3">
               <img
                 src={imagePreview}
-                alt="Stool preview"
+                alt="Preview"
                 className="w-full h-48 object-cover rounded-lg border"
               />
               <Button
@@ -247,6 +266,20 @@ const StoolImageAnalyzer = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Not Stool Image Message */}
+      {isNotStoolImage && (
+        <Card className="bg-red-50 border-red-200 shadow-sm">
+          <CardContent className="p-6 text-center">
+            <XCircle className="w-8 h-8 mx-auto mb-3 text-red-500" />
+            <h3 className="text-lg font-semibold mb-2 text-red-700">Image Not Recognized</h3>
+            <p className="text-red-600 mb-4">{notStoolMessage}</p>
+            <p className="text-sm text-red-500">
+              Please upload a clear image of stool for proper analysis. The AI can only analyze stool samples.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Analysis Results */}
       {analysisData && (

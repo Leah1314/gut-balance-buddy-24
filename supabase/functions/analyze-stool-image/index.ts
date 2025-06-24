@@ -38,7 +38,7 @@ serve(async (req) => {
             content: `You are a medical AI assistant specialized in analyzing stool samples using the Bristol Stool Chart. 
 
 CRITICAL INSTRUCTIONS:
-1. You MUST respond with ONLY a valid JSON object, no other text
+1. You MUST respond with ONLY a valid JSON object, no other text, no markdown formatting
 2. Analyze the image to determine if it shows stool/feces
 3. If it's NOT stool, return: {"error": "This image does not appear to show stool. Please upload a clear image of stool for analysis."}
 4. If it IS stool, classify it using the Bristol Stool Chart (1-7) and provide analysis
@@ -101,8 +101,15 @@ For valid stool images, respond with this exact JSON structure:
     const data = await response.json();
     console.log('OpenAI response:', data);
 
-    const analysisText = data.choices[0].message.content.trim();
+    let analysisText = data.choices[0].message.content.trim();
     console.log('Analysis text:', analysisText);
+
+    // Remove markdown code block formatting if present
+    if (analysisText.startsWith('```json')) {
+      analysisText = analysisText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (analysisText.startsWith('```')) {
+      analysisText = analysisText.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
 
     // Parse the JSON response from OpenAI
     let analysisResult;
@@ -115,7 +122,10 @@ For valid stool images, respond with this exact JSON structure:
 
     // Check if it's an error response (not stool)
     if (analysisResult.error) {
-      return new Response(JSON.stringify({ error: analysisResult.error }), {
+      return new Response(JSON.stringify({ 
+        error: analysisResult.error,
+        isNotStool: true 
+      }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
