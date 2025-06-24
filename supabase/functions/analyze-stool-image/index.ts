@@ -120,13 +120,14 @@ For valid stool images, respond with this exact JSON structure:
       throw new Error('Invalid response format from AI analysis');
     }
 
-    // Check if it's an error response (not stool)
+    // Check if it's an error response (not stool) - return 200 status with error flag
     if (analysisResult.error) {
+      console.log('Image rejected by AI:', analysisResult.error);
       return new Response(JSON.stringify({ 
         error: analysisResult.error,
         isNotStool: true 
       }), {
-        status: 400,
+        status: 200, // Changed from 400 to 200 so frontend handles it properly
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
