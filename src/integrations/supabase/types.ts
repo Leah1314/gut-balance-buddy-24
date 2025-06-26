@@ -151,6 +151,7 @@ export type Database = {
           created_at: string
           custom_restrictions: string | null
           dietary_restrictions: Json | null
+          gender: string | null
           height_cm: number | null
           id: string
           latest_test_results_id: string | null
@@ -168,6 +169,7 @@ export type Database = {
           created_at?: string
           custom_restrictions?: string | null
           dietary_restrictions?: Json | null
+          gender?: string | null
           height_cm?: number | null
           id?: string
           latest_test_results_id?: string | null
@@ -185,6 +187,7 @@ export type Database = {
           created_at?: string
           custom_restrictions?: string | null
           dietary_restrictions?: Json | null
+          gender?: string | null
           height_cm?: number | null
           id?: string
           latest_test_results_id?: string | null
