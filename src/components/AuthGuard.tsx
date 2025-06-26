@@ -1,4 +1,5 @@
 
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,10 +22,10 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9F8F4' }}>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#4A7C59' }} />
-          <p style={{ color: '#2E2E2E' }}>Loading...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-green-600" />
+          <p className="text-gray-700">Loading...</p>
         </div>
       </div>
     );
@@ -32,9 +33,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9F8F4' }}>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
         <div className="text-center">
-          <p style={{ color: '#2E2E2E' }}>Redirecting to login...</p>
+          <p className="text-gray-700">Redirecting to login...</p>
         </div>
       </div>
     );
@@ -44,3 +45,4 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 };
 
 export default AuthGuard;
+
