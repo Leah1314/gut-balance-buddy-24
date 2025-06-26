@@ -1,12 +1,13 @@
+
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 
-import { Auth } from "./pages/Auth";
-import { Index } from "./pages/Index";
-import { NotFound } from "./pages/NotFound";
-import { AuthGuard } from "./components/AuthGuard";
+import Auth from "./pages/Auth";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import AuthGuard from "./components/AuthGuard";
 import GutHealthCoach from "./components/GutHealthCoach";
 import AnalyticsPage from "./pages/Analytics";
 
