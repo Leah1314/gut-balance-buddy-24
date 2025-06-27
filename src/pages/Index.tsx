@@ -2,17 +2,22 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Activity, MessageCircle, Utensils, Scroll, User, Calendar } from "lucide-react";
+import { Activity, MessageCircle, Utensils, Scroll, User, Calendar, BarChart3 } from "lucide-react";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
 import ChatPage from "@/components/ChatPage";
 import HealthProfile from "@/components/HealthProfile";
 import LogHistory from "@/components/LogHistory";
+import Analytics from "@/components/Analytics";
 import UserMenu from "@/components/UserMenu";
 
 const Index = () => {
-  const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat' | 'health'>('track');
+  const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat' | 'health' | 'analytics'>('track');
   const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool' | 'history'>('food');
+
+  const handleSwitchToChat = () => {
+    setActiveMainTab('chat');
+  };
 
   return (
     <div className="min-h-screen pb-24" style={{
@@ -162,19 +167,23 @@ const Index = () => {
           <div>
             <ChatPage />
           </div>
-        ) : (
+        ) : activeMainTab === 'health' ? (
           <div>
             <HealthProfile />
+          </div>
+        ) : (
+          <div>
+            <Analytics onSwitchToChat={handleSwitchToChat} />
           </div>
         )}
       </div>
 
-      {/* Bottom Tab Navigation - Larger touch targets and better spacing */}
+      {/* Bottom Tab Navigation - Updated to 4 columns */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-50 w-full safe-area-bottom" style={{
         borderColor: '#D3D3D3'
       }}>
         <div className="w-full max-w-screen-md px-4 mx-auto">
-          <div className="grid grid-cols-3 gap-0">
+          <div className="grid grid-cols-4 gap-0">
             <button 
               onClick={() => setActiveMainTab('track')} 
               className={`flex flex-col items-center justify-center py-4 transition-all duration-200 ${activeMainTab === 'track' ? 'opacity-100' : 'opacity-60'}`} 
@@ -184,6 +193,16 @@ const Index = () => {
             >
               <Activity className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'track' ? 'scale-105' : ''} transition-transform`} />
               <span className="text-xs font-medium">Track</span>
+            </button>
+            <button 
+              onClick={() => setActiveMainTab('analytics')} 
+              className={`flex flex-col items-center justify-center py-4 transition-all duration-200 ${activeMainTab === 'analytics' ? 'opacity-100' : 'opacity-60'}`} 
+              style={{
+                color: activeMainTab === 'analytics' ? '#4A7C59' : '#2E2E2E'
+              }}
+            >
+              <BarChart3 className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'analytics' ? 'scale-105' : ''} transition-transform`} />
+              <span className="text-xs font-medium">Analytics</span>
             </button>
             <button 
               onClick={() => setActiveMainTab('chat')} 
