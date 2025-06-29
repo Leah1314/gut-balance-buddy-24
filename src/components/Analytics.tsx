@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +32,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const { getStoolLogs } = useStoolLogs();
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
   const [historicalData, setHistoricalData] = useState<DayScore[]>([]);
+  const [filteredHistoricalData, setFilteredHistoricalData] = useState<DayScore[]>([]);
   const [todayScore, setTodayScore] = useState(0);
   const [foodScore, setFoodScore] = useState(0);
   const [stoolScore, setStoolScore] = useState(0);
@@ -175,11 +175,19 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
     setHistoricalData(historical);
     
-    // Set today's scores
+    // Filter data to only show days with actual scores
+    const filtered = filterHistoricalData(historical);
+    setFilteredHistoricalData(filtered);
+    
+    // Set today's scores from the last day in historical data
     const todayData = historical[historical.length - 1];
     setTodayScore(todayData.score);
     setFoodScore(todayData.foodScore);
     setStoolScore(todayData.stoolScore);
+  };
+
+  const filterHistoricalData = (data: DayScore[]) => {
+    return data.filter(day => day.foodScore > 0 || day.stoolScore > 0);
   };
 
   const calculateFoodSummary = () => {
@@ -272,10 +280,10 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   };
 
   const getTrendDirection = () => {
-    if (historicalData.length < 7) return null;
+    if (filteredHistoricalData.length < 7) return null;
     
-    const recent = historicalData.slice(-7).reduce((sum, day) => sum + day.score, 0) / 7;
-    const previous = historicalData.slice(-14, -7).reduce((sum, day) => sum + day.score, 0) / 7;
+    const recent = filteredHistoricalData.slice(-7).reduce((sum, day) => sum + day.score, 0) / 7;
+    const previous = filteredHistoricalData.slice(-14, -7).reduce((sum, day) => sum + day.score, 0) / 7;
     
     if (recent > previous + 5) return 'up';
     if (recent < previous - 5) return 'down';
@@ -361,47 +369,59 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         </CardHeader>
         <CardContent>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={historicalData}>
-                <XAxis 
-                  dataKey="displayDate" 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 11, fill: '#2E2E2E' }}
-                />
-                <YAxis 
-                  domain={[0, 100]}
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 11, fill: '#2E2E2E' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '1px solid #D3D3D3',
-                    borderRadius: '8px',
-                    fontSize: '12px'
-                  }}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="foodScore" 
-                  stroke="#4A7C59" 
-                  strokeWidth={2}
-                  dot={{ fill: '#4A7C59', strokeWidth: 2, r: 4 }}
-                  name="Food Score"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="stoolScore" 
-                  stroke="#FF8C42" 
-                  strokeWidth={2}
-                  dot={{ fill: '#FF8C42', strokeWidth: 2, r: 4 }}
-                  name="Stool Score"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {filteredHistoricalData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={filteredHistoricalData}>
+                  <XAxis 
+                    dataKey="displayDate" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: '#2E2E2E' }}
+                  />
+                  <YAxis 
+                    domain={[0, 100]}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: '#2E2E2E' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #D3D3D3',
+                      borderRadius: '8px',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="foodScore" 
+                    stroke="#4A7C59" 
+                    strokeWidth={2}
+                    dot={{ fill: '#4A7C59', strokeWidth: 2, r: 4 }}
+                    name="Food Score"
+                    connectNulls={false}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="stoolScore" 
+                    stroke="#FF8C42" 
+                    strokeWidth={2}
+                    dot={{ fill: '#FF8C42', strokeWidth: 2, r: 4 }}
+                    name="Stool Score"
+                    connectNulls={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                <div className="text-center">
+                  <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p>No data logged yet</p>
+                  <p className="text-xs">Start logging food and stool entries to see trends</p>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
