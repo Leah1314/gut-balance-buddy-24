@@ -35,6 +35,7 @@ const FoodImageAnalyzer = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [nutritionData, setNutritionData] = useState<NutritionData | null>(null);
+  const [userNotes, setUserNotes] = useState<string>("");
   const { addFoodLog } = useFoodLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +48,7 @@ const FoodImageAnalyzer = () => {
       };
       reader.readAsDataURL(file);
       setNutritionData(null);
+      setUserNotes("");
       
       toast.success(`✅ Image uploaded successfully! Ready for analysis.`);
       console.log('Image uploaded:', file.name, file.size, 'bytes');
@@ -113,11 +115,14 @@ const FoodImageAnalyzer = () => {
 
     const imageUrl = URL.createObjectURL(selectedImage);
     
+    const aiAnalysis = `Gut Health Rating: ${nutritionData.gutHealthRating}/10. ${nutritionData.insights.join('. ')}`;
+    const combinedNotes = userNotes ? `${aiAnalysis}. User Notes: ${userNotes}` : aiAnalysis;
+    
     const foodLogData = {
       food_name: nutritionData.foodItems.join(', '),
       description: `Nutrition: ${nutritionData.calories} cal, ${nutritionData.protein}g protein, ${nutritionData.carbs}g carbs, ${nutritionData.fat}g fat`,
       image_url: imageUrl,
-      notes: `Gut Health Rating: ${nutritionData.gutHealthRating}/10. ${nutritionData.insights.join('. ')}`,
+      notes: combinedNotes,
       entry_type: 'food'
     };
 
@@ -130,6 +135,7 @@ const FoodImageAnalyzer = () => {
       setSelectedImage(null);
       setImagePreview(null);
       setNutritionData(null);
+      setUserNotes("");
     } else {
       toast.error("❌ Failed to save food analysis. Please try again.");
       console.error('Failed to save analysis to log');
@@ -292,6 +298,25 @@ const FoodImageAnalyzer = () => {
                     <p className="text-sm text-gray-700 leading-relaxed">{insight}</p>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Additional Notes */}
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Additional Notes</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Textarea
+                value={userNotes}
+                onChange={(e) => setUserNotes(e.target.value)}
+                placeholder="Add any corrections or additional details about your meal... (e.g., 'Had extra sauce on the side', 'Portion was larger than shown', 'Actually grilled, not fried')"
+                className="min-h-[80px] resize-none"
+                maxLength={500}
+              />
+              <div className="text-right text-xs text-gray-500 mt-1">
+                {userNotes.length}/500 characters
               </div>
             </CardContent>
           </Card>

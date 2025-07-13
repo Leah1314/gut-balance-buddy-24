@@ -15,6 +15,7 @@ import {
   Save,
   Info
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
@@ -39,6 +40,7 @@ const StoolImageAnalyzer = () => {
   const [streakDays, setStreakDays] = useState(1);
   const [isNotStoolImage, setIsNotStoolImage] = useState(false);
   const [notStoolMessage, setNotStoolMessage] = useState("");
+  const [userNotes, setUserNotes] = useState<string>("");
   const { addStoolLog, calculateCurrentStreak } = useStoolLogs();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +55,7 @@ const StoolImageAnalyzer = () => {
       setAnalysisData(null);
       setIsNotStoolImage(false);
       setNotStoolMessage("");
+      setUserNotes("");
       toast.success("Image uploaded successfully!");
     }
   };
@@ -139,11 +142,14 @@ const StoolImageAnalyzer = () => {
     try {
       const imageUrl = URL.createObjectURL(selectedImage);
       
+      const aiAnalysis = `AI Analysis - Health Score: ${analysisData.healthScore}/10. Insights: ${analysisData.insights.join('. ')}`;
+      const combinedNotes = userNotes ? `${aiAnalysis}. User Notes: ${userNotes}` : aiAnalysis;
+      
       const stoolLogData = {
         bristol_type: analysisData.bristolType,
         consistency: analysisData.consistency,
         color: analysisData.color,
-        notes: `AI Analysis - Health Score: ${analysisData.healthScore}/10. Insights: ${analysisData.insights.join('. ')}`,
+        notes: combinedNotes,
         image_url: imageUrl
       };
 
@@ -166,6 +172,7 @@ const StoolImageAnalyzer = () => {
         setAnalysisData(null);
         setIsNotStoolImage(false);
         setNotStoolMessage("");
+        setUserNotes("");
       } else {
         toast.error("Failed to save analysis. Please try again.");
         console.error('Failed to save AI analysis');
@@ -369,6 +376,25 @@ const StoolImageAnalyzer = () => {
                     <p className="text-sm text-gray-700">{recommendation}</p>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Symptoms & Notes */}
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle>Symptoms & Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={userNotes}
+                onChange={(e) => setUserNotes(e.target.value)}
+                placeholder="Add any symptoms or corrections... (e.g., 'Had stomach pain beforehand', 'More urgent than usual', 'Color was darker than detected')"
+                className="min-h-[80px] resize-none"
+                maxLength={500}
+              />
+              <div className="text-right text-xs text-gray-500 mt-1">
+                {userNotes.length}/500 characters
               </div>
             </CardContent>
           </Card>
