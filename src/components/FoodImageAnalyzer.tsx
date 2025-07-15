@@ -115,15 +115,22 @@ const FoodImageAnalyzer = () => {
 
     const imageUrl = URL.createObjectURL(selectedImage);
     
-    const aiAnalysis = `Gut Health Rating: ${nutritionData.gutHealthRating}/10. ${nutritionData.insights.join('. ')}`;
-    const combinedNotes = userNotes ? `${aiAnalysis}. User Notes: ${userNotes}` : aiAnalysis;
+    const nutritionInfo = `Nutrition: ${nutritionData.calories} cal, ${nutritionData.protein}g protein, ${nutritionData.carbs}g carbs, ${nutritionData.fat}g fat`;
+    const aiAnalysis = `AI Analysis - Gut Health Rating: ${nutritionData.gutHealthRating}/10. ${nutritionData.insights.join('. ')}`;
+    
+    // Combine nutrition info, AI analysis, and user notes
+    let fullDescription = nutritionInfo;
+    if (aiAnalysis) {
+      fullDescription += `. ${aiAnalysis}`;
+    }
+    if (userNotes?.trim()) {
+      fullDescription += `. User Notes: ${userNotes.trim()}`;
+    }
     
     const foodLogData = {
       food_name: nutritionData.foodItems.join(', '),
-      description: `Nutrition: ${nutritionData.calories} cal, ${nutritionData.protein}g protein, ${nutritionData.carbs}g carbs, ${nutritionData.fat}g fat`,
-      image_url: imageUrl,
-      notes: combinedNotes,
-      entry_type: 'food'
+      description: fullDescription,
+      image_url: imageUrl
     };
 
     console.log('Saving analysis to food log:', foodLogData);
