@@ -23,10 +23,11 @@ serve(async (req) => {
     const requestBody = await req.json();
     console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
-    const { message, conversationHistory, includeUserData } = requestBody;
+    const { message, conversationHistory, includeUserData, imageData } = requestBody;
     
     console.log('Message received:', message);
     console.log('Include user data:', includeUserData);
+    console.log('Image data provided:', imageData ? 'Yes' : 'No');
 
     console.log('=== CHECKING OPENAI API KEY ===');
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
@@ -42,7 +43,9 @@ serve(async (req) => {
     }
     console.log('OpenAI API key found');
 
-    let systemPrompt = `You are a helpful gut health coach. Provide friendly, supportive advice about digestive health and nutrition. Keep your responses concise and practical.`;
+    let systemPrompt = `You are a helpful gut health coach. Provide friendly, supportive advice about digestive health and nutrition. Keep your responses concise and practical.
+    
+    When analyzing food images, identify ingredients, potential allergens, and assess suitability based on the user's health profile, dietary restrictions, and recent symptoms. For menu images, recommend safe options and highlight items to avoid.`;
     
     // If user data analysis is requested, fetch and include user data
     if (includeUserData) {
@@ -210,6 +213,35 @@ serve(async (req) => {
     }
 
     console.log('=== CALLING OPENAI API ===');
+    
+    // Build messages array
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...(conversationHistory || []).slice(-5).map((msg: any) => ({
+        role: msg.role,
+        content: msg.content
+      }))
+    ];
+    
+    // Create the user message
+    const userMessage: any = { role: 'user', content: message };
+    
+    // Add image if provided
+    if (imageData) {
+      userMessage.content = [
+        { type: 'text', text: message },
+        { 
+          type: 'image_url', 
+          image_url: { 
+            url: imageData,
+            detail: 'high'
+          } 
+        }
+      ];
+    }
+    
+    messages.push(userMessage);
+    
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -218,14 +250,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...(conversationHistory || []).slice(-5).map((msg: any) => ({
-            role: msg.role,
-            content: msg.content
-          })),
-          { role: 'user', content: message }
-        ],
+        messages: messages,
         max_tokens: 500,
         temperature: 0.7,
       }),

@@ -7,12 +7,14 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import QuickQuestions from "./QuickQuestions";
+import ImageUploadDialog from "./ImageUploadDialog";
 
 interface Message {
   id: string;
   content: string;
   role: 'user' | 'assistant';
   timestamp: string;
+  imageData?: string;
 }
 
 const ChatPage = () => {
@@ -38,14 +40,15 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async (messageText: string, includeUserData: boolean = true) => {
-    if (!messageText.trim() || isLoading) return;
+  const sendMessage = async (messageText: string, includeUserData: boolean = true, imageData?: string) => {
+    if ((!messageText.trim() && !imageData) || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       content: messageText,
       role: 'user',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      imageData
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -61,7 +64,8 @@ const ChatPage = () => {
         body: {
           message: messageText,
           conversationHistory: messages,
-          includeUserData: includeUserData
+          includeUserData: includeUserData,
+          imageData: imageData
         },
         headers: session ? {
           Authorization: `Bearer ${session.access_token}`
@@ -119,6 +123,12 @@ const ChatPage = () => {
     await sendMessage(question, true);
   };
 
+  const handleImageUpload = async (imageData: string, context?: string) => {
+    console.log('Image uploaded with context:', context);
+    const messageText = context ? `${context}\n\n[Image uploaded]` : '[Image uploaded]';
+    await sendMessage(messageText, true, imageData);
+  };
+
   if (!user) {
     return (
       <div className="flex justify-center items-center min-h-96">
@@ -149,6 +159,15 @@ const ChatPage = () => {
                     color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
                   }}
                 >
+                  {message.imageData && (
+                    <div className="mb-3">
+                      <img 
+                        src={message.imageData} 
+                        alt="Uploaded food" 
+                        className="w-full max-w-48 h-auto rounded-lg"
+                      />
+                    </div>
+                  )}
                   <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
                   <div className="text-xs mt-2 opacity-70">
                     {new Date(message.timestamp).toLocaleTimeString()}
@@ -176,6 +195,10 @@ const ChatPage = () => {
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
         <CardContent className="p-3">
           <form onSubmit={handleSubmit} className="flex space-x-2">
+            <ImageUploadDialog 
+              onImageUpload={handleImageUpload} 
+              isLoading={isLoading}
+            />
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
