@@ -64,7 +64,7 @@ const LogHistory = () => {
           type: 'stool',
           timestamp: log.created_at,
           title: 'Stool Entry',
-          content: `Type ${log.bristol_type || 'N/A'}`,
+          content: log.notes || `Bristol Type ${log.bristol_type || 'N/A'}`,
           details: {
             bristol_type: log.bristol_type,
             color: log.color,
@@ -132,15 +132,17 @@ const LogHistory = () => {
       const details = entry.details;
       return (
         <div className="space-y-2">
-          <p><strong>Type:</strong> Bristol Type {details?.bristol_type || 'N/A'}</p>
+          {details?.notes && (
+            <p className="font-medium">{details.notes}</p>
+          )}
+          {details?.bristol_type && (
+            <p className="text-sm text-gray-600"><strong>Bristol Type:</strong> {details.bristol_type}</p>
+          )}
           {details?.consistency && (
-            <p><strong>Consistency:</strong> {details.consistency}</p>
+            <p className="text-sm text-gray-600"><strong>Consistency:</strong> {details.consistency}</p>
           )}
           {details?.color && (
-            <p><strong>Color:</strong> {details.color}</p>
-          )}
-          {details?.notes && (
-            <p><strong>Notes:</strong> {details.notes}</p>
+            <p className="text-sm text-gray-600"><strong>Color:</strong> {details.color}</p>
           )}
           {typeof details?.analysis_result === 'string' && details.analysis_result.includes('AI Analysis') && (
             <div className="text-sm">
