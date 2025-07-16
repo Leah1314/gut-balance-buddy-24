@@ -168,7 +168,34 @@ const ChatPage = () => {
                       />
                     </div>
                   )}
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+                  <div 
+                    className={`whitespace-pre-wrap leading-relaxed ${
+                      message.role === 'assistant' 
+                        ? 'text-base font-normal' 
+                        : 'text-sm'
+                    }`}
+                    style={{
+                      lineHeight: message.role === 'assistant' ? '1.6' : '1.4',
+                      fontFamily: message.role === 'assistant' 
+                        ? '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                        : 'inherit'
+                    }}
+                  >
+                    {message.role === 'assistant' ? (
+                      <div 
+                        dangerouslySetInnerHTML={{
+                          __html: message.content
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/### (.*?)\n/g, '<h3 style="font-weight: 600; font-size: 1.1em; margin: 16px 0 8px 0; color: #1f2937;">$1</h3>')
+                            .replace(/- (.*?)(?=\n|$)/g, '<div style="margin: 4px 0; padding-left: 16px; position: relative;"><span style="position: absolute; left: 0; color: #374151;">•</span>$1</div>')
+                            .replace(/\n\n/g, '<div style="margin: 12px 0;"></div>')
+                            .replace(/\n/g, '<br/>')
+                        }}
+                      />
+                    ) : (
+                      message.content
+                    )}
+                  </div>
                   <div className="text-xs mt-2 opacity-70">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </div>
