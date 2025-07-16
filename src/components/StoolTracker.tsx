@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Save,
   Calendar,
   Clock,
   Camera,
-  Edit
+  Edit,
+  FileText
 } from "lucide-react";
 import { toast } from "sonner";
 import { StoolEntry } from "@/types/stool";
@@ -30,6 +33,8 @@ const StoolTracker = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessCard, setShowSuccessCard] = useState(false);
   const [streakDays, setStreakDays] = useState(1);
+  const [generalSymptoms, setGeneralSymptoms] = useState("");
+  const [isSavingSymptom, setIsSavingSymptom] = useState(false);
   const { addStoolLog, calculateCurrentStreak } = useStoolLogs();
 
   const handleSave = async () => {
@@ -95,6 +100,37 @@ const StoolTracker = () => {
     setShowSuccessCard(false);
   };
 
+  const handleSaveGeneralSymptom = async () => {
+    if (!generalSymptoms.trim()) {
+      toast.error("Please enter some symptoms or notes");
+      return;
+    }
+
+    setIsSavingSymptom(true);
+
+    const symptomData = {
+      bristol_type: null,
+      consistency: null,
+      color: null,
+      notes: generalSymptoms.trim(),
+      image_url: undefined
+    };
+
+    console.log('Saving general symptom:', symptomData);
+    const result = await addStoolLog(symptomData);
+    
+    if (result) {
+      toast.success("✅ Symptom note saved successfully!");
+      setGeneralSymptoms("");
+      console.log('General symptom saved:', result);
+    } else {
+      toast.error("❌ Failed to save symptom note. Please try again.");
+      console.error('Failed to save general symptom');
+    }
+
+    setIsSavingSymptom(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Success Card Overlay */}
@@ -128,6 +164,43 @@ const StoolTracker = () => {
         </TabsContent>
 
         <TabsContent value="manual" className="space-y-6">
+          {/* General Bowel/Digestive Symptoms */}
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-lg">
+                <FileText className="w-5 h-5 text-orange-600" />
+                <span>General Bowel/Digestive Symptoms</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-gray-900 text-left block">
+                  Log any digestive symptoms, discomfort, or general observations
+                </Label>
+                <Textarea
+                  placeholder="Example: Abdominal cramping this morning, constipated for 2 days, digestive discomfort after eating, feeling irregular today..."
+                  value={generalSymptoms}
+                  onChange={(e) => setGeneralSymptoms(e.target.value)}
+                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 min-h-[100px] text-sm rounded-lg resize-none"
+                  maxLength={500}
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">
+                    {generalSymptoms.length}/500 characters
+                  </span>
+                  <Button 
+                    onClick={handleSaveGeneralSymptom}
+                    disabled={!generalSymptoms.trim() || isSavingSymptom}
+                    className="bg-orange-600 text-white hover:bg-orange-700 font-medium h-10 px-6 rounded-lg"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    {isSavingSymptom ? 'Saving...' : 'Save Symptom'}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Date/Time Header */}
           <DateTimeHeader />
 

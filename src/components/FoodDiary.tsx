@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Apple, Coffee, UtensilsCrossed, Camera, Edit } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Apple, Coffee, UtensilsCrossed, Camera, Edit, FileText } from "lucide-react";
 import FoodImageAnalyzer from "./FoodImageAnalyzer";
 import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { toast } from "sonner";
@@ -15,6 +16,8 @@ const FoodDiary = () => {
   const [newFood, setNewFood] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
+  const [generalNotes, setGeneralNotes] = useState("");
+  const [isSavingNote, setIsSavingNote] = useState(false);
   const { addFoodLog } = useFoodLogs();
 
   const mealTypes = [{
@@ -97,6 +100,34 @@ const FoodDiary = () => {
     setSelectedFoods([]);
   };
 
+  const handleSaveGeneralNote = async () => {
+    if (!generalNotes.trim()) {
+      toast.error("Please enter some notes or symptoms");
+      return;
+    }
+
+    setIsSavingNote(true);
+
+    const noteData = {
+      food_name: "General Food Note",
+      description: generalNotes.trim()
+    };
+
+    console.log('Saving general food note:', noteData);
+    const result = await addFoodLog(noteData);
+    
+    if (result) {
+      toast.success("✅ Food note saved successfully!");
+      setGeneralNotes("");
+      console.log('General note saved:', result);
+    } else {
+      toast.error("❌ Failed to save note. Please try again.");
+      console.error('Failed to save general note');
+    }
+
+    setIsSavingNote(false);
+  };
+
   return (
     <div className="space-y-4">
       <Tabs defaultValue="camera" className="w-full">
@@ -122,6 +153,43 @@ const FoodDiary = () => {
         </TabsContent>
 
         <TabsContent value="manual" className="space-y-4">
+          {/* General Food Notes/Symptoms */}
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-lg">
+                <FileText className="w-5 h-5 text-blue-600" />
+                <span>General Food Notes/Symptoms</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-gray-900 text-left block">
+                  Log any food-related symptoms, reactions, or general notes
+                </Label>
+                <Textarea
+                  placeholder="Example: Feeling bloated after lunch, had food sensitivity reaction, ate out at restaurant - unsure of ingredients, feeling nauseous..."
+                  value={generalNotes}
+                  onChange={(e) => setGeneralNotes(e.target.value)}
+                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 min-h-[100px] text-sm rounded-lg resize-none"
+                  maxLength={500}
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">
+                    {generalNotes.length}/500 characters
+                  </span>
+                  <Button 
+                    onClick={handleSaveGeneralNote}
+                    disabled={!generalNotes.trim() || isSavingNote}
+                    className="bg-blue-600 text-white hover:bg-blue-700 font-medium h-10 px-6 rounded-lg"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    {isSavingNote ? 'Saving...' : 'Save Note'}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Add Food Entry - More mobile friendly */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="pb-3">
