@@ -155,13 +155,14 @@ const ChatPage = () => {
                   className={`max-w-[90%] rounded-2xl shadow-sm ${
                     message.role === 'user'
                       ? 'bg-blue-500 text-white ml-8'
-                      : 'bg-white text-gray-800 mr-8 border border-gray-100'
+                      : 'text-gray-800 mr-8 border border-gray-100'
                   }`}
                   style={{
                     padding: '16px 20px',
-                    fontSize: message.role === 'assistant' ? '17px' : '16px',
-                    lineHeight: '1.5',
-                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                    fontSize: message.role === 'assistant' ? '15px' : '16px',
+                    lineHeight: '1.4',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                    backgroundColor: message.role === 'assistant' ? '#f9f9fb' : undefined
                   }}
                 >
                   {message.imageData && (
@@ -181,9 +182,9 @@ const ChatPage = () => {
                         dangerouslySetInnerHTML={{
                           __html: message.content
                             .replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 600; color: #1f2937;">$1</strong>')
-                            .replace(/### (.*?)\n/g, '<h3 style="font-weight: 700; font-size: 1.1em; margin: 20px 0 12px 0; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">$1</h3>')
-                            .replace(/- (.*?)(?=\n|$)/g, '<div style="margin: 8px 0; padding-left: 20px; position: relative; color: #374151;"><span style="position: absolute; left: 0; color: #6b7280; font-weight: 600;">•</span>$1</div>')
-                            .replace(/\n\n/g, '<div style="margin: 16px 0;"></div>')
+                            .replace(/### (.*?)\n/g, '<strong style="font-weight: 600; color: #111827; margin: 12px 0 6px 0; display: inline-block;">$1:</strong><br/>')
+                            .replace(/- (.*?)(?=\n|$)/g, '<div style="margin: 6px 0; padding-left: 16px; position: relative; color: #374151;"><span style="position: absolute; left: 0; color: #6b7280; font-weight: 600;">•</span>$1</div>')
+                            .replace(/\n\n/g, '<div style="margin: 10px 0;"></div>')
                             .replace(/\n/g, '<br/>')
                         }}
                         style={{
