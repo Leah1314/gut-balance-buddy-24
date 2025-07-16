@@ -229,11 +229,6 @@ const StoolTracker = () => {
             onPhotoRemove={handlePhotoRemove}
           />
 
-          {/* Notes */}
-          <NotesSection
-            notes={notes}
-            onNotesChange={setNotes}
-          />
 
           {/* Save Button */}
           <div className="text-center pt-4">
