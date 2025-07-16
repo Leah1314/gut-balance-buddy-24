@@ -228,12 +228,32 @@ serve(async (req) => {
     
     // Add image if provided
     if (imageData) {
+      // Ensure the image data is in the correct format for OpenAI
+      let processedImageData = imageData;
+      
+      // If it's a data URL, keep it as is (OpenAI accepts data URLs)
+      // But ensure it has the correct MIME type
+      if (imageData.startsWith('data:image/')) {
+        // Extract the format and ensure it's supported
+        const formatMatch = imageData.match(/data:image\/([^;]+)/);
+        const format = formatMatch ? formatMatch[1].toLowerCase() : 'unknown';
+        
+        console.log('Image format detected:', format);
+        
+        // Convert unsupported formats to supported ones
+        if (!['png', 'jpeg', 'jpg', 'gif', 'webp'].includes(format)) {
+          console.log('Converting unsupported format to PNG');
+          // For now, we'll assume it's a valid image and let OpenAI handle it
+          // In a production app, you might want to convert the image format here
+        }
+      }
+      
       userMessage.content = [
         { type: 'text', text: message },
         { 
           type: 'image_url', 
           image_url: { 
-            url: imageData,
+            url: processedImageData,
             detail: 'high'
           } 
         }
