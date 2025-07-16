@@ -140,73 +140,98 @@ const ChatPage = () => {
   return (
     <div className="space-y-4 h-full flex flex-col">
       {/* Chat Messages - Optimized for mobile */}
-      <Card className="flex-1 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardContent className="p-3 h-80 overflow-y-auto">
-          <div className="space-y-4">
-            {messages.map((message) => (
+      <Card className="flex-1 bg-gray-50 shadow-sm border-0">
+        <CardContent className="p-4 h-80 overflow-y-auto">
+          <div className="space-y-6">
+            {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex animate-in slide-in-from-left-2 duration-500 ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                }`}
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div
-                  className={`max-w-[85%] rounded-lg px-4 py-3 ${
+                  className={`max-w-[90%] rounded-2xl shadow-sm ${
                     message.role === 'user'
-                      ? 'text-white'
-                      : 'bg-gray-100'
+                      ? 'bg-blue-500 text-white ml-8'
+                      : 'bg-white text-gray-800 mr-8 border border-gray-100'
                   }`}
                   style={{
-                    backgroundColor: message.role === 'user' ? '#4A7C59' : '#F3F4F6',
-                    color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
+                    padding: '16px 20px',
+                    fontSize: message.role === 'assistant' ? '17px' : '16px',
+                    lineHeight: '1.5',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
                   }}
                 >
                   {message.imageData && (
-                    <div className="mb-3">
+                    <div className="mb-4">
                       <img 
                         src={message.imageData} 
                         alt="Uploaded food" 
-                        className="w-full max-w-48 h-auto rounded-lg"
+                        className="w-full max-w-64 h-auto rounded-xl shadow-sm"
                       />
                     </div>
                   )}
-                  <div 
-                    className={`whitespace-pre-wrap leading-relaxed ${
-                      message.role === 'assistant' 
-                        ? 'text-base font-normal' 
-                        : 'text-sm'
-                    }`}
-                    style={{
-                      lineHeight: message.role === 'assistant' ? '1.6' : '1.4',
-                      fontFamily: message.role === 'assistant' 
-                        ? '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-                        : 'inherit'
-                    }}
-                  >
+                  
+                  <div className="text-left">
                     {message.role === 'assistant' ? (
                       <div 
+                        className="assistant-message"
                         dangerouslySetInnerHTML={{
                           __html: message.content
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                            .replace(/### (.*?)\n/g, '<h3 style="font-weight: 600; font-size: 1.1em; margin: 16px 0 8px 0; color: #1f2937;">$1</h3>')
-                            .replace(/- (.*?)(?=\n|$)/g, '<div style="margin: 4px 0; padding-left: 16px; position: relative;"><span style="position: absolute; left: 0; color: #374151;">•</span>$1</div>')
-                            .replace(/\n\n/g, '<div style="margin: 12px 0;"></div>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 600; color: #1f2937;">$1</strong>')
+                            .replace(/### (.*?)\n/g, '<h3 style="font-weight: 700; font-size: 1.1em; margin: 20px 0 12px 0; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">$1</h3>')
+                            .replace(/- (.*?)(?=\n|$)/g, '<div style="margin: 8px 0; padding-left: 20px; position: relative; color: #374151;"><span style="position: absolute; left: 0; color: #6b7280; font-weight: 600;">•</span>$1</div>')
+                            .replace(/\n\n/g, '<div style="margin: 16px 0;"></div>')
                             .replace(/\n/g, '<br/>')
+                        }}
+                        style={{
+                          color: '#111827',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word'
                         }}
                       />
                     ) : (
-                      message.content
+                      <div style={{ 
+                        wordWrap: 'break-word', 
+                        overflowWrap: 'break-word'
+                      }}>
+                        {message.content}
+                      </div>
                     )}
                   </div>
-                  <div className="text-xs mt-2 opacity-70">
-                    {new Date(message.timestamp).toLocaleTimeString()}
+                  
+                  <div 
+                    className={`text-xs mt-3 ${
+                      message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                    }`}
+                    style={{ textAlign: 'right' }}
+                  >
+                    {new Date(message.timestamp).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
                   </div>
                 </div>
               </div>
             ))}
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 rounded-lg px-4 py-3 flex items-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm" style={{ color: '#2E2E2E' }}>Thinking...</span>
+              <div className="flex justify-start animate-in slide-in-from-left-2 duration-300">
+                <div 
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 mr-8 flex items-center space-x-3"
+                  style={{ padding: '16px 20px' }}
+                >
+                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                  <span 
+                    className="text-gray-600"
+                    style={{ 
+                      fontSize: '17px',
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                    }}
+                  >
+                    Thinking...
+                  </span>
                 </div>
               </div>
             )}
