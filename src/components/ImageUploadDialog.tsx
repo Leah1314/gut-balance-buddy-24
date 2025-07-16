@@ -21,7 +21,7 @@ const ImageUploadDialog = ({ onImageUpload, isLoading }: ImageUploadDialogProps)
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = async (file: File) => {
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
         title: "File too large",
@@ -31,12 +31,56 @@ const ImageUploadDialog = ({ onImageUpload, isLoading }: ImageUploadDialogProps)
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setSelectedImage(result);
-    };
-    reader.readAsDataURL(file);
+    // Check if file type is supported
+    const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!supportedTypes.includes(file.type)) {
+      toast({
+        title: "Unsupported format",
+        description: "Please select a JPEG, PNG, GIF, or WebP image",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Convert image to standard format using Canvas API
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = document.createElement('img');
+      
+      img.onload = () => {
+        // Set canvas size to image size
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Draw image to canvas
+        ctx?.drawImage(img, 0, 0);
+        
+        // Convert to standard JPEG format
+        const standardImageData = canvas.toDataURL('image/jpeg', 0.85);
+        setSelectedImage(standardImageData);
+      };
+      
+      img.onerror = () => {
+        toast({
+          title: "Invalid image",
+          description: "Please select a valid image file",
+          variant: "destructive",
+        });
+      };
+      
+      // Create object URL for the image
+      const objectUrl = URL.createObjectURL(file);
+      img.src = objectUrl;
+      
+    } catch (error) {
+      console.error('Error processing image:', error);
+      toast({
+        title: "Error processing image",
+        description: "Please try a different image",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCameraClick = () => {
@@ -172,14 +216,14 @@ const ImageUploadDialog = ({ onImageUpload, isLoading }: ImageUploadDialogProps)
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
           onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
           className="hidden"
         />
         <input
           ref={cameraInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
           capture="environment"
           onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
           className="hidden"
