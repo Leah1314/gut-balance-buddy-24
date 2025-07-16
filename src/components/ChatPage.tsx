@@ -18,14 +18,30 @@ interface Message {
 }
 
 const ChatPage = () => {
-  const [messages, setMessages] = useState<Message[]>([
+  // Load chat history from localStorage or use default welcome message
+  const loadChatHistory = (): Message[] => {
+    try {
+      const savedMessages = localStorage.getItem('chatHistory');
+      if (savedMessages) {
+        const parsed = JSON.parse(savedMessages);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : getDefaultMessage();
+      }
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+    }
+    return getDefaultMessage();
+  };
+
+  const getDefaultMessage = (): Message[] => [
     {
       id: '1',
       content: "Hi! I'm your gut health coach. I can see you have some health data stored. I can help you understand your digestive patterns, suggest meal improvements, and answer questions about your symptoms. What would you like to know?",
       role: 'assistant',
       timestamp: new Date().toISOString()
     }
-  ]);
+  ];
+
+  const [messages, setMessages] = useState<Message[]>(loadChatHistory);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -35,6 +51,15 @@ const ChatPage = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Save messages to localStorage whenever messages change
+  useEffect(() => {
+    try {
+      localStorage.setItem('chatHistory', JSON.stringify(messages));
+    } catch (error) {
+      console.error('Error saving chat history:', error);
+    }
+  }, [messages]);
 
   useEffect(() => {
     scrollToBottom();
