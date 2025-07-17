@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } f
 import { TrendingUp, MessageCircle, Calendar, Target, Apple, Heart, TrendingDown } from 'lucide-react';
 import { useFoodLogs } from '@/hooks/useFoodLogs';
 import { useStoolLogs } from '@/hooks/useStoolLogs';
+import MonthlyActivityCalendar from './MonthlyActivityCalendar';
 
 interface DayScore {
   date: string;
@@ -513,6 +514,9 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Monthly Activity Calendar */}
+      <MonthlyActivityCalendar foodLogs={foodLogs} stoolLogs={stoolLogs} />
 
       {/* Personalized Suggestions */}
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
