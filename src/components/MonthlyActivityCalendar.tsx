@@ -118,8 +118,8 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <span className="text-sm font-medium min-w-[120px] text-center" style={{ color: '#2E2E2E' }}>
-                {format(currentMonth, 'MMMM yyyy')}
+              <span className="text-sm font-medium min-w-[100px] sm:min-w-[120px] text-center" style={{ color: '#2E2E2E' }}>
+                {format(currentMonth, 'MMM yyyy')}
               </span>
               <Button
                 variant="outline"
@@ -133,50 +133,52 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <Calendar
-            mode="single"
-            month={currentMonth}
-            onMonthChange={setCurrentMonth}
-            className="w-full pointer-events-auto"
-            modifiers={{
-              hasFood: (date) => getActivityLevel(date) === 'food',
-              hasStool: (date) => getActivityLevel(date) === 'stool',
-              hasBoth: (date) => getActivityLevel(date) === 'both',
-              hasActivity: (date) => getActivityLevel(date) !== 'none'
-            }}
-            modifiersStyles={{
-              hasFood: { 
-                backgroundColor: '#E8F5E8',
-                color: '#2E7D32',
-                fontWeight: 'bold'
-              },
-              hasStool: { 
-                backgroundColor: '#FFF3E0',
-                color: '#F57C00',
-                fontWeight: 'bold'
-              },
-              hasBoth: { 
-                backgroundColor: '#E3F2FD',
-                color: '#1976D2',
-                fontWeight: 'bold'
-              }
-            }}
-            onDayClick={handleDateClick}
-            disabled={(date) => date > new Date()}
-          />
+        <CardContent className="p-3 sm:p-6">
+          <div className="overflow-x-auto">
+            <Calendar
+              mode="single"
+              month={currentMonth}
+              onMonthChange={setCurrentMonth}
+              className="w-full pointer-events-auto text-sm mx-auto max-w-full"
+              modifiers={{
+                hasFood: (date) => getActivityLevel(date) === 'food',
+                hasStool: (date) => getActivityLevel(date) === 'stool',
+                hasBoth: (date) => getActivityLevel(date) === 'both',
+                hasActivity: (date) => getActivityLevel(date) !== 'none'
+              }}
+              modifiersStyles={{
+                hasFood: { 
+                  backgroundColor: '#E8F5E8',
+                  color: '#2E7D32',
+                  fontWeight: 'bold'
+                },
+                hasStool: { 
+                  backgroundColor: '#FFF3E0',
+                  color: '#F57C00',
+                  fontWeight: 'bold'
+                },
+                hasBoth: { 
+                  backgroundColor: '#E3F2FD',
+                  color: '#1976D2',
+                  fontWeight: 'bold'
+                }
+              }}
+              onDayClick={handleDateClick}
+              disabled={(date) => date > new Date()}
+            />
+          </div>
           
           {/* Legend */}
-          <div className="mt-4 flex flex-wrap gap-4 text-xs">
-            <div className="flex items-center space-x-2">
+          <div className="mt-4 flex flex-wrap gap-2 sm:gap-4 text-xs justify-center sm:justify-start">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#E8F5E8' }}></div>
               <span style={{ color: '#2E2E2E' }}>Food only</span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFF3E0' }}></div>
               <span style={{ color: '#2E2E2E' }}>Stool only</span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#E3F2FD' }}></div>
               <span style={{ color: '#2E2E2E' }}>Both logged</span>
             </div>
