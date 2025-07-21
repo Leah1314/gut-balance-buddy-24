@@ -168,14 +168,14 @@ const ChatPage = () => {
       <Card className="flex-1 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
         <CardContent className="p-4 sm:p-6 flex flex-col h-full">
           <div className="flex-1 overflow-y-auto min-h-[60vh] sm:min-h-[70vh]">
-            <div className="space-y-6">
+            <div className="space-y-3">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[90%] sm:max-w-[85%] md:max-w-[80%] rounded-lg px-5 py-4 ${
+                    className={`max-w-[90%] sm:max-w-[85%] md:max-w-[80%] rounded-lg px-3 py-2 ${
                       message.role === 'user'
                         ? 'text-white'
                         : 'bg-gray-100'
@@ -186,7 +186,7 @@ const ChatPage = () => {
                     }}
                   >
                     {message.imageData && (
-                      <div className="mb-4">
+                      <div className="mb-2">
                         <img 
                           src={message.imageData} 
                           alt="Uploaded food" 
@@ -194,8 +194,8 @@ const ChatPage = () => {
                         />
                       </div>
                     )}
-                    <div className="whitespace-pre-wrap text-base leading-relaxed">{message.content}</div>
-                    <div className="text-sm mt-3 opacity-75">
+                    <div className="whitespace-pre-wrap text-sm leading-snug">{message.content}</div>
+                    <div className="text-xs mt-1 opacity-75">
                       {new Date(message.timestamp).toLocaleTimeString()}
                     </div>
                   </div>
