@@ -1,0 +1,102 @@
+
+{
+  "navigation": {
+    "track": "追踪",
+    "analytics": "分析",
+    "chat": "聊天",
+    "health": "健康"
+  },
+  "track": {
+    "title": "追踪您的消化健康",
+    "subtitle": "监控进食和排便，优化肠道健康",
+    "tabs": {
+      "foodIn": "食物摄入",
+      "stoolOut": "排便记录",
+      "history": "历史记录"
+    }
+  },
+  "buttons": {
+    "save": "保存",
+    "cancel": "取消",
+    "submit": "提交",
+    "saveEntry": "保存记录",
+    "logSymptom": "记录症状",
+    "viewAllEntries": "查看所有记录",
+    "saving": "保存中...",
+    "sending": "发送中…"
+  },
+  "food": {
+    "title": "食物追踪",
+    "aiAnalysis": "AI分析",
+    "manualEntry": "手动输入"
+  },
+  "stool": {
+    "title": "排便追踪",
+    "generalSymptoms": "肠道/消化症状",
+    "generalSymptomsDescription": "记录任何消化症状、不适或一般观察",
+    "generalSymptomsPlaceholder": "例如：今天早上腹部痉挛，便秘2天，进食后消化不适，今天感觉不规律...",
+    "saveSymptom": "保存症状",
+    "bristolChart": "布里斯托大便分类法",
+    "consistency": "硬度",
+    "color": "颜色",
+    "notes": "备注",
+    "photoUpload": "照片上传"
+  },
+  "symptoms": {
+    "title": "记录新症状",
+    "selectSymptom": "选择或输入症状",
+    "placeholder": "输入症状或从下方选择",
+    "severityLevel": "严重程度",
+    "severityScale": {
+      "mild": "轻微",
+      "moderate": "中等",
+      "severe": "严重"
+    },
+    "notesOptional": "备注（可选）",
+    "notesPlaceholder": "关于症状的任何其他详细信息...",
+    "recentEntries": "最近记录",
+    "insight": "洞察",
+    "insightMessage": "您本周记录了3次腹胀，通常在饭后2-3小时。考虑追踪您的饮食以识别潜在的诱因。",
+    "common": {
+      "bloating": "腹胀",
+      "cramping": "痉挛",
+      "nausea": "恶心",
+      "heartburn": "胃灼热",
+      "gas": "胀气",
+      "constipation": "便秘",
+      "diarrhea": "腹泻",
+      "stomachPain": "胃痛",
+      "fatigue": "疲劳",
+      "headache": "头痛"
+    }
+  },
+  "chat": {
+    "title": "肠道健康助手",
+    "placeholder": "询问关于您的消化健康、食物追踪或症状的问题...",
+    "quickQuestions": "快速问题：",
+    "quickQ1": "分析我最近的饮食模式",
+    "quickQ2": "帮助我理解我的症状",
+    "quickQ3": "建议有助于消化的食物",
+    "quickQ4": "我应该每天追踪什么？"
+  },
+  "auth": {
+    "signOut": "退出登录",
+    "signingOut": "正在退出...",
+    "signedIn": "已登录",
+    "signOutSuccess": "成功退出登录",
+    "signOutError": "退出登录错误",
+    "signOutErrorMessage": "退出登录时发生错误。请重试。"
+  },
+  "common": {
+    "today": "今天",
+    "yesterday": "昨天",
+    "morning": "早上",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "characters": "字符"
+  },
+  "app": {
+    "title": "进进出出"
+  }
+}

@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface QuickQuestionsProps {
   onQuestionSelect: (question: string) => void;
@@ -7,13 +8,14 @@ interface QuickQuestionsProps {
 }
 
 const QuickQuestions = ({ onQuestionSelect, isLoading }: QuickQuestionsProps) => {
+  const { t } = useTranslation();
   const [loadingQuestion, setLoadingQuestion] = useState<string | null>(null);
 
   const quickQs = [
-    "Analyze my recent meal patterns",
-    "Help me understand my symptoms", 
-    "Suggest foods for better digestion",
-    "What should I track daily?",
+    t('chat.quickQ1'),
+    t('chat.quickQ2'),
+    t('chat.quickQ3'),
+    t('chat.quickQ4'),
   ];
 
   const handleClick = async (question: string) => {
@@ -25,7 +27,7 @@ const QuickQuestions = ({ onQuestionSelect, isLoading }: QuickQuestionsProps) =>
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium mb-3" style={{ color: '#2E2E2E' }}>Quick questions:</p>
+      <p className="text-sm font-medium mb-3" style={{ color: '#2E2E2E' }}>{t('chat.quickQuestions')}</p>
       {quickQs.map(q => (
         <button
           key={q}
@@ -51,7 +53,7 @@ const QuickQuestions = ({ onQuestionSelect, isLoading }: QuickQuestionsProps) =>
             }
           }}
         >
-          {loadingQuestion === q ? "Sending…" : q}
+          {loadingQuestion === q ? t('buttons.sending') : q}
         </button>
       ))}
     </div>

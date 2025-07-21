@@ -1,4 +1,6 @@
+
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -25,6 +27,7 @@ import SuccessCard from "./stool/SuccessCard";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 const StoolTracker = () => {
+  const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState<number | null>(null);
   const [selectedConsistency, setSelectedConsistency] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -148,14 +151,14 @@ const StoolTracker = () => {
             className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
           >
             <Camera className="w-4 h-4" />
-            <span>AI Analysis</span>
+            <span>{t('food.aiAnalysis')}</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manual" 
             className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
           >
             <Edit className="w-4 h-4" />
-            <span>Manual Entry</span>
+            <span>{t('food.manualEntry')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -169,16 +172,16 @@ const StoolTracker = () => {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2 text-lg">
                 <FileText className="w-5 h-5 text-orange-600" />
-                <span>General Bowel/Digestive Symptoms</span>
+                <span>{t('stool.generalSymptoms')}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-900 text-left block">
-                  Log any digestive symptoms, discomfort, or general observations
+                  {t('stool.generalSymptomsDescription')}
                 </Label>
                 <Textarea
-                  placeholder="Example: Abdominal cramping this morning, constipated for 2 days, digestive discomfort after eating, feeling irregular today..."
+                  placeholder={t('stool.generalSymptomsPlaceholder')}
                   value={generalSymptoms}
                   onChange={(e) => setGeneralSymptoms(e.target.value)}
                   className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 min-h-[100px] text-sm rounded-lg resize-none"
@@ -186,7 +189,7 @@ const StoolTracker = () => {
                 />
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-500">
-                    {generalSymptoms.length}/500 characters
+                    {generalSymptoms.length}/500 {t('common.characters')}
                   </span>
                   <Button 
                     onClick={handleSaveGeneralSymptom}
@@ -194,7 +197,7 @@ const StoolTracker = () => {
                     className="bg-orange-600 text-white hover:bg-orange-700 font-medium h-10 px-6 rounded-lg"
                   >
                     <FileText className="w-4 h-4 mr-2" />
-                    {isSavingSymptom ? 'Saving...' : 'Save Symptom'}
+                    {isSavingSymptom ? t('buttons.saving') : t('stool.saveSymptom')}
                   </Button>
                 </div>
               </div>
@@ -229,7 +232,6 @@ const StoolTracker = () => {
             onPhotoRemove={handlePhotoRemove}
           />
 
-
           {/* Save Button */}
           <div className="text-center pt-4">
             <Button 
@@ -251,7 +253,7 @@ const StoolTracker = () => {
               }}
             >
               <Save className="w-4 h-4 mr-2 stroke-2" />
-              {isSaving ? 'Saving...' : 'Save Entry'}
+              {isSaving ? t('buttons.saving') : t('buttons.saveEntry')}
             </Button>
           </div>
         </TabsContent>

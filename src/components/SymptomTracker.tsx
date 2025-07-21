@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,34 +20,43 @@ import {
 } from "lucide-react";
 
 const SymptomTracker = () => {
+  const { t } = useTranslation();
   const [selectedSymptom, setSelectedSymptom] = useState("");
   const [severity, setSeverity] = useState([3]);
   const [notes, setNotes] = useState("");
 
   const commonSymptoms = [
-    "Bloating", "Cramping", "Nausea", "Heartburn", "Gas", 
-    "Constipation", "Diarrhea", "Stomach Pain", "Fatigue", "Headache"
+    t('symptoms.common.bloating'),
+    t('symptoms.common.cramping'),
+    t('symptoms.common.nausea'),
+    t('symptoms.common.heartburn'),
+    t('symptoms.common.gas'),
+    t('symptoms.common.constipation'),
+    t('symptoms.common.diarrhea'),
+    t('symptoms.common.stomachPain'),
+    t('symptoms.common.fatigue'),
+    t('symptoms.common.headache')
   ];
 
   const recentEntries = [
     { 
-      symptom: "Bloating", 
+      symptom: t('symptoms.common.bloating'), 
       severity: 4, 
       time: "2 hours ago", 
-      date: "Today",
+      date: t('common.today'),
       notes: "After lunch, feeling quite uncomfortable" 
     },
     { 
       symptom: "Energy Level", 
       severity: 8, 
-      time: "Morning", 
-      date: "Today",
+      time: t('common.morning'), 
+      date: t('common.today'),
       notes: "Feeling great after good sleep" 
     },
     { 
-      symptom: "Stomach Pain", 
+      symptom: t('symptoms.common.stomachPain'), 
       severity: 2, 
-      time: "Yesterday", 
+      time: t('common.yesterday'), 
       date: "Dec 19",
       notes: "Mild discomfort, went away quickly" 
     },
@@ -81,15 +91,15 @@ const SymptomTracker = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Plus className="w-5 h-5 text-blue-600" />
-            <span>Log New Symptom</span>
+            <span>{t('symptoms.title')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Symptom Selection */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Select or enter symptom</Label>
+            <Label className="text-sm font-medium">{t('symptoms.selectSymptom')}</Label>
             <Input
-              placeholder="Enter symptom or select from below"
+              placeholder={t('symptoms.placeholder')}
               value={selectedSymptom}
               onChange={(e) => setSelectedSymptom(e.target.value)}
               className="mb-3"
@@ -112,7 +122,7 @@ const SymptomTracker = () => {
           {/* Severity Scale */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">
-              Severity Level: {severity[0]}/10
+              {t('symptoms.severityLevel')}: {severity[0]}/10
             </Label>
             <div className="px-3">
               <Slider
@@ -124,18 +134,18 @@ const SymptomTracker = () => {
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>Mild</span>
-                <span>Moderate</span>
-                <span>Severe</span>
+                <span>{t('symptoms.severityScale.mild')}</span>
+                <span>{t('symptoms.severityScale.moderate')}</span>
+                <span>{t('symptoms.severityScale.severe')}</span>
               </div>
             </div>
           </div>
 
           {/* Notes */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Notes (optional)</Label>
+            <Label className="text-sm font-medium">{t('symptoms.notesOptional')}</Label>
             <Textarea
-              placeholder="Any additional details about the symptom..."
+              placeholder={t('symptoms.notesPlaceholder')}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="min-h-[80px]"
@@ -148,7 +158,7 @@ const SymptomTracker = () => {
             disabled={!selectedSymptom}
           >
             <Activity className="w-4 h-4 mr-2" />
-            Log Symptom
+            {t('buttons.logSymptom')}
           </Button>
         </CardContent>
       </Card>
@@ -158,7 +168,7 @@ const SymptomTracker = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Calendar className="w-5 h-5 text-green-600" />
-            <span>Recent Entries</span>
+            <span>{t('symptoms.recentEntries')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -193,7 +203,7 @@ const SymptomTracker = () => {
             </div>
           ))}
           <Button variant="outline" className="w-full">
-            View All Entries
+            {t('buttons.viewAllEntries')}
           </Button>
         </CardContent>
       </Card>
@@ -204,10 +214,9 @@ const SymptomTracker = () => {
           <div className="flex items-start space-x-3">
             <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
             <div>
-              <h3 className="font-medium text-gray-900 mb-1">Insight</h3>
+              <h3 className="font-medium text-gray-900 mb-1">{t('symptoms.insight')}</h3>
               <p className="text-sm text-gray-700">
-                You've logged bloating 3 times this week, typically 2-3 hours after meals. 
-                Consider tracking what you eat to identify potential triggers.
+                {t('symptoms.insightMessage')}
               </p>
             </div>
           </div>

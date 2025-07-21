@@ -1,0 +1,102 @@
+
+{
+  "navigation": {
+    "track": "Track",
+    "analytics": "Analytics",
+    "chat": "Chat",
+    "health": "Health"
+  },
+  "track": {
+    "title": "Track Your Digestive Health",
+    "subtitle": "Monitor what goes in and what comes out for optimal gut health",
+    "tabs": {
+      "foodIn": "Food In",
+      "stoolOut": "Stool Out",
+      "history": "History"
+    }
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "saveEntry": "Save Entry",
+    "logSymptom": "Log Symptom",
+    "viewAllEntries": "View All Entries",
+    "saving": "Saving...",
+    "sending": "Sending…"
+  },
+  "food": {
+    "title": "Food Tracking",
+    "aiAnalysis": "AI Analysis",
+    "manualEntry": "Manual Entry"
+  },
+  "stool": {
+    "title": "Stool Tracking",
+    "generalSymptoms": "General Bowel/Digestive Symptoms",
+    "generalSymptomsDescription": "Log any digestive symptoms, discomfort, or general observations",
+    "generalSymptomsPlaceholder": "Example: Abdominal cramping this morning, constipated for 2 days, digestive discomfort after eating, feeling irregular today...",
+    "saveSymptom": "Save Symptom",
+    "bristolChart": "Bristol Stool Chart",
+    "consistency": "Consistency",
+    "color": "Color",
+    "notes": "Notes",
+    "photoUpload": "Photo Upload"
+  },
+  "symptoms": {
+    "title": "Log New Symptom",
+    "selectSymptom": "Select or enter symptom",
+    "placeholder": "Enter symptom or select from below",
+    "severityLevel": "Severity Level",
+    "severityScale": {
+      "mild": "Mild",
+      "moderate": "Moderate",
+      "severe": "Severe"
+    },
+    "notesOptional": "Notes (optional)",
+    "notesPlaceholder": "Any additional details about the symptom...",
+    "recentEntries": "Recent Entries",
+    "insight": "Insight",
+    "insightMessage": "You've logged bloating 3 times this week, typically 2-3 hours after meals. Consider tracking what you eat to identify potential triggers.",
+    "common": {
+      "bloating": "Bloating",
+      "cramping": "Cramping",
+      "nausea": "Nausea",
+      "heartburn": "Heartburn",
+      "gas": "Gas",
+      "constipation": "Constipation",
+      "diarrhea": "Diarrhea",
+      "stomachPain": "Stomach Pain",
+      "fatigue": "Fatigue",
+      "headache": "Headache"
+    }
+  },
+  "chat": {
+    "title": "Gut Health Assistant",
+    "placeholder": "Ask me about your digestive health, food tracking, or symptoms...",
+    "quickQuestions": "Quick questions:",
+    "quickQ1": "Analyze my recent meal patterns",
+    "quickQ2": "Help me understand my symptoms",
+    "quickQ3": "Suggest foods for better digestion",
+    "quickQ4": "What should I track daily?"
+  },
+  "auth": {
+    "signOut": "Sign out",
+    "signingOut": "Signing out...",
+    "signedIn": "Signed in",
+    "signOutSuccess": "Signed out successfully",
+    "signOutError": "Sign out error",
+    "signOutErrorMessage": "There was an error signing out. Please try again."
+  },
+  "common": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "morning": "Morning",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "characters": "characters"
+  },
+  "app": {
+    "title": "In and Out"
+  }
+}

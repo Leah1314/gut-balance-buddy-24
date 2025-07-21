@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Activity, MessageCircle, Utensils, Scroll, User, Calendar, BarChart3 } from "lucide-react";
@@ -10,8 +11,10 @@ import HealthProfile from "@/components/HealthProfile";
 import LogHistory from "@/components/LogHistory";
 import Analytics from "@/components/Analytics";
 import UserMenu from "@/components/UserMenu";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Index = () => {
+  const { t } = useTranslation();
   const [activeMainTab, setActiveMainTab] = useState<'track' | 'chat' | 'health' | 'analytics'>('track');
   const [activeTrackTab, setActiveTrackTab] = useState<'food' | 'stool' | 'history'>('food');
 
@@ -34,9 +37,12 @@ const Index = () => {
             </div>
             <h1 className="text-xl font-semibold" style={{
               color: '#2E2E2E'
-            }}>In and Out</h1>
+            }}>{t('app.title')}</h1>
           </div>
-          <UserMenu />
+          <div className="flex items-center space-x-2">
+            <LanguageSelector />
+            <UserMenu />
+          </div>
         </div>
       </header>
 
@@ -49,13 +55,13 @@ const Index = () => {
               <h2 className="text-xl font-semibold mb-2" style={{
                 color: '#2E2E2E'
               }}>
-                Track Your Digestive Health
+                {t('track.title')}
               </h2>
               <p className="text-sm leading-relaxed px-4" style={{
                 color: '#2E2E2E',
                 opacity: 0.7
               }}>
-                Monitor what goes in and what comes out for optimal gut health
+                {t('track.subtitle')}
               </p>
             </div>
 
@@ -91,7 +97,7 @@ const Index = () => {
                       }}
                     >
                       <Utensils className={`w-5 h-5 stroke-2 ${activeTrackTab === 'food' ? 'scale-105' : ''} transition-transform`} />
-                      <span className="font-medium text-xs">Food In</span>
+                      <span className="font-medium text-xs">{t('track.tabs.foodIn')}</span>
                     </Button>
                     <Button 
                       onClick={() => setActiveTrackTab('stool')} 
@@ -118,7 +124,7 @@ const Index = () => {
                       }}
                     >
                       <Scroll className={`w-5 h-5 stroke-2 ${activeTrackTab === 'stool' ? 'scale-105' : ''} transition-transform`} />
-                      <span className="font-medium text-xs">Stool Out</span>
+                      <span className="font-medium text-xs">{t('track.tabs.stoolOut')}</span>
                     </Button>
                     <Button 
                       onClick={() => setActiveTrackTab('history')} 
@@ -145,7 +151,7 @@ const Index = () => {
                       }}
                     >
                       <Calendar className={`w-5 h-5 stroke-2 ${activeTrackTab === 'history' ? 'scale-105' : ''} transition-transform`} />
-                      <span className="font-medium text-xs">History</span>
+                      <span className="font-medium text-xs">{t('track.tabs.history')}</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -192,7 +198,7 @@ const Index = () => {
               }}
             >
               <Activity className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'track' ? 'scale-105' : ''} transition-transform`} />
-              <span className="text-xs font-medium">Track</span>
+              <span className="text-xs font-medium">{t('navigation.track')}</span>
             </button>
             <button 
               onClick={() => setActiveMainTab('analytics')} 
@@ -202,7 +208,7 @@ const Index = () => {
               }}
             >
               <BarChart3 className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'analytics' ? 'scale-105' : ''} transition-transform`} />
-              <span className="text-xs font-medium">Analytics</span>
+              <span className="text-xs font-medium">{t('navigation.analytics')}</span>
             </button>
             <button 
               onClick={() => setActiveMainTab('chat')} 
@@ -212,7 +218,7 @@ const Index = () => {
               }}
             >
               <MessageCircle className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'chat' ? 'scale-105' : ''} transition-transform`} />
-              <span className="text-xs font-medium">Chat</span>
+              <span className="text-xs font-medium">{t('navigation.chat')}</span>
             </button>
             <button 
               onClick={() => setActiveMainTab('health')} 
@@ -222,7 +228,7 @@ const Index = () => {
               }}
             >
               <User className={`w-6 h-6 mb-1 stroke-2 ${activeMainTab === 'health' ? 'scale-105' : ''} transition-transform`} />
-              <span className="text-xs font-medium">Health</span>
+              <span className="text-xs font-medium">{t('navigation.health')}</span>
             </button>
           </div>
         </div>
