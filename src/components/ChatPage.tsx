@@ -164,51 +164,53 @@ const ChatPage = () => {
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      {/* Chat Messages - Optimized for mobile */}
+      {/* Chat Messages - Enhanced for better readability */}
       <Card className="flex-1 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardContent className="p-3 h-80 overflow-y-auto">
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+        <CardContent className="p-4 sm:p-6 flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto min-h-[60vh] sm:min-h-[70vh]">
+            <div className="space-y-6">
+              {messages.map((message) => (
                 <div
-                  className={`max-w-[85%] rounded-lg px-4 py-3 ${
-                    message.role === 'user'
-                      ? 'text-white'
-                      : 'bg-gray-100'
-                  }`}
-                  style={{
-                    backgroundColor: message.role === 'user' ? '#4A7C59' : '#F3F4F6',
-                    color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
-                  }}
+                  key={message.id}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.imageData && (
-                    <div className="mb-3">
-                      <img 
-                        src={message.imageData} 
-                        alt="Uploaded food" 
-                        className="w-full max-w-48 h-auto rounded-lg"
-                      />
+                  <div
+                    className={`max-w-[90%] sm:max-w-[85%] md:max-w-[80%] rounded-lg px-5 py-4 ${
+                      message.role === 'user'
+                        ? 'text-white'
+                        : 'bg-gray-100'
+                    }`}
+                    style={{
+                      backgroundColor: message.role === 'user' ? '#4A7C59' : '#F3F4F6',
+                      color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
+                    }}
+                  >
+                    {message.imageData && (
+                      <div className="mb-4">
+                        <img 
+                          src={message.imageData} 
+                          alt="Uploaded food" 
+                          className="w-full max-w-64 h-auto rounded-lg"
+                        />
+                      </div>
+                    )}
+                    <div className="whitespace-pre-wrap text-base leading-relaxed">{message.content}</div>
+                    <div className="text-sm mt-3 opacity-75">
+                      {new Date(message.timestamp).toLocaleTimeString()}
                     </div>
-                  )}
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
-                  <div className="text-xs mt-2 opacity-70">
-                    {new Date(message.timestamp).toLocaleTimeString()}
                   </div>
                 </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 rounded-lg px-4 py-3 flex items-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm" style={{ color: '#2E2E2E' }}>Thinking...</span>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 rounded-lg px-5 py-4 flex items-center space-x-3">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span className="text-base" style={{ color: '#2E2E2E' }}>Thinking...</span>
+                  </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
+              )}
+              <div ref={messagesEndRef} />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -216,10 +218,10 @@ const ChatPage = () => {
       {/* Quick Questions */}
       <QuickQuestions onQuestionSelect={handleQuickQuestion} isLoading={isLoading} />
 
-      {/* Message Input - Mobile optimized */}
+      {/* Message Input - Enhanced for better usability */}
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardContent className="p-3">
-          <form onSubmit={handleSubmit} className="flex space-x-2">
+        <CardContent className="p-4">
+          <form onSubmit={handleSubmit} className="flex space-x-3">
             <ImageUploadDialog 
               onImageUpload={handleImageUpload} 
               isLoading={isLoading}
@@ -228,7 +230,7 @@ const ChatPage = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me about your gut health..."
-              className="flex-1 min-h-[48px] max-h-32 resize-none rounded-lg text-sm"
+              className="flex-1 min-h-[52px] max-h-32 resize-none rounded-lg text-base leading-relaxed"
               style={{
                 borderColor: '#D3D3D3',
                 color: '#2E2E2E'
@@ -243,7 +245,7 @@ const ChatPage = () => {
             <Button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="self-end text-white h-12 w-12 rounded-lg"
+              className="self-end text-white h-[52px] w-[52px] rounded-lg"
               style={{
                 backgroundColor: '#4A7C59',
                 borderColor: '#4A7C59'
