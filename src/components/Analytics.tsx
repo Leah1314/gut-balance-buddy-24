@@ -416,7 +416,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                     dataKey="foodScore" 
                     stroke="#4A7C59" 
                     strokeWidth={2}
-                    dot={{ fill: '#4A7C59', strokeWidth: 2, r: 4 }}
+                    dot={(props) => {
+                      const { payload } = props;
+                      if (payload?.foodScore === null || payload?.foodScore === undefined) {
+                        return null;
+                      }
+                      return <circle {...props} fill="#4A7C59" strokeWidth={2} r={4} />;
+                    }}
                      name="Food Score"
                      connectNulls={true}
                    />
@@ -425,7 +431,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                     dataKey="stoolScore" 
                     stroke="#FF8C42" 
                     strokeWidth={2}
-                    dot={{ fill: '#FF8C42', strokeWidth: 2, r: 4 }}
+                    dot={(props) => {
+                      const { payload } = props;
+                      if (payload?.stoolScore === null || payload?.stoolScore === undefined) {
+                        return null;
+                      }
+                      return <circle {...props} fill="#FF8C42" strokeWidth={2} r={4} />;
+                    }}
                      name="Stool Score"
                      connectNulls={true}
                    />
