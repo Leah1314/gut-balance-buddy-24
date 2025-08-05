@@ -74,7 +74,21 @@
     "analysisFailed": "分析图片失败。请重试。",
     "noAnalysisData": "没有分析数据可保存",
     "analysisSaved": "食物分析成功保存到您的日志！",
-    "saveAnalysisFailed": "保存食物分析失败。请重试。"
+    "saveAnalysisFailed": "保存食物分析失败。请重试。",
+    "commonFoods": {
+      "rice": "米饭",
+      "chicken": "鸡肉", 
+      "salad": "沙拉",
+      "banana": "香蕉",
+      "apple": "苹果",
+      "yogurt": "酸奶",
+      "oatmeal": "燕麦",
+      "vegetables": "蔬菜",
+      "nuts": "坚果",
+      "bread": "面包",
+      "pasta": "意面",
+      "fish": "鱼类"
+    }
   },
   "stool": {
     "title": "排便追踪",
@@ -181,6 +195,7 @@
     "medicationsAndSymptoms": "用药情况和症状",
     "testResults": "检查结果",
     "uploadFiles": "上传文件",
+    "uploadFiles": "上传文件",
     "age": "年龄",
     "gender": "性别",
     "weight": "体重 (kg)",
@@ -246,6 +261,16 @@
     "personalizedSuggestions": "个性化建议",
     "askAI": "询问AI助手",
     "monthlyCalendar": "月度日历",
+    "monthlyActivityCalendar": "月度活动日历",
+    "dayAbbreviations": {
+      "su": "日",
+      "mo": "一", 
+      "tu": "二",
+      "we": "三",
+      "th": "四",
+      "fr": "五",
+      "sa": "六"
+    },
     "excellent": "优秀",
     "good": "良好",
     "needsAttention": "需要注意",

@@ -439,7 +439,7 @@ const HealthProfile = () => {
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <AlertCircle className="w-4 h-4 text-orange-600" />
-                    <span>Medical Conditions</span>
+                    <span>{t('health.medicalConditions')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-gray-500 font-normal">
@@ -496,7 +496,7 @@ const HealthProfile = () => {
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <span>💊</span>
-                    <span>Medications & Symptoms</span>
+                    <span>{t('health.medicationsAndSymptoms')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-gray-500 font-normal">
@@ -569,10 +569,10 @@ const HealthProfile = () => {
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <FileText className="w-4 h-4 text-purple-600" />
-                    <span>Test Results</span>
+                    <span>{t('health.testResults')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-normal">📄 Upload files</span>
+                    <span className="text-xs text-gray-500 font-normal">📄 {t('health.uploadFiles')}</span>
                     {expandedSection === 'uploads' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </div>
                 </CardTitle>

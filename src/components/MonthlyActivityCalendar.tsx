@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 interface DayActivity {
@@ -23,6 +25,7 @@ interface MonthlyActivityCalendarProps {
 }
 
 const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalendarProps) => {
+  const { t, i18n } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dayActivities, setDayActivities] = useState<Map<string, DayActivity>>(new Map());
@@ -107,7 +110,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               <CalendarIcon className="w-5 h-5" style={{ color: '#4A7C59' }} />
-              <span style={{ color: '#2E2E2E' }}>Monthly Activity Calendar</span>
+              <span style={{ color: '#2E2E2E' }}>{t('analytics.monthlyActivityCalendar')}</span>
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Button
@@ -119,7 +122,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <span className="text-sm font-medium min-w-[100px] sm:min-w-[120px] text-center" style={{ color: '#2E2E2E' }}>
-                {format(currentMonth, 'MMM yyyy')}
+                {format(currentMonth, 'MMM yyyy', { locale: i18n.language === 'zh' ? zhCN : undefined })}
               </span>
               <Button
                 variant="outline"
@@ -136,6 +139,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
         <CardContent className="p-3 sm:p-6">
           <div className="overflow-x-auto">
             <Calendar
+              locale={i18n.language === 'zh' ? zhCN : undefined}
               mode="single"
               month={currentMonth}
               onMonthChange={setCurrentMonth}
@@ -172,15 +176,15 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
           <div className="mt-4 flex flex-wrap gap-2 sm:gap-4 text-xs justify-center sm:justify-start">
             <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#E8F5E8' }}></div>
-              <span style={{ color: '#2E2E2E' }}>Food only</span>
+              <span style={{ color: '#2E2E2E' }}>{t('history.foodEntry')}</span>
             </div>
             <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFF3E0' }}></div>
-              <span style={{ color: '#2E2E2E' }}>Stool only</span>
+              <span style={{ color: '#2E2E2E' }}>{t('history.stoolEntry')}</span>
             </div>
             <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#E3F2FD' }}></div>
-              <span style={{ color: '#2E2E2E' }}>Both logged</span>
+              <span style={{ color: '#2E2E2E' }}>已记录两项</span>
             </div>
           </div>
         </CardContent>
@@ -191,7 +195,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {selectedDate && format(selectedDate, 'EEEE, MMMM d, yyyy')}
+              {selectedDate && format(selectedDate, 'EEEE, MMMM d, yyyy', { locale: i18n.language === 'zh' ? zhCN : undefined })}
             </DialogTitle>
           </DialogHeader>
           
@@ -201,7 +205,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
               {selectedActivity.hasFoodLogs && (
                 <div>
                   <h4 className="font-medium text-sm mb-2" style={{ color: '#4A7C59' }}>
-                    Food Logs ({selectedActivity.foodCount})
+                    {t('history.foodLog')} ({selectedActivity.foodCount})
                   </h4>
                   <div className="space-y-2">
                     {selectedActivity.foodLogs.map((log, index) => (
@@ -211,7 +215,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
                           <p className="text-xs text-gray-600">{log.description}</p>
                         )}
                         <p className="text-xs text-gray-500">
-                          {format(parseISO(log.created_at), 'h:mm a')}
+                          {format(parseISO(log.created_at), 'h:mm a', { locale: i18n.language === 'zh' ? zhCN : undefined })}
                         </p>
                       </div>
                     ))}
@@ -223,22 +227,22 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
               {selectedActivity.hasStoolLogs && (
                 <div>
                   <h4 className="font-medium text-sm mb-2" style={{ color: '#F57C00' }}>
-                    Stool Logs ({selectedActivity.stoolCount})
+                    {t('history.stoolLog')} ({selectedActivity.stoolCount})
                   </h4>
                   <div className="space-y-2">
                     {selectedActivity.stoolLogs.map((log, index) => (
                       <div key={index} className="p-2 rounded border" style={{ borderColor: '#FFF3E0', backgroundColor: '#FFFBF5' }}>
                         <div className="flex justify-between text-sm">
-                          <span>Bristol Type: {log.bristol_type}</span>
+                          <span>{t('history.bristolType')}: {log.bristol_type}</span>
                           <span className="text-xs text-gray-500">
-                            {format(parseISO(log.created_at), 'h:mm a')}
+                            {format(parseISO(log.created_at), 'h:mm a', { locale: i18n.language === 'zh' ? zhCN : undefined })}
                           </span>
                         </div>
                         {log.color && (
-                          <p className="text-xs">Color: {log.color}</p>
+                          <p className="text-xs">{t('history.color')}: {log.color}</p>
                         )}
                         {log.consistency && (
-                          <p className="text-xs">Consistency: {log.consistency}</p>
+                          <p className="text-xs">{t('history.consistency')}: {log.consistency}</p>
                         )}
                         {log.notes && (
                           <p className="text-xs text-gray-600 mt-1">{log.notes}</p>
@@ -252,7 +256,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
               {/* Empty State */}
               {!selectedActivity.hasFoodLogs && !selectedActivity.hasStoolLogs && (
                 <div className="text-center py-4 text-gray-500">
-                  <p>No logs found for this date</p>
+                  <p>此日期没有记录</p>
                 </div>
               )}
             </div>

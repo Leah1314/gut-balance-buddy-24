@@ -40,7 +40,7 @@ const FoodDiary = () => {
     icon: Apple
   }];
 
-  const commonFoods = ["Rice", "Chicken", "Salad", "Banana", "Apple", "Yogurt", "Oatmeal", "Vegetables", "Nuts", "Bread", "Pasta", "Fish"];
+  const commonFoods = [t('food.commonFoods.rice'), t('food.commonFoods.chicken'), t('food.commonFoods.salad'), t('food.commonFoods.banana'), t('food.commonFoods.apple'), t('food.commonFoods.yogurt'), t('food.commonFoods.oatmeal'), t('food.commonFoods.vegetables'), t('food.commonFoods.nuts'), t('food.commonFoods.bread'), t('food.commonFoods.pasta'), t('food.commonFoods.fish')];
 
   const handleAddFood = async () => {
     if (!newFood.trim()) {
