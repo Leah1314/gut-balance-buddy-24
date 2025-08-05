@@ -81,7 +81,16 @@ const HealthProfile = () => {
     { value: 'prefer-not-to-say', label: t('health.genderOptions.preferNotToSay') },
   ];
 
-  const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Low-FODMAP', 'Keto', 'Mediterranean'];
+  const dietaryOptions = [
+    t('health.dietaryOptions.vegetarian'),
+    t('health.dietaryOptions.vegan'), 
+    t('health.dietaryOptions.glutenFree'),
+    t('health.dietaryOptions.dairyFree'),
+    t('health.dietaryOptions.nutFree'),
+    t('health.dietaryOptions.lowFodmap'),
+    t('health.dietaryOptions.keto'),
+    t('health.dietaryOptions.mediterranean')
+  ];
   
   const activityLevels = [{
     value: 'sedentary',
@@ -511,10 +520,10 @@ const HealthProfile = () => {
               <CardContent className="px-4 pb-4">
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">Current Medications</Label>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('health.currentMedications')}</Label>
                     <div className="flex space-x-2 mb-2">
                       <Input 
-                        placeholder="Add medication..." 
+                        placeholder={t('health.addMedication')} 
                         value={newMedication} 
                         onChange={e => setNewMedication(e.target.value)} 
                         onKeyPress={e => {
@@ -546,9 +555,9 @@ const HealthProfile = () => {
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">Current Symptoms</Label>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('health.currentSymptoms')}</Label>
                     <Textarea 
-                      placeholder="Describe any digestive symptoms or concerns..." 
+                      placeholder={t('health.describeSymptoms')} 
                       value={formData.symptoms_notes} 
                       onChange={e => handleInputChange('symptoms_notes', e.target.value)} 
                       className="text-sm min-h-[80px]"

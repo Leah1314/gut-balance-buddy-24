@@ -1,6 +1,7 @@
 
 
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ interface TestResult {
 }
 
 const TestResultsUpload = () => {
+  const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<TestResult | null>(null);
@@ -194,13 +196,13 @@ const TestResultsUpload = () => {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-gray-900">
             <FileText className="w-4 h-4 text-blue-600" />
-            Upload Test Results
+            {t('health.uploadTestResults')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
             <Label htmlFor="test-file" className="text-sm font-medium text-gray-700">
-              Select Test Result File
+              {t('health.selectTestResultFile')}
             </Label>
             <Input
               id="test-file"
@@ -240,12 +242,12 @@ const TestResultsUpload = () => {
             {isAnalyzing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analyzing...
+                {t('health.analyzing')}
               </>
             ) : (
               <>
                 <Search className="w-4 h-4 mr-2" />
-                Analyze Test Results
+                {t('health.analyzeTestResults')}
               </>
             )}
           </Button>
