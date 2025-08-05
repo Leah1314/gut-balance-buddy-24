@@ -184,7 +184,21 @@
     "mostCommonFoods": "最常吃的食物",
     "servings": "份",
     "personalizedRecommendations": "个性化建议",
-    "askGutCoach": "询问肠道助手"
+    "askGutCoach": "询问肠道助手",
+    "dateRanges": {
+      "7d": "7天",
+      "30d": "30天",
+      "all": "全部"
+    },
+    "suggestions": {
+      "addFiber": "考虑增加更多纤维和水分来软化大便",
+      "eatBinding": "尝试吃一些有助于成形的食物，如香蕉、米饭和吐司",
+      "aimForVegetables": "每天尽量吃不同颜色的蔬菜",
+      "replaceProcessed": "用全食物替代加工零食",
+      "regularMeals": "尝试每天吃3-4顿小份规律餐食",
+      "addFiberFoods": "添加更多富含纤维的食物，如燕麦、豆类和浆果",
+      "keepUp": "很棒！保持健康的习惯"
+    }
   },
   "history": {
     "title": "您的记录历史",

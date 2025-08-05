@@ -251,32 +251,32 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       if (stoolLogs.length > 0) {
         const recentStool = stoolLogs[0];
         if (recentStool.bristol_type <= 2) {
-          suggestions.push('Consider adding more fiber and water to soften stools');
+          suggestions.push(t('analytics.suggestions.addFiber'));
         } else if (recentStool.bristol_type >= 6) {
-          suggestions.push('Try eating binding foods like bananas, rice, and toast');
+          suggestions.push(t('analytics.suggestions.eatBinding'));
         }
       }
     }
 
     if (foodScore < 60) {
       if (foodSummary.varietyScore < 50) {
-        suggestions.push('Aim for different colored vegetables each day');
+        suggestions.push(t('analytics.suggestions.aimForVegetables'));
       }
       if (foodSummary.processedRatio > 30) {
-        suggestions.push('Replace processed snacks with whole foods');
+        suggestions.push(t('analytics.suggestions.replaceProcessed'));
       }
       if (foodSummary.totalMeals < 21) { // Less than 3 meals/day average
-        suggestions.push('Try eating 3-4 smaller, regular meals');
+        suggestions.push(t('analytics.suggestions.regularMeals'));
       }
     }
 
     if (foodSummary.fiberFoods < 3) {
-      suggestions.push('Add more fiber-rich foods like oats, beans, and berries');
+      suggestions.push(t('analytics.suggestions.addFiberFoods'));
     }
 
     // General tips if doing well
     if (todayScore >= 80) {
-      suggestions.push('Great job! Keep up the healthy habits');
+      suggestions.push(t('analytics.suggestions.keepUp'));
     }
 
     return suggestions.slice(0, 3); // Limit to 3 suggestions
@@ -349,7 +349,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 onClick={() => setDateRange('7d')}
                 style={dateRange === '7d' ? { backgroundColor: '#4A7C59' } : {}}
               >
-                7D
+                {t('analytics.dateRanges.7d')}
               </Button>
               <Button
                 variant={dateRange === '30d' ? 'default' : 'outline'}
@@ -357,7 +357,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 onClick={() => setDateRange('30d')}
                 style={dateRange === '30d' ? { backgroundColor: '#4A7C59' } : {}}
               >
-                30D
+                {t('analytics.dateRanges.30d')}
               </Button>
               <Button
                 variant={dateRange === 'all' ? 'default' : 'outline'}
@@ -365,7 +365,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 onClick={() => setDateRange('all')}
                 style={dateRange === 'all' ? { backgroundColor: '#4A7C59' } : {}}
               >
-                All
+                {t('analytics.dateRanges.all')}
               </Button>
             </div>
           </div>
