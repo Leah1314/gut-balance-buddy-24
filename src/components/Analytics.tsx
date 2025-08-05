@@ -199,6 +199,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   };
 
   const filterHistoricalData = (data: DayScore[]) => {
+    // 完全移除没有任何数据的天数，只保留有记录的天数
     return data.filter(day => day.foodScore !== null || day.stoolScore !== null);
   };
 
@@ -416,18 +417,18 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                     stroke="#4A7C59" 
                     strokeWidth={2}
                     dot={{ fill: '#4A7C59', strokeWidth: 2, r: 4 }}
-                    name="Food Score"
-                    connectNulls={false}
-                  />
+                     name="Food Score"
+                     connectNulls={true}
+                   />
                   <Line 
                     type="monotone" 
                     dataKey="stoolScore" 
                     stroke="#FF8C42" 
                     strokeWidth={2}
                     dot={{ fill: '#FF8C42', strokeWidth: 2, r: 4 }}
-                    name="Stool Score"
-                    connectNulls={false}
-                  />
+                     name="Stool Score"
+                     connectNulls={true}
+                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
