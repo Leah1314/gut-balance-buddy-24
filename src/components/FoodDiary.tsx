@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { toast } from "sonner";
 
 const FoodDiary = () => {
+  const { t } = useTranslation();
   const [newFood, setNewFood] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
@@ -22,19 +24,19 @@ const FoodDiary = () => {
 
   const mealTypes = [{
     id: "breakfast",
-    label: "Breakfast",
+    label: t('food.breakfast'),
     icon: Coffee
   }, {
     id: "lunch",
-    label: "Lunch",
+    label: t('food.lunch'),
     icon: UtensilsCrossed
   }, {
     id: "dinner",
-    label: "Dinner",
+    label: t('food.dinner'),
     icon: UtensilsCrossed
   }, {
     id: "snack",
-    label: "Snack",
+    label: t('food.snack'),
     icon: Apple
   }];
 
@@ -42,7 +44,7 @@ const FoodDiary = () => {
 
   const handleAddFood = async () => {
     if (!newFood.trim()) {
-      toast.error("Please enter a food name");
+      toast.error(t('food.enterFoodItem'));
       return;
     }
 
@@ -76,7 +78,7 @@ const FoodDiary = () => {
 
   const handleLogSelectedFoods = async () => {
     if (selectedFoods.length === 0) {
-      toast.error("Please select at least one food item");
+      toast.error("请至少选择一个食物项目");
       return;
     }
 
@@ -102,7 +104,7 @@ const FoodDiary = () => {
 
   const handleSaveGeneralNote = async () => {
     if (!generalNotes.trim()) {
-      toast.error("Please enter some notes or symptoms");
+      toast.error("请输入一些备注或症状");
       return;
     }
 
@@ -137,14 +139,14 @@ const FoodDiary = () => {
             className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white h-10 text-sm"
           >
             <Camera className="w-4 h-4" />
-            <span>AI Analysis</span>
+            <span>{t('food.aiAnalysis')}</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manual" 
             className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white h-10 text-sm"
           >
             <Edit className="w-4 h-4" />
-            <span>Manual Entry</span>
+            <span>{t('food.manualEntry')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -158,16 +160,16 @@ const FoodDiary = () => {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2 text-lg">
                 <FileText className="w-5 h-5 text-blue-600" />
-                <span>General Food Notes/Symptoms</span>
+                <span>{t('food.generalNotes')}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-900 text-left block">
-                  Log any food-related symptoms, reactions, or general notes
+                  {t('food.generalNotesDescription')}
                 </Label>
                 <Textarea
-                  placeholder="Example: Feeling bloated after lunch, had food sensitivity reaction, ate out at restaurant - unsure of ingredients, feeling nauseous..."
+                  placeholder={t('food.generalNotesPlaceholder')}
                   value={generalNotes}
                   onChange={(e) => setGeneralNotes(e.target.value)}
                   className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 min-h-[100px] text-sm rounded-lg resize-none"
@@ -175,7 +177,7 @@ const FoodDiary = () => {
                 />
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-500">
-                    {generalNotes.length}/500 characters
+                    {generalNotes.length}/500 {t('common.characters')}
                   </span>
                   <Button 
                     onClick={handleSaveGeneralNote}
@@ -183,7 +185,7 @@ const FoodDiary = () => {
                     className="bg-blue-600 text-white hover:bg-blue-700 font-medium h-10 px-6 rounded-lg"
                   >
                     <FileText className="w-4 h-4 mr-2" />
-                    {isSavingNote ? 'Saving...' : 'Save Note'}
+                    {isSavingNote ? t('buttons.saving') : t('food.saveNote')}
                   </Button>
                 </div>
               </div>
@@ -195,12 +197,12 @@ const FoodDiary = () => {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2 text-lg">
                 <Plus className="w-5 h-5 text-green-600" />
-                <span>Log Food</span>
+                <span>{t('food.logFood')}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-900 text-left block">Meal Type</Label>
+                <Label className="text-sm font-medium text-gray-900 text-left block">{t('food.mealType')}</Label>
                 <div className="grid grid-cols-2 gap-3">
                   {mealTypes.map(meal => (
                     <Button 
@@ -218,10 +220,10 @@ const FoodDiary = () => {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-900 text-left block">What did you eat?</Label>
+                <Label className="text-sm font-medium text-gray-900 text-left block">{t('food.whatDidYouEat')}</Label>
                 <div className="flex space-x-2">
                   <Input 
-                    placeholder="Enter food item..." 
+                    placeholder={t('food.enterFoodItem')} 
                     value={newFood} 
                     onChange={e => setNewFood(e.target.value)} 
                     className="flex-1 bg-white border-gray-300 text-gray-900 placeholder-gray-500 h-12 text-sm rounded-lg" 
@@ -242,7 +244,7 @@ const FoodDiary = () => {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-900 text-left block">Quick Add</Label>
+                <Label className="text-sm font-medium text-gray-900 text-left block">{t('food.quickAdd')}</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {commonFoods.map(food => (
                     <Button 
@@ -259,7 +261,7 @@ const FoodDiary = () => {
                 
                 {selectedFoods.length > 0 && (
                   <div className="space-y-4 pt-2">
-                    <Label className="text-sm font-medium text-gray-900 text-left block">Selected Foods</Label>
+                    <Label className="text-sm font-medium text-gray-900 text-left block">{t('food.selectedFoods')}</Label>
                     <div className="flex flex-wrap gap-2">
                       {selectedFoods.map((food, index) => (
                         <Badge 
@@ -276,7 +278,7 @@ const FoodDiary = () => {
                       className="w-full bg-green-600 text-white hover:bg-green-700 font-medium h-12 rounded-lg"
                       size="lg"
                     >
-                      Log Food ({selectedFoods.length} item{selectedFoods.length > 1 ? 's' : ''})
+                      {t('food.logSelectedFoods').replace('{count}', selectedFoods.length.toString())}
                     </Button>
                   </div>
                 )}

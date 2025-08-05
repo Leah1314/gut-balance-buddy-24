@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ interface NutritionData {
 }
 
 const FoodImageAnalyzer = () => {
+  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -50,7 +52,7 @@ const FoodImageAnalyzer = () => {
       setNutritionData(null);
       setUserNotes("");
       
-      toast.success(`✅ Image uploaded successfully! Ready for analysis.`);
+      toast.success(t('food.foodUploaded'));
       console.log('Image uploaded:', file.name, file.size, 'bytes');
     }
   };
@@ -69,7 +71,7 @@ const FoodImageAnalyzer = () => {
 
   const analyzeImage = async () => {
     if (!selectedImage) {
-      toast.error("Please select an image first");
+      toast.error(t('food.selectImageFirst'));
       return;
     }
 
@@ -97,11 +99,11 @@ const FoodImageAnalyzer = () => {
 
       console.log('Analysis result:', data);
       setNutritionData(data);
-      toast.success("✅ Food analysis completed successfully!");
+      toast.success(t('food.analysisCompleted'));
       
     } catch (error) {
       console.error('Analysis error:', error);
-      toast.error("❌ Failed to analyze image. Please try again.");
+      toast.error(t('food.analysisFailed'));
     } finally {
       setIsAnalyzing(false);
     }
@@ -109,7 +111,7 @@ const FoodImageAnalyzer = () => {
 
   const saveAnalysisToLog = async () => {
     if (!nutritionData || !selectedImage) {
-      toast.error("No analysis data to save");
+      toast.error(t('food.noAnalysisData'));
       return;
     }
 
@@ -137,14 +139,14 @@ const FoodImageAnalyzer = () => {
     const result = await addFoodLog(foodLogData);
     
     if (result) {
-      toast.success("✅ Food analysis saved to your log successfully!");
+      toast.success(t('food.analysisSaved'));
       console.log('Analysis saved to log:', result);
       setSelectedImage(null);
       setImagePreview(null);
       setNutritionData(null);
       setUserNotes("");
     } else {
-      toast.error("❌ Failed to save food analysis. Please try again.");
+      toast.error(t('food.saveAnalysisFailed'));
       console.error('Failed to save analysis to log');
     }
   };
@@ -162,20 +164,20 @@ const FoodImageAnalyzer = () => {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center space-x-2 text-lg">
             <Camera className="w-5 h-5 text-blue-600" />
-            <span>AI Food Image Analysis</span>
+            <span>{t('food.aiImageAnalysis')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Upload Food Image</Label>
+            <Label className="text-sm font-medium">{t('food.uploadFoodImage')}</Label>
             <div className="flex items-center justify-center w-full">
               <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 active:bg-gray-200 transition-colors">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="w-10 h-10 mb-3 text-gray-500" />
                   <p className="mb-2 text-sm text-gray-500 text-center px-4">
-                    <span className="font-semibold">Tap to upload</span> or drag and drop
+                    <span className="font-semibold">{t('food.tapToUpload')}</span> {t('food.dragAndDrop')}
                   </p>
-                  <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
+                  <p className="text-xs text-gray-500">{t('food.maxFileSize')}</p>
                 </div>
                 <Input
                   type="file"
@@ -202,12 +204,12 @@ const FoodImageAnalyzer = () => {
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Analyzing Image...
+                    {t('food.analyzingImage')}
                   </>
                 ) : (
                   <>
                     <Zap className="w-5 h-5 mr-2" />
-                    Analyze with AI
+                    {t('food.analyzeWithAI')}
                   </>
                 )}
               </Button>
@@ -224,7 +226,7 @@ const FoodImageAnalyzer = () => {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center space-x-2 text-base">
                 <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Identified Foods</span>
+                <span>{t('food.identifiedFoods')}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -241,33 +243,33 @@ const FoodImageAnalyzer = () => {
           {/* Nutrition Facts - Mobile grid */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Nutrition Facts</CardTitle>
+              <CardTitle className="text-base">{t('food.nutritionFacts')}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-2 gap-3">
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
                   <p className="text-xl font-bold text-blue-600">{nutritionData.calories}</p>
-                  <p className="text-xs text-gray-600">Calories</p>
+                  <p className="text-xs text-gray-600">{t('food.calories')}</p>
                 </div>
                 <div className="text-center p-3 bg-green-50 rounded-lg">
                   <p className="text-xl font-bold text-green-600">{nutritionData.protein}g</p>
-                  <p className="text-xs text-gray-600">Protein</p>
+                  <p className="text-xs text-gray-600">{t('food.protein')}</p>
                 </div>
                 <div className="text-center p-3 bg-yellow-50 rounded-lg">
                   <p className="text-xl font-bold text-yellow-600">{nutritionData.carbs}g</p>
-                  <p className="text-xs text-gray-600">Carbs</p>
+                  <p className="text-xs text-gray-600">{t('food.carbs')}</p>
                 </div>
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
                   <p className="text-xl font-bold text-purple-600">{nutritionData.fat}g</p>
-                  <p className="text-xs text-gray-600">Fat</p>
+                  <p className="text-xs text-gray-600">{t('food.fat')}</p>
                 </div>
                 <div className="text-center p-3 bg-orange-50 rounded-lg">
                   <p className="text-xl font-bold text-orange-600">{nutritionData.fiber}g</p>
-                  <p className="text-xs text-gray-600">Fiber</p>
+                  <p className="text-xs text-gray-600">{t('food.fiber')}</p>
                 </div>
                 <div className="text-center p-3 bg-red-50 rounded-lg">
                   <p className="text-xl font-bold text-red-600">{nutritionData.sugar}g</p>
-                  <p className="text-xs text-gray-600">Sugar</p>
+                  <p className="text-xs text-gray-600">{t('food.sugar')}</p>
                 </div>
               </div>
             </CardContent>
@@ -276,7 +278,7 @@ const FoodImageAnalyzer = () => {
           {/* Gut Health Rating */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Gut Health Rating</CardTitle>
+              <CardTitle className="text-base">{t('food.gutHealthRating')}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className={`text-center p-4 rounded-lg ${getRatingColor(nutritionData.gutHealthRating)}`}>
@@ -284,9 +286,9 @@ const FoodImageAnalyzer = () => {
                   {nutritionData.gutHealthRating}/10
                 </div>
                 <p className="text-sm">
-                  {nutritionData.gutHealthRating >= 8 ? "Excellent for gut health!" :
-                   nutritionData.gutHealthRating >= 6 ? "Good choice with some benefits" :
-                   "Consider healthier alternatives"}
+                  {nutritionData.gutHealthRating >= 8 ? t('food.excellentForGut') :
+                   nutritionData.gutHealthRating >= 6 ? t('food.goodChoice') :
+                   t('food.considerHealthier')}
                 </p>
               </div>
             </CardContent>
@@ -295,7 +297,7 @@ const FoodImageAnalyzer = () => {
           {/* AI Insights - Compact */}
           <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-0 shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">AI Insights</CardTitle>
+              <CardTitle className="text-base">{t('food.aiInsights')}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-3">
@@ -312,18 +314,18 @@ const FoodImageAnalyzer = () => {
           {/* Additional Notes */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Additional Notes</CardTitle>
+              <CardTitle className="text-base">{t('food.additionalNotes')}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <Textarea
                 value={userNotes}
                 onChange={(e) => setUserNotes(e.target.value)}
-                placeholder="Add any corrections or additional details about your meal... (e.g., 'Had extra sauce on the side', 'Portion was larger than shown', 'Actually grilled, not fried')"
+                placeholder={`${t('food.addCorrections')} ${t('food.portionWasLarger')}`}
                 className="min-h-[80px] resize-none"
                 maxLength={500}
               />
               <div className="text-right text-xs text-gray-500 mt-1">
-                {userNotes.length}/500 characters
+                {userNotes.length}/500 {t('common.characters')}
               </div>
             </CardContent>
           </Card>
@@ -344,7 +346,7 @@ const FoodImageAnalyzer = () => {
               }}
             >
               <Save className="w-5 h-5 mr-2 stroke-2" />
-              Save to My Log
+              {t('food.saveToLog')}
             </Button>
           </div>
         </div>

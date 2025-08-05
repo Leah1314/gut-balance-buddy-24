@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ interface StoolAnalysisData {
 }
 
 const StoolImageAnalyzer = () => {
+  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -56,7 +58,7 @@ const StoolImageAnalyzer = () => {
       setIsNotStoolImage(false);
       setNotStoolMessage("");
       setUserNotes("");
-      toast.success("Image uploaded successfully!");
+      toast.success(t('stool.imageUploaded'));
     }
   };
 
@@ -74,7 +76,7 @@ const StoolImageAnalyzer = () => {
 
   const analyzeImage = async () => {
     if (!selectedImage) {
-      toast.error("Please select an image first");
+      toast.error(t('food.selectImageFirst'));
       return;
     }
 
@@ -121,11 +123,11 @@ const StoolImageAnalyzer = () => {
       setAnalysisData(data);
       setIsNotStoolImage(false);
       setNotStoolMessage("");
-      toast.success("Stool analysis completed successfully!");
+      toast.success(t('stool.stoolAnalysisCompleted'));
       
     } catch (error) {
       console.error('Analysis error:', error);
-      toast.error("Failed to analyze image. Please try again.");
+      toast.error(t('stool.analysisImageFailed'));
     } finally {
       setIsAnalyzing(false);
     }
@@ -133,7 +135,7 @@ const StoolImageAnalyzer = () => {
 
   const saveAnalysisToLog = async () => {
     if (!analysisData || !selectedImage) {
-      toast.error("No analysis data to save");
+      toast.error(t('food.noAnalysisData'));
       return;
     }
 
@@ -190,16 +192,7 @@ const StoolImageAnalyzer = () => {
   };
 
   const getBristolDescription = (type: number) => {
-    const descriptions = {
-      1: "Separate hard lumps",
-      2: "Sausage-shaped but lumpy",
-      3: "Like a sausage with cracks",
-      4: "Smooth, soft sausage",
-      5: "Soft blobs with clear edges",
-      6: "Fluffy pieces with ragged edges",
-      7: "Watery, no solid pieces"
-    };
-    return descriptions[type as keyof typeof descriptions] || "Unknown";
+    return t(`stool.bristolDescriptions.${type}`) || "Unknown";
   };
 
   const getHealthScoreColor = (score: number) => {
@@ -223,7 +216,7 @@ const StoolImageAnalyzer = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Camera className="w-5 h-5 text-blue-600" />
-            <span>AI Stool Analysis</span>
+            <span>{t('stool.aiStoolAnalysis')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -232,9 +225,9 @@ const StoolImageAnalyzer = () => {
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Upload className="w-8 h-8 mb-2 text-gray-500" />
                 <p className="mb-2 text-sm text-gray-500">
-                  <span className="font-semibold">Click to upload</span> stool photo
+                  <span className="font-semibold">{t('stool.clickToUpload')}</span> {t('stool.uploadStoolPhoto')}
                 </p>
-                <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
+                <p className="text-xs text-gray-500">{t('food.maxFileSize')}</p>
               </div>
               <Input
                 type="file"
@@ -260,12 +253,12 @@ const StoolImageAnalyzer = () => {
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing Image with AI...
+                    {t('stool.analyzingWithAI')}
                   </>
                 ) : (
                   <>
                     <Zap className="w-4 h-4 mr-2" />
-                    Analyze with AI
+                    {t('food.analyzeWithAI')}
                   </>
                 )}
               </Button>
@@ -279,10 +272,10 @@ const StoolImageAnalyzer = () => {
         <Card className="bg-blue-50 border-blue-200 shadow-sm">
           <CardContent className="p-6 text-center">
             <Info className="w-8 h-8 mx-auto mb-3 text-blue-500" />
-            <h3 className="text-lg font-semibold mb-2 text-blue-700">Not Stool</h3>
+            <h3 className="text-lg font-semibold mb-2 text-blue-700">{t('stool.notStool')}</h3>
             <p className="text-blue-600 mb-4">{notStoolMessage}</p>
             <p className="text-sm text-blue-500">
-              Please only upload stool samples for analysis.
+              {t('stool.pleaseUploadStool')}
             </p>
           </CardContent>
         </Card>
@@ -299,7 +292,7 @@ const StoolImageAnalyzer = () => {
                 }}>
             <CardContent className="p-6 text-center">
               <Heart className="w-8 h-8 mx-auto mb-3 stroke-2" style={{ color: '#4A7C59' }} />
-              <h3 className="text-lg font-semibold mb-2" style={{ color: '#2E2E2E' }}>Health Score</h3>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#2E2E2E' }}>{t('stool.healthScore')}</h3>
               <div className="inline-flex items-center px-6 py-3 rounded-full text-2xl font-bold border"
                    style={getHealthScoreColor(analysisData.healthScore)}>
                 {analysisData.healthScore}/10
@@ -312,7 +305,7 @@ const StoolImageAnalyzer = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span>Bristol Stool Type</span>
+                <span>{t('stool.bristolStoolType')}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -330,17 +323,17 @@ const StoolImageAnalyzer = () => {
           {/* Analysis Details */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Analysis Details</CardTitle>
+              <CardTitle>{t('stool.analysisDetails')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-green-50 rounded-lg">
                   <p className="text-lg font-bold text-green-600">{analysisData.consistency}</p>
-                  <p className="text-sm text-gray-600">Consistency</p>
+                  <p className="text-sm text-gray-600">{t('stool.consistency')}</p>
                 </div>
                 <div className="text-center p-3 bg-yellow-50 rounded-lg">
                   <p className="text-lg font-bold text-yellow-600">{analysisData.color}</p>
-                  <p className="text-sm text-gray-600">Color</p>
+                  <p className="text-sm text-gray-600">{t('stool.color')}</p>
                 </div>
               </div>
             </CardContent>
@@ -349,7 +342,7 @@ const StoolImageAnalyzer = () => {
           {/* AI Insights */}
           <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>AI Insights</CardTitle>
+              <CardTitle>{t('food.aiInsights')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -366,7 +359,7 @@ const StoolImageAnalyzer = () => {
           {/* Recommendations */}
           <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Recommendations</CardTitle>
+              <CardTitle>{t('stool.recommendations')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -383,18 +376,18 @@ const StoolImageAnalyzer = () => {
           {/* Symptoms & Notes */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Symptoms & Notes</CardTitle>
+              <CardTitle>{t('stool.symptomsAndNotes')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
                 value={userNotes}
                 onChange={(e) => setUserNotes(e.target.value)}
-                placeholder="Add any symptoms or corrections... (e.g., 'Had stomach pain beforehand', 'More urgent than usual', 'Color was darker than detected')"
+                placeholder={`${t('stool.addSymptoms')} ${t('stool.stomachPainExample')}`}
                 className="min-h-[80px] resize-none"
                 maxLength={500}
               />
               <div className="text-right text-xs text-gray-500 mt-1">
-                {userNotes.length}/500 characters
+                {userNotes.length}/500 {t('common.characters')}
               </div>
             </CardContent>
           </Card>
@@ -420,7 +413,7 @@ const StoolImageAnalyzer = () => {
               }}
             >
               <Save className="w-4 h-4 mr-2 stroke-2" />
-              {isSaving ? 'Saving...' : 'Save to My Log'}
+              {isSaving ? t('buttons.saving') : t('food.saveToLog')}
             </Button>
           </div>
         </div>
