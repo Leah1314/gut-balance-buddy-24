@@ -98,5 +98,57 @@
   },
   "app": {
     "title": "In and Out"
+  },
+  "health": {
+    "title": "Health Profile",
+    "subtitle": "Manage your health information to get personalized insights",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "hasUnsavedChanges": "You have unsaved changes",
+    "basicInfo": "Basic Information",
+    "activityLevel": "Activity Level",
+    "dietaryRestrictions": "Dietary Restrictions",
+    "medicalConditions": "Medical Conditions",
+    "medicationsAndSymptoms": "Medications & Symptoms",
+    "testResults": "Test Results",
+    "uploadFiles": "Upload Files",
+    "currentMedications": "Current Medications",
+    "addMedication": "Add medication...",
+    "currentSymptoms": "Current Symptoms",
+    "describeSymptoms": "Describe any digestive symptoms or concerns...",
+    "uploadTestResults": "Upload Test Results",
+    "selectTestResultFile": "Select Test Result File",
+    "analyzeTestResults": "Analyze Test Results",
+    "analyzing": "Analyzing...",
+    "dietaryOptions": {
+      "vegetarian": "Vegetarian",
+      "vegan": "Vegan",
+      "glutenFree": "Gluten-Free",
+      "dairyFree": "Dairy-Free",
+      "nutFree": "Nut-Free",
+      "lowFodmap": "Low-FODMAP",
+      "keto": "Keto",
+      "mediterranean": "Mediterranean"
+    },
+    "age": "Age",
+    "gender": "Gender",
+    "weight": "Weight (kg)",
+    "height": "Height (cm)",
+    "genderOptions": {
+      "male": "Male",
+      "female": "Female", 
+      "preferNotToSay": "Prefer not to say"
+    },
+    "activityLevels": {
+      "sedentary": "Sedentary (little to no exercise)",
+      "lightlyActive": "Lightly Active (light exercise 1-3 days/week)",
+      "moderatelyActive": "Moderately Active (moderate exercise 3-5 days/week)",
+      "veryActive": "Very Active (hard exercise 6-7 days/week)",
+      "extraActive": "Extra Active (very hard exercise, physical job)"
+    },
+    "addMedicalCondition": "Add medical condition...",
+    "customRestrictions": "Custom Restrictions",
+    "customRestrictionsPlaceholder": "Enter any other dietary restrictions or preferences..."
   }
 }
