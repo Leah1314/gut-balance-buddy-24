@@ -210,7 +210,11 @@ const FoodDiary = () => {
                       variant={selectedMeal === meal.id ? "default" : "outline"} 
                       size="lg" 
                       onClick={() => setSelectedMeal(meal.id)} 
-                      className="text-neutral-950 bg-neutral-50 font-normal h-12 rounded-lg flex items-center justify-center space-x-2"
+                      className={`font-normal h-12 rounded-lg flex items-center justify-center space-x-2 ${
+                        selectedMeal === meal.id 
+                          ? "text-white" 
+                          : "text-neutral-950 bg-white border border-neutral-200 hover:bg-neutral-50"
+                      }`}
                     >
                       <meal.icon className="w-4 h-4" />
                       <span className="font-normal text-sm">{meal.label}</span>
