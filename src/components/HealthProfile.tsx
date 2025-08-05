@@ -15,8 +15,10 @@ import { useHealthProfile } from "@/hooks/useHealthProfile";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import TestResultsUpload from "./TestResultsUpload";
+import { useTranslation } from 'react-i18next';
 
 const HealthProfile = () => {
+  const { t } = useTranslation();
   const {
     healthProfile: profile,
     saveHealthProfile: updateProfile,
@@ -73,34 +75,34 @@ const HealthProfile = () => {
   }, [hasUnsavedChanges]);
 
   const genderOptions = [
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-    { value: 'non-binary', label: 'Non-binary' },
-    { value: 'prefer-not-to-say', label: 'Prefer not to say' },
+    { value: 'male', label: t('health.genderOptions.male') },
+    { value: 'female', label: t('health.genderOptions.female') },
+    { value: 'non-binary', label: t('health.genderOptions.nonBinary') },
+    { value: 'prefer-not-to-say', label: t('health.genderOptions.preferNotToSay') },
   ];
 
   const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Low-FODMAP', 'Keto', 'Mediterranean'];
   
   const activityLevels = [{
     value: 'sedentary',
-    label: 'Sedentary',
-    description: 'Little to no exercise'
+    label: t('health.activityLevels.sedentary'),
+    description: t('health.activityLevels.sedentaryDesc')
   }, {
     value: 'light',
-    label: 'Light',
-    description: '1-3 days/week'
+    label: t('health.activityLevels.light'),
+    description: t('health.activityLevels.lightDesc')
   }, {
     value: 'moderate',
-    label: 'Moderate',
-    description: '3-5 days/week'
+    label: t('health.activityLevels.moderate'),
+    description: t('health.activityLevels.moderateDesc')
   }, {
     value: 'active',
-    label: 'Active',
-    description: '6-7 days/week'
+    label: t('health.activityLevels.active'),
+    description: t('health.activityLevels.activeDesc')
   }, {
     value: 'very_active',
-    label: 'Very Active',
-    description: '2x/day or intense'
+    label: t('health.activityLevels.veryActive'),
+    description: t('health.activityLevels.veryActiveDesc')
   }];
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -124,7 +126,7 @@ const HealthProfile = () => {
 
   const addMedicalCondition = () => {
     if (!newCondition.trim()) {
-      toast.error("Please enter a medical condition");
+      toast.error(t('health.errorAddingCondition'));
       return;
     }
     setFormData(prev => ({
@@ -133,7 +135,7 @@ const HealthProfile = () => {
     }));
     setNewCondition('');
     setHasUnsavedChanges(true);
-    toast.success(`✅ Medical condition "${newCondition}" added successfully!`);
+    toast.success(`✅ ${t('health.conditionAdded')}`);
   };
 
   const removeMedicalCondition = (index: number) => {
@@ -143,12 +145,12 @@ const HealthProfile = () => {
       medical_conditions: prev.medical_conditions.filter((_, i) => i !== index)
     }));
     setHasUnsavedChanges(true);
-    toast.success(`✅ Medical condition "${condition}" removed successfully!`);
+    toast.success(`✅ ${t('health.conditionRemoved')}`);
   };
 
   const addMedication = () => {
     if (!newMedication.trim()) {
-      toast.error("Please enter a medication");
+      toast.error(t('health.errorAddingMedication'));
       return;
     }
     setFormData(prev => ({
@@ -157,7 +159,7 @@ const HealthProfile = () => {
     }));
     setNewMedication('');
     setHasUnsavedChanges(true);
-    toast.success(`✅ Medication "${newMedication}" added successfully!`);
+    toast.success(`✅ ${t('health.medicationAdded')}`);
   };
 
   const removeMedication = (index: number) => {
@@ -167,7 +169,7 @@ const HealthProfile = () => {
       medications: prev.medications.filter((_, i) => i !== index)
     }));
     setHasUnsavedChanges(true);
-    toast.success(`✅ Medication "${medication}" removed successfully!`);
+    toast.success(`✅ ${t('health.medicationRemoved')}`);
   };
 
   const handleSave = async () => {
@@ -188,15 +190,15 @@ const HealthProfile = () => {
       console.log('Saving health profile with data:', profileData);
       const result = await updateProfile(profileData);
       if (result) {
-        toast.success("✅ Health profile saved successfully!");
+        toast.success(`✅ ${t('health.profileSaved')}`);
         setHasUnsavedChanges(false);
         console.log('Health profile saved successfully:', result);
       } else {
-        toast.error("❌ Failed to save health profile. Please try again.");
+        toast.error(`❌ ${t('health.profileSaveError')}`);
       }
     } catch (error) {
       console.error('Error saving profile:', error);
-      toast.error("❌ Failed to save health profile. Please try again.");
+      toast.error(`❌ ${t('health.profileSaveError')}`);
     }
   };
 
@@ -215,18 +217,18 @@ const HealthProfile = () => {
         if (formData.age) parts.push(`${formData.age}y`);
         if (formData.weight_kg) parts.push(`${formData.weight_kg}kg`);
         if (formData.height_cm) parts.push(`${formData.height_cm}cm`);
-        return parts.length > 0 ? `🧍 ${parts.join(' · ')}` : 'Not filled';
+        return parts.length > 0 ? `🧍 ${parts.join(' · ')}` : t('health.notFilled');
       case 'activity':
         return formData.activity_level 
           ? `💪 ${activityLevels.find(a => a.value === formData.activity_level)?.label}`
-          : '💪 Not selected';
+          : `💪 ${t('health.notSelected')}`;
       case 'dietary':
         const activeRestrictions = Object.keys(formData.dietary_restrictions).filter(key => formData.dietary_restrictions[key]);
-        return activeRestrictions.length > 0 ? `🥗 ${activeRestrictions.length} restrictions` : '🥗 None';
+        return activeRestrictions.length > 0 ? `🥗 ${activeRestrictions.length} ${t('health.restrictions')}` : `🥗 ${t('health.none')}`;
       case 'medical':
-        return formData.medical_conditions.length > 0 ? `🏥 ${formData.medical_conditions.length} conditions` : '🏥 None';
+        return formData.medical_conditions.length > 0 ? `🏥 ${formData.medical_conditions.length}${t('health.conditions')}` : `🏥 ${t('health.none')}`;
       case 'medications':
-        return formData.medications.length > 0 ? `💊 ${formData.medications.length} medications` : '💊 None';
+        return formData.medications.length > 0 ? `💊 ${formData.medications.length}${t('health.medications')}` : `💊 ${t('health.none')}`;
       default:
         return '';
     }
@@ -236,9 +238,9 @@ const HealthProfile = () => {
     <div className="pb-24 px-1">
       {/* Header - More compact */}
       <div className="text-center mb-6">
-        <h2 className="text-xl font-semibold mb-1 text-gray-900">Health Profile</h2>
+        <h2 className="text-xl font-semibold mb-1 text-gray-900">{t('health.title')}</h2>
         <p className="text-sm text-gray-600">
-          Personalize your gut health journey
+          {t('health.subtitle')}
         </p>
       </div>
 
@@ -251,7 +253,7 @@ const HealthProfile = () => {
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-blue-600" />
-                    <span>Basic Information</span>
+                    <span>{t('health.basicInfo')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-gray-500 font-normal">
@@ -269,11 +271,11 @@ const HealthProfile = () => {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 flex items-center">
                       <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-                      Age
+                      {t('health.age')}
                     </Label>
                     <Input 
                       type="number" 
-                      placeholder="Enter your age" 
+                      placeholder={t('health.enterAge')} 
                       value={formData.age} 
                       onChange={e => handleInputChange('age', e.target.value)} 
                       className="h-12 text-sm"
@@ -284,11 +286,11 @@ const HealthProfile = () => {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 flex items-center">
                       <User className="w-4 h-4 mr-2 text-purple-500" />
-                      Gender
+                      {t('health.gender')}
                     </Label>
                     <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
                       <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Select Gender" />
+                        <SelectValue placeholder={t('health.selectGender')} />
                       </SelectTrigger>
                       <SelectContent>
                         {genderOptions.map(option => (
@@ -304,12 +306,12 @@ const HealthProfile = () => {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 flex items-center">
                       <Scale className="w-4 h-4 mr-2 text-green-500" />
-                      Weight (kg)
+                      {t('health.weight')}
                     </Label>
                     <Input 
                       type="number" 
                       step="0.1" 
-                      placeholder="Enter your weight in kg" 
+                      placeholder={t('health.enterWeight')} 
                       value={formData.weight_kg} 
                       onChange={e => handleInputChange('weight_kg', e.target.value)} 
                       className="h-12 text-sm"
@@ -320,11 +322,11 @@ const HealthProfile = () => {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700 flex items-center">
                       <Ruler className="w-4 h-4 mr-2 text-orange-500" />
-                      Height (cm)
+                      {t('health.height')}
                     </Label>
                     <Input 
                       type="number" 
-                      placeholder="Enter your height in cm" 
+                      placeholder={t('health.enterHeight')} 
                       value={formData.height_cm} 
                       onChange={e => handleInputChange('height_cm', e.target.value)} 
                       className="h-12 text-sm"
@@ -344,7 +346,7 @@ const HealthProfile = () => {
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <Heart className="w-4 h-4 text-red-600" />
-                    <span>Activity Level</span>
+                    <span>{t('health.activityLevel')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-gray-500 font-normal">
@@ -389,7 +391,7 @@ const HealthProfile = () => {
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <span>🥗</span>
-                    <span>Dietary Restrictions</span>
+                    <span>{t('health.dietaryRestrictions')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-gray-500 font-normal">
@@ -415,9 +417,9 @@ const HealthProfile = () => {
                   ))}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Custom Notes</Label>
+                  <Label className="text-sm font-medium text-gray-700">{t('health.customNotes')}</Label>
                   <Textarea 
-                    placeholder="Any other dietary restrictions..." 
+                    placeholder={t('health.anyOtherRestrictions')} 
                     value={formData.custom_restrictions} 
                     onChange={e => handleInputChange('custom_restrictions', e.target.value)} 
                     className="text-sm min-h-[60px]"

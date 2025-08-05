@@ -7,6 +7,7 @@ import { TrendingUp, MessageCircle, Calendar, Target, Apple, Heart, TrendingDown
 import { useFoodLogs } from '@/hooks/useFoodLogs';
 import { useStoolLogs } from '@/hooks/useStoolLogs';
 import MonthlyActivityCalendar from './MonthlyActivityCalendar';
+import { useTranslation } from 'react-i18next';
 
 interface DayScore {
   date: string;
@@ -29,6 +30,7 @@ interface AnalyticsProps {
 }
 
 const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
+  const { t } = useTranslation();
   const { foodLogs } = useFoodLogs();
   const { getStoolLogs } = useStoolLogs();
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
@@ -236,10 +238,10 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'Excellent';
-    if (score >= 60) return 'Good';
-    if (score >= 40) return 'Needs Attention';
-    return 'Critical';
+    if (score >= 80) return t('analytics.excellent');
+    if (score >= 60) return t('analytics.good');
+    if (score >= 40) return t('analytics.needsAttention');
+    return t('analytics.critical');
   };
 
   const getPersonalizedSuggestions = (): string[] => {
@@ -296,10 +298,10 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl font-semibold mb-2" style={{ color: '#2E2E2E' }}>
-          Your Analytics
+          {t('analytics.title')}
         </h2>
         <p className="text-sm" style={{ color: '#2E2E2E', opacity: 0.7 }}>
-          Track your digestive health progress over time
+          {t('analytics.subtitle')}
         </p>
       </div>
 
@@ -307,7 +309,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between">
-            <span style={{ color: '#2E2E2E' }}>Today's Health Score</span>
+            <span style={{ color: '#2E2E2E' }}>{t('analytics.todayScore')}</span>
             <div className="flex items-center space-x-2">
               {getTrendDirection() === 'up' && <TrendingUp className="w-5 h-5" style={{ color: '#4A7C59' }} />}
               {getTrendDirection() === 'down' && <TrendingDown className="w-5 h-5" style={{ color: '#E74C3C' }} />}
@@ -338,7 +340,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               <TrendingUp className="w-5 h-5" style={{ color: '#4A7C59' }} />
-              <span style={{ color: '#2E2E2E' }}>Historical Trends</span>
+              <span style={{ color: '#2E2E2E' }}>{t('analytics.historicalTrends')}</span>
             </CardTitle>
             <div className="flex space-x-2">
               <Button
@@ -418,8 +420,8 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
               <div className="flex items-center justify-center h-full text-gray-500">
                 <div className="text-center">
                   <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>No data logged yet</p>
-                  <p className="text-xs">Start logging food and stool entries to see trends</p>
+                   <p>{t('analytics.noDataYet')}</p>
+                   <p className="text-xs">{t('analytics.startLogging')}</p>
                 </div>
               </div>
             )}
@@ -432,7 +434,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium" style={{ color: '#2E2E2E' }}>
-              Food Score
+              {t('analytics.foodScore')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -449,7 +451,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium" style={{ color: '#2E2E2E' }}>
-              Stool Score
+              {t('analytics.stoolScore')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -469,24 +471,24 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Heart className="w-5 h-5" style={{ color: '#4A7C59' }} />
-            <span style={{ color: '#2E2E2E' }}>7-Day Food Summary</span>
+            <span style={{ color: '#2E2E2E' }}>{t('analytics.foodSummary')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <p className="text-sm text-gray-600">Total Meals</p>
+              <p className="text-sm text-gray-600">{t('analytics.totalMeals')}</p>
               <p className="text-2xl font-bold" style={{ color: '#4A7C59' }}>{foodSummary.totalMeals}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Food Variety</p>
+              <p className="text-sm text-gray-600">{t('analytics.foodVariety')}</p>
               <p className="text-2xl font-bold" style={{ color: '#4A7C59' }}>{foodSummary.varietyScore}%</p>
             </div>
           </div>
           
           {foodSummary.topFoods.length > 0 && (
             <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">Most Common Foods:</p>
+              <p className="text-sm text-gray-600 mb-2">{t('analytics.mostCommonFoods')}:</p>
               <div className="flex flex-wrap gap-2">
                 {foodSummary.topFoods.map((food, index) => (
                   <span 
@@ -502,11 +504,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Fiber Foods</p>
-              <p className="font-semibold" style={{ color: '#4A7C59' }}>{foodSummary.fiberFoods} servings</p>
+               <p className="text-sm text-gray-600">{t('analytics.fiberFoods')}</p>
+               <p className="font-semibold" style={{ color: '#4A7C59' }}>{foodSummary.fiberFoods} {t('analytics.servings')}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Processed Foods</p>
+              <p className="text-sm text-gray-600">{t('analytics.processedFoods')}</p>
               <p className="font-semibold" style={{ color: foodSummary.processedRatio > 30 ? '#E74C3C' : '#4A7C59' }}>
                 {foodSummary.processedRatio}%
               </p>
@@ -523,7 +525,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         <CardContent className="p-4">
           <h3 className="font-semibold mb-3 flex items-center space-x-2" style={{ color: '#2E2E2E' }}>
             <Calendar className="w-4 h-4" />
-            <span>Personalized Recommendations</span>
+            <span>{t('analytics.personalizedRecommendations')}</span>
           </h3>
           <div className="space-y-2 mb-4">
             {getPersonalizedSuggestions().map((suggestion, index) => (
@@ -539,7 +541,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
             style={{ backgroundColor: '#4A7C59' }}
           >
             <MessageCircle className="w-4 h-4" />
-            <span>Ask Gut Coach</span>
+            <span>{t('analytics.askGutCoach')}</span>
           </Button>
         </CardContent>
       </Card>

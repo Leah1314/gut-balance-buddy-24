@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 import { format } from "date-fns";
+import { useTranslation } from 'react-i18next';
 
 interface LogEntry {
   id: string;
@@ -18,6 +19,7 @@ interface LogEntry {
 }
 
 const LogHistory = () => {
+  const { t } = useTranslation();
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
@@ -45,7 +47,7 @@ const LogHistory = () => {
           id: log.id,
           type: 'food',
           timestamp: log.created_at,
-          title: 'Food Entry',
+          title: t('history.foodEntry'),
           content: log.food_name,
           details: {
             description: log.description,
@@ -63,7 +65,7 @@ const LogHistory = () => {
           id: log.id,
           type: 'stool',
           timestamp: log.created_at,
-          title: 'Stool Entry',
+          title: t('history.stoolEntry'),
           content: log.notes || `Bristol Type ${log.bristol_type || 'N/A'}`,
           details: {
             bristol_type: log.bristol_type,
@@ -120,7 +122,7 @@ const LogHistory = () => {
           {entry.details?.analysis_result && (
             <div className="text-sm">
               <p className="text-gray-700">
-                🤖 AI Analysis: {typeof entry.details.analysis_result === 'string' 
+                🤖 {t('history.aiAnalysis')}: {typeof entry.details.analysis_result === 'string' 
                   ? entry.details.analysis_result 
                   : JSON.stringify(entry.details.analysis_result)}
               </p>
@@ -136,13 +138,13 @@ const LogHistory = () => {
             <p className="font-medium">{details.notes}</p>
           )}
           {details?.bristol_type && (
-            <p className="text-sm text-gray-600"><strong>Bristol Type:</strong> {details.bristol_type}</p>
+            <p className="text-sm text-gray-600"><strong>{t('history.bristolType')}:</strong> {details.bristol_type}</p>
           )}
           {details?.consistency && (
-            <p className="text-sm text-gray-600"><strong>Consistency:</strong> {details.consistency}</p>
+            <p className="text-sm text-gray-600"><strong>{t('history.consistency')}:</strong> {details.consistency}</p>
           )}
           {details?.color && (
-            <p className="text-sm text-gray-600"><strong>Color:</strong> {details.color}</p>
+            <p className="text-sm text-gray-600"><strong>{t('history.color')}:</strong> {details.color}</p>
           )}
           {typeof details?.analysis_result === 'string' && details.analysis_result.includes('AI Analysis') && (
             <div className="text-sm">
@@ -162,10 +164,10 @@ const LogHistory = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold mb-1" style={{ color: '#2E2E2E' }}>
-            Your Log History
+            {t('history.title')}
           </h2>
           <p className="text-base leading-tight" style={{ color: '#2E2E2E', opacity: 0.6 }}>
-            Track your food intake and digestive health over time
+            {t('history.subtitle')}
           </p>
         </div>
         <Button
@@ -181,7 +183,7 @@ const LogHistory = () => {
           }}
         >
           <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Refresh
+          {t('history.refresh')}
         </Button>
       </div>
 
@@ -192,10 +194,10 @@ const LogHistory = () => {
             <CardContent className="p-8 text-center">
               <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 mb-4">
-                No logs found. Start tracking your food and digestive health!
+                {t('history.noLogsFound')}
               </p>
               <p className="text-sm text-gray-500">
-                Use the "Food In" and "Stool Out" tabs to log your entries.
+                {t('history.useTabs')}
               </p>
             </CardContent>
           </Card>
@@ -221,7 +223,7 @@ const LogHistory = () => {
                         variant="secondary" 
                         className={`text-xs ${entry.type === 'food' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}
                       >
-                        {entry.type === 'food' ? 'Food Log' : 'Stool Log'}
+                        {entry.type === 'food' ? t('history.foodLog') : t('history.stoolLog')}
                       </Badge>
                     </div>
                   </div>
