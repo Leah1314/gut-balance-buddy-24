@@ -12,9 +12,9 @@ import { useTranslation } from 'react-i18next';
 interface DayScore {
   date: string;
   displayDate: string;
-  score: number;
-  foodScore: number;
-  stoolScore: number;
+  score: number | null;
+  foodScore: number | null;
+  stoolScore: number | null;
 }
 
 interface FoodSummary {
@@ -63,13 +63,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     }
   }, [foodLogs, stoolLogs, dateRange]);
 
-  const calculateEnhancedFoodScore = (logs: any[], date: Date): number => {
+  const calculateEnhancedFoodScore = (logs: any[], date: Date): number | null => {
     const dayLogs = logs.filter(log => {
       const logDate = new Date(log.created_at);
       return logDate.toDateString() === date.toDateString();
     });
 
-    if (dayLogs.length === 0) return 0;
+    if (dayLogs.length === 0) return null;
 
     let score = 0;
     
@@ -108,13 +108,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     return Math.max(0, Math.min(score, 100));
   };
 
-  const calculateEnhancedStoolScore = (logs: any[], date: Date): number => {
+  const calculateEnhancedStoolScore = (logs: any[], date: Date): number | null => {
     const dayLogs = logs.filter(log => {
       const logDate = new Date(log.created_at);
       return logDate.toDateString() === date.toDateString();
     });
 
-    if (dayLogs.length === 0) return 0;
+    if (dayLogs.length === 0) return null;
 
     const latestLog = dayLogs[0];
     let score = 0;
@@ -165,7 +165,16 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       
       const dayFoodScore = calculateEnhancedFoodScore(foodLogs, date);
       const dayStoolScore = calculateEnhancedStoolScore(stoolLogs, date);
-      const dayScore = Math.round((dayFoodScore + dayStoolScore) / 2);
+      
+      // Calculate overall score only if at least one score exists
+      let dayScore: number | null = null;
+      if (dayFoodScore !== null && dayStoolScore !== null) {
+        dayScore = Math.round((dayFoodScore + dayStoolScore) / 2);
+      } else if (dayFoodScore !== null) {
+        dayScore = dayFoodScore;
+      } else if (dayStoolScore !== null) {
+        dayScore = dayStoolScore;
+      }
 
       historical.push({
         date: date.toISOString().split('T')[0],
@@ -184,13 +193,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     
     // Set today's scores from the last day in historical data
     const todayData = historical[historical.length - 1];
-    setTodayScore(todayData.score);
-    setFoodScore(todayData.foodScore);
-    setStoolScore(todayData.stoolScore);
+    setTodayScore(todayData.score || 0);
+    setFoodScore(todayData.foodScore || 0);
+    setStoolScore(todayData.stoolScore || 0);
   };
 
   const filterHistoricalData = (data: DayScore[]) => {
-    return data.filter(day => day.foodScore > 0 || day.stoolScore > 0);
+    return data.filter(day => day.foodScore !== null || day.stoolScore !== null);
   };
 
   const calculateFoodSummary = () => {
@@ -285,8 +294,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const getTrendDirection = () => {
     if (filteredHistoricalData.length < 7) return null;
     
-    const recent = filteredHistoricalData.slice(-7).reduce((sum, day) => sum + day.score, 0) / 7;
-    const previous = filteredHistoricalData.slice(-14, -7).reduce((sum, day) => sum + day.score, 0) / 7;
+    const recentData = filteredHistoricalData.slice(-7).filter(day => day.score !== null);
+    const previousData = filteredHistoricalData.slice(-14, -7).filter(day => day.score !== null);
+    
+    if (recentData.length === 0 || previousData.length === 0) return null;
+    
+    const recent = recentData.reduce((sum, day) => sum + (day.score || 0), 0) / recentData.length;
+    const previous = previousData.reduce((sum, day) => sum + (day.score || 0), 0) / previousData.length;
     
     if (recent > previous + 5) return 'up';
     if (recent < previous - 5) return 'down';
