@@ -194,8 +194,8 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     // Set today's scores from the last day in historical data
     const todayData = historical[historical.length - 1];
     setTodayScore(todayData.score || 0);
-    setFoodScore(todayData.foodScore || 0);
-    setStoolScore(todayData.stoolScore || 0);
+    setFoodScore(todayData.foodScore);
+    setStoolScore(todayData.stoolScore);
   };
 
   const filterHistoricalData = (data: DayScore[]) => {
@@ -455,11 +455,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
           <CardContent>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xl font-bold" style={{ color: '#4A7C59' }}>
-                {foodScore}
+                {foodScore !== null ? foodScore : '--'}
               </span>
               <Apple className="w-4 h-4" style={{ color: '#4A7C59' }} />
             </div>
-            <Progress value={foodScore} className="h-2" />
+            <Progress value={foodScore || 0} className="h-2" />
           </CardContent>
         </Card>
 
@@ -472,11 +472,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
           <CardContent>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xl font-bold" style={{ color: '#4A7C59' }}>
-                {stoolScore}
+                {stoolScore !== null ? stoolScore : '--'}
               </span>
               <Target className="w-4 h-4" style={{ color: '#4A7C59' }} />
             </div>
-            <Progress value={stoolScore} className="h-2" />
+            <Progress value={stoolScore || 0} className="h-2" />
           </CardContent>
         </Card>
       </div>
