@@ -150,5 +150,70 @@
     "addMedicalCondition": "Add medical condition...",
     "customRestrictions": "Custom Restrictions",
     "customRestrictionsPlaceholder": "Enter any other dietary restrictions or preferences..."
+  },
+  "analytics": {
+    "title": "Health Analytics",
+    "subtitle": "Track your progress and get personalized insights",
+    "todayScore": "Today's Health Score",
+    "foodScore": "Food Score", 
+    "stoolScore": "Stool Score",
+    "overallScore": "Overall Score",
+    "historicalTrends": "Health Trends",
+    "excellent": "Excellent",
+    "good": "Good",
+    "needsAttention": "Needs Attention",
+    "critical": "Critical",
+    "noDataYet": "No data yet",
+    "startLogging": "Start logging your meals and stool to see insights",
+    "dateRanges": {
+      "7d": "7 Days",
+      "30d": "30 Days", 
+      "all": "All Time"
+    },
+    "suggestions": {
+      "addFiber": "Try adding more fiber-rich foods like beans, oats, or vegetables",
+      "eatBinding": "Consider eating binding foods like bananas or rice to firm up stool",
+      "aimForVegetables": "Aim for 5-7 different fruits and vegetables each day",
+      "replaceProcessed": "Try replacing processed foods with whole food alternatives",
+      "regularMeals": "Aim for 3 regular meals per day to support digestive health",
+      "addFiberFoods": "Add more fiber-rich foods like apples, beans, or whole grains",
+      "keepUp": "Great job! Keep up your healthy eating patterns"
+    },
+    "foodSummary": "Weekly Food Summary",
+    "totalMeals": "Total Meals",
+    "foodVariety": "Food Variety", 
+    "mostCommonFoods": "Most Common Foods",
+    "fiberFoods": "Fiber-Rich Foods",
+    "servings": "servings",
+    "processedFoods": "Processed Foods",
+    "personalizedRecommendations": "Personalized Recommendations",
+    "askGutCoach": "Ask Gut Health Coach",
+    "stoolSummary": {
+      "title": "Digestive Health Summary",
+      "frequency": "Weekly Frequency",
+      "averageBristol": "Average Bristol Score",
+      "consistency": "Consistency Trends"
+    },
+    "insights": {
+      "title": "Personalized Insights",
+      "subtitle": "Based on your recent tracking data",
+      "askAI": "Ask AI Coach",
+      "noSuggestions": "Keep up your great tracking! Our AI will provide more insights as you log more data."
+    },
+    "activityCalendar": {
+      "title": "Activity Calendar",
+      "subtitle": "Your tracking consistency over time"
+    },
+    "trendDirection": {
+      "improving": "Trending upward",
+      "declining": "Trending downward", 
+      "stable": "Stable"
+    },
+    "weeklyGoals": {
+      "title": "Weekly Goals",
+      "mealFrequency": "Log 3+ meals daily",
+      "foodVariety": "Try 15+ different foods",
+      "stoolTracking": "Track bowel movements daily"
+    }
   }
 }
