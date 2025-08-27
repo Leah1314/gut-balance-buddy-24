@@ -184,7 +184,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
             </div>
             <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#E3F2FD' }}></div>
-              <span style={{ color: '#2E2E2E' }}>已记录两项</span>
+              <span style={{ color: '#2E2E2E' }}>{t('history.bothEntries')}</span>
             </div>
           </div>
         </CardContent>
@@ -256,7 +256,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
               {/* Empty State */}
               {!selectedActivity.hasFoodLogs && !selectedActivity.hasStoolLogs && (
                 <div className="text-center py-4 text-gray-500">
-                  <p>此日期没有记录</p>
+                  <p>{t('history.noRecordsForDate')}</p>
                 </div>
               )}
             </div>

@@ -252,6 +252,12 @@
   "history": {
     "foodEntry": "Food Entry",
     "stoolEntry": "Stool Entry",
-    "bothEntries": "Both Recorded"
+    "bothEntries": "Both Recorded",
+    "foodLog": "Food Log",
+    "stoolLog": "Stool Log", 
+    "bristolType": "Bristol Type",
+    "color": "Color",
+    "consistency": "Consistency",
+    "noRecordsForDate": "No records for this date"
   }
 }
