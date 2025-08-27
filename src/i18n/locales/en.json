@@ -72,7 +72,10 @@
     "consistency": "Consistency",
     "color": "Color",
     "notes": "Notes",
-    "photoUpload": "Photo Upload"
+    "photoUpload": "Photo Upload",
+    "aiStoolAnalysis": "AI Stool Analysis",
+    "clickToUpload": "Click to upload",
+    "uploadStoolPhoto": "or drag and drop your stool image"
   },
   "symptoms": {
     "title": "Log New Symptom",
@@ -250,6 +253,9 @@
     }
   },
   "history": {
+    "title": "History",
+    "subtitle": "View your past food and stool entries",
+    "refresh": "Refresh",
     "foodEntry": "Food Entry",
     "stoolEntry": "Stool Entry",
     "bothEntries": "Both Recorded",
