@@ -34,12 +34,12 @@ export const BristolStoolChart = ({ selectedType, onTypeSelect }: BristolStoolCh
                   : 'border-gray-200 hover:border-gray-300 bg-white'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-semibold">Type {item.type}</div>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex-1">
+                  <div className="font-semibold mb-1">Type {item.type}</div>
                   <div className="text-sm text-gray-600">{item.description}</div>
                 </div>
-                <div className="text-sm font-medium text-gray-500">
+                <div className="text-sm font-medium text-gray-500 text-right ml-4">
                   {item.severity}
                 </div>
               </div>
