@@ -28,7 +28,39 @@
   "food": {
     "title": "Food Tracking",
     "aiAnalysis": "AI Analysis",
-    "manualEntry": "Manual Entry"
+    "manualEntry": "Manual Entry",
+    "aiImageAnalysis": "AI Image Analysis",
+    "uploadFoodImage": "Upload Food Image",
+    "tapToUpload": "Tap to upload",
+    "dragAndDrop": "Drag and drop your image here",
+    "maxFileSize": "Max file size: 10MB",
+    "generalNotes": "General Notes",
+    "generalNotesDescription": "Add any notes about your meal, portion size, or how you feel",
+    "generalNotesPlaceholder": "Example: Large portion, ate quickly, feeling satisfied...",
+    "saveNote": "Save Note",
+    "logFood": "Log Food",
+    "mealType": "Meal Type",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch", 
+    "dinner": "Dinner",
+    "snack": "Snack",
+    "whatDidYouEat": "What did you eat?",
+    "enterFoodItem": "Enter food item",
+    "quickAdd": "Quick Add",
+    "commonFoods": {
+      "rice": "Rice",
+      "chicken": "Chicken",
+      "salad": "Salad", 
+      "banana": "Banana",
+      "apple": "Apple",
+      "yogurt": "Yogurt",
+      "oatmeal": "Oatmeal",
+      "vegetables": "Vegetables",
+      "nuts": "Nuts",
+      "bread": "Bread",
+      "pasta": "Pasta",
+      "fish": "Fish"
+    }
   },
   "stool": {
     "title": "Stool Tracking",
@@ -165,6 +197,7 @@
     "critical": "Critical",
     "noDataYet": "No data yet",
     "startLogging": "Start logging your meals and stool to see insights",
+    "monthlyActivityCalendar": "Monthly Activity Calendar",
     "dateRanges": {
       "7d": "7 Days",
       "30d": "30 Days", 
@@ -215,5 +248,10 @@
       "foodVariety": "Try 15+ different foods",
       "stoolTracking": "Track bowel movements daily"
     }
+  },
+  "history": {
+    "foodEntry": "Food Entry",
+    "stoolEntry": "Stool Entry",
+    "bothEntries": "Both Recorded"
   }
 }
