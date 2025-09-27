@@ -78,7 +78,9 @@ const FoodImageAnalyzer = () => {
     setIsAnalyzing(true);
     
     try {
+      console.log('Starting image analysis for:', selectedImage.name);
       const base64Image = await convertImageToBase64(selectedImage);
+      console.log('Image converted to base64, size:', base64Image.length);
       
       console.log('Calling Supabase edge function for image analysis...');
       
@@ -88,13 +90,24 @@ const FoodImageAnalyzer = () => {
         }
       });
 
+      console.log('Edge function response - data:', data, 'error:', error);
+
       if (error) {
         console.error('Supabase function error:', error);
-        throw new Error(error.message || 'Failed to analyze image');
+        toast.error(`Analysis failed: ${error.message || 'Unknown error'}`);
+        return;
       }
 
       if (!data) {
-        throw new Error('No data received from analysis');
+        console.error('No data received from analysis');
+        toast.error('No analysis data received');
+        return;
+      }
+
+      if (data.error) {
+        console.error('Analysis returned error:', data.error);
+        toast.error(`Analysis failed: ${data.error}`);
+        return;
       }
 
       console.log('Analysis result:', data);
@@ -103,7 +116,8 @@ const FoodImageAnalyzer = () => {
       
     } catch (error) {
       console.error('Analysis error:', error);
-      toast.error(t('food.analysisFailed'));
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Analysis failed: ${errorMessage}`);
     } finally {
       setIsAnalyzing(false);
     }
