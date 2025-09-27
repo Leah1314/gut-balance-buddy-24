@@ -184,9 +184,9 @@ serve(async (req) => {
                   description += ` Recommendations: ${result.recommendations.join(', ')}`;
                 }
                 if (result.test_values && Array.isArray(result.test_values)) {
-                  const abnormalValues = result.test_values.filter(v => v.status && v.status.toLowerCase() !== 'normal');
+                  const abnormalValues = result.test_values.filter((v: any) => v.status && v.status.toLowerCase() !== 'normal');
                   if (abnormalValues.length > 0) {
-                    description += ` Abnormal Values: ${abnormalValues.map(v => `${v.parameter}: ${v.value} ${v.unit} (${v.status})`).join(', ')}`;
+                    description += ` Abnormal Values: ${abnormalValues.map((v: any) => `${v.parameter}: ${v.value} ${v.unit} (${v.status})`).join(', ')}`;
                   }
                 }
                 return description;
@@ -261,7 +261,7 @@ serve(async (req) => {
         
       } catch (imageError) {
         console.error('Error processing image:', imageError);
-        throw new Error('Failed to process image: ' + imageError.message);
+        throw new Error('Failed to process image: ' + (imageError instanceof Error ? imageError.message : String(imageError)));
       }
     }
     
@@ -304,7 +304,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('=== EDGE FUNCTION ERROR ===');
-    console.error('Error:', error.message);
+    console.error('Error:', error instanceof Error ? error.message : String(error));
 
     return new Response(JSON.stringify({ 
       error: 'Failed to process request',

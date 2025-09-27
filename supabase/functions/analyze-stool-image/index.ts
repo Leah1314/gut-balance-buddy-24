@@ -149,7 +149,7 @@ For valid stool images, respond with this exact JSON structure:
     return new Response(
       JSON.stringify({ 
         error: 'Analysis failed', 
-        details: error.message 
+        details: error instanceof Error ? error.message : String(error) 
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

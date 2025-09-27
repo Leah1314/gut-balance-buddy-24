@@ -110,7 +110,7 @@ Focus on gut health implications and be as accurate as possible with nutrition e
     return new Response(
       JSON.stringify({ 
         error: 'Failed to analyze image', 
-        details: error.message 
+        details: error instanceof Error ? error.message : String(error)
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
