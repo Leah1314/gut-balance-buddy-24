@@ -69,11 +69,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string) => {
     try {
+      const redirectUrl = `${window.location.origin}/`;
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'https://gut-health-in-and-out.lovable.app/'
+          emailRedirectTo: redirectUrl
         }
       });
       return { error };
@@ -98,10 +99,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async () => {
     try {
+      const redirectUrl = `${window.location.origin}/`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://gut-health-in-and-out.lovable.app/'
+          redirectTo: redirectUrl
         }
       });
       return { error };
