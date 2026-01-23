@@ -351,17 +351,18 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
       {/* Historical Trend Chart */}
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <CardTitle className="flex items-center space-x-2">
               <TrendingUp className="w-5 h-5" style={{ color: '#4A7C59' }} />
               <span style={{ color: '#2E2E2E' }}>{t('analytics.historicalTrends')}</span>
             </CardTitle>
-            <div className="flex space-x-2">
+            <div className="flex space-x-1 sm:space-x-2">
               <Button
                 variant={dateRange === '7d' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setDateRange('7d')}
+                className="flex-1 sm:flex-none text-xs sm:text-sm px-2 sm:px-3"
                 style={dateRange === '7d' ? { backgroundColor: '#4A7C59' } : {}}
               >
                 {t('analytics.dateRanges.7d')}
@@ -370,6 +371,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 variant={dateRange === '30d' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setDateRange('30d')}
+                className="flex-1 sm:flex-none text-xs sm:text-sm px-2 sm:px-3"
                 style={dateRange === '30d' ? { backgroundColor: '#4A7C59' } : {}}
               >
                 {t('analytics.dateRanges.30d')}
@@ -378,6 +380,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 variant={dateRange === 'all' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setDateRange('all')}
+                className="flex-1 sm:flex-none text-xs sm:text-sm px-2 sm:px-3"
                 style={dateRange === 'all' ? { backgroundColor: '#4A7C59' } : {}}
               >
                 {t('analytics.dateRanges.all')}
