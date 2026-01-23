@@ -106,29 +106,29 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
   return (
     <>
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center space-x-2">
-              <CalendarIcon className="w-5 h-5" style={{ color: '#4A7C59' }} />
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+              <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#4A7C59' }} />
               <span style={{ color: '#2E2E2E' }}>{t('analytics.monthlyActivityCalendar')}</span>
             </CardTitle>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center sm:justify-end space-x-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigateMonth('prev')}
-                className="p-2"
+                className="p-1.5 sm:p-2 h-8 w-8"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <span className="text-sm font-medium min-w-[100px] sm:min-w-[120px] text-center" style={{ color: '#2E2E2E' }}>
+              <span className="text-xs sm:text-sm font-medium min-w-[80px] sm:min-w-[100px] text-center" style={{ color: '#2E2E2E' }}>
                 {format(currentMonth, 'MMM yyyy', { locale: i18n.language === 'zh' ? zhCN : undefined })}
               </span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigateMonth('next')}
-                className="p-2"
+                className="p-1.5 sm:p-2 h-8 w-8"
                 disabled={currentMonth >= new Date()}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -136,54 +136,52 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs }: MonthlyActivityCalenda
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-3 sm:p-6">
-          <div className="overflow-x-auto">
-            <Calendar
-              locale={i18n.language === 'zh' ? zhCN : undefined}
-              mode="single"
-              month={currentMonth}
-              onMonthChange={setCurrentMonth}
-              className="w-full pointer-events-auto text-sm mx-auto max-w-full"
-              modifiers={{
-                hasFood: (date) => getActivityLevel(date) === 'food',
-                hasStool: (date) => getActivityLevel(date) === 'stool',
-                hasBoth: (date) => getActivityLevel(date) === 'both',
-                hasActivity: (date) => getActivityLevel(date) !== 'none'
-              }}
-              modifiersStyles={{
-                hasFood: { 
-                  backgroundColor: '#E8F5E8',
-                  color: '#2E7D32',
-                  fontWeight: 'bold'
-                },
-                hasStool: { 
-                  backgroundColor: '#FFF3E0',
-                  color: '#F57C00',
-                  fontWeight: 'bold'
-                },
-                hasBoth: { 
-                  backgroundColor: '#E3F2FD',
-                  color: '#1976D2',
-                  fontWeight: 'bold'
-                }
-              }}
-              onDayClick={handleDateClick}
-              disabled={(date) => date > new Date()}
-            />
-          </div>
+        <CardContent className="px-2 py-3 sm:p-6">
+          <Calendar
+            locale={i18n.language === 'zh' ? zhCN : undefined}
+            mode="single"
+            month={currentMonth}
+            onMonthChange={setCurrentMonth}
+            className="w-full pointer-events-auto mx-auto [&_.rdp-caption]:hidden [&_.rdp-table]:w-full [&_.rdp-cell]:p-0.5 sm:[&_.rdp-cell]:p-1 [&_.rdp-day]:h-8 [&_.rdp-day]:w-8 sm:[&_.rdp-day]:h-10 sm:[&_.rdp-day]:w-10 [&_.rdp-day]:text-xs sm:[&_.rdp-day]:text-sm [&_.rdp-head_cell]:text-xs sm:[&_.rdp-head_cell]:text-sm [&_.rdp-head_cell]:font-medium [&_.rdp-head_cell]:w-8 sm:[&_.rdp-head_cell]:w-10"
+            modifiers={{
+              hasFood: (date) => getActivityLevel(date) === 'food',
+              hasStool: (date) => getActivityLevel(date) === 'stool',
+              hasBoth: (date) => getActivityLevel(date) === 'both',
+              hasActivity: (date) => getActivityLevel(date) !== 'none'
+            }}
+            modifiersStyles={{
+              hasFood: { 
+                backgroundColor: '#E8F5E8',
+                color: '#2E7D32',
+                fontWeight: 'bold'
+              },
+              hasStool: { 
+                backgroundColor: '#FFF3E0',
+                color: '#F57C00',
+                fontWeight: 'bold'
+              },
+              hasBoth: { 
+                backgroundColor: '#E3F2FD',
+                color: '#1976D2',
+                fontWeight: 'bold'
+              }
+            }}
+            onDayClick={handleDateClick}
+            disabled={(date) => date > new Date()}
+          />
           
           {/* Legend */}
-          <div className="mt-4 flex flex-wrap gap-2 sm:gap-4 text-xs justify-center sm:justify-start">
-            <div className="flex items-center space-x-1 sm:space-x-2">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#E8F5E8' }}></div>
+          <div className="mt-3 sm:mt-4 flex flex-wrap gap-x-3 gap-y-1 sm:gap-4 text-[10px] sm:text-xs justify-center">
+            <div className="flex items-center space-x-1">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded" style={{ backgroundColor: '#E8F5E8' }}></div>
               <span style={{ color: '#2E2E2E' }}>{t('history.foodEntry')}</span>
             </div>
-            <div className="flex items-center space-x-1 sm:space-x-2">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFF3E0' }}></div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded" style={{ backgroundColor: '#FFF3E0' }}></div>
               <span style={{ color: '#2E2E2E' }}>{t('history.stoolEntry')}</span>
             </div>
-            <div className="flex items-center space-x-1 sm:space-x-2">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#E3F2FD' }}></div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded" style={{ backgroundColor: '#E3F2FD' }}></div>
               <span style={{ color: '#2E2E2E' }}>{t('history.bothEntries')}</span>
             </div>
           </div>
