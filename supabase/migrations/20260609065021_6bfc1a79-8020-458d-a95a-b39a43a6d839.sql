@@ -1,0 +1,1 @@
+ALTER TABLE public.user_health_profiles ADD COLUMN IF NOT EXISTS dietary_preferences jsonb DEFAULT '[]'::jsonb;
