@@ -1,7 +1,1 @@
-project_id = "wpfusmytujopvfyebiar"
-
-[functions.gut-health-chat]
-verify_jwt = false
-
-[functions.analyze-food-image]
-verify_jwt = false
+project_id = "ppfonjpfpyfeklecowpd"
