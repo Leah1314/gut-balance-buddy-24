@@ -59,7 +59,8 @@ Focus on gut health implications and be as accurate as possible with nutrition e
               {
                 type: 'image_url',
                 image_url: {
-                  url: `data:image/jpeg;base64,${image}`
+                  url: `data:image/jpeg;base64,${image}`,
+                  detail: 'low'
                 }
               }
             ]
