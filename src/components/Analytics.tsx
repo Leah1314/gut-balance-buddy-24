@@ -553,7 +553,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       </Card>
 
       {/* Monthly Activity Calendar */}
-      <MonthlyActivityCalendar foodLogs={foodLogs} stoolLogs={stoolLogs} />
+      <MonthlyActivityCalendar foodLogs={foodLogs} stoolLogs={stoolLogs} onEntryAdded={handleEntryAdded} />
 
       {/* Personalized Suggestions */}
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
