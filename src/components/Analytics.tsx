@@ -31,7 +31,7 @@ interface AnalyticsProps {
 
 const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const { t } = useTranslation();
-  const { foodLogs } = useFoodLogs();
+  const { foodLogs, refreshFoodLogs } = useFoodLogs();
   const { getStoolLogs } = useStoolLogs();
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
   const [historicalData, setHistoricalData] = useState<DayScore[]>([]);
@@ -48,13 +48,18 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   });
   const [dateRange, setDateRange] = useState<'7d' | '30d' | 'all'>('30d');
 
+  const fetchStoolLogs = async () => {
+    const logs = await getStoolLogs();
+    setStoolLogs(logs);
+  };
+
   useEffect(() => {
-    const fetchStoolLogs = async () => {
-      const logs = await getStoolLogs();
-      setStoolLogs(logs);
-    };
     fetchStoolLogs();
   }, []);
+
+  const handleEntryAdded = async () => {
+    await Promise.all([refreshFoodLogs(), fetchStoolLogs()]);
+  };
 
   useEffect(() => {
     if (foodLogs.length > 0 || stoolLogs.length > 0) {
@@ -548,7 +553,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       </Card>
 
       {/* Monthly Activity Calendar */}
-      <MonthlyActivityCalendar foodLogs={foodLogs} stoolLogs={stoolLogs} />
+      <MonthlyActivityCalendar foodLogs={foodLogs} stoolLogs={stoolLogs} onEntryAdded={handleEntryAdded} />
 
       {/* Personalized Suggestions */}
       <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
