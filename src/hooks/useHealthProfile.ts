@@ -15,7 +15,7 @@ interface HealthProfile {
   medical_conditions?: string[];
   medications?: string[];
   dietary_restrictions?: any;
-  dietary_preferences?: any[];
+  dietary_preferences?: any;
   custom_restrictions?: string;
   recent_tests?: any;
   symptoms_notes?: string;
