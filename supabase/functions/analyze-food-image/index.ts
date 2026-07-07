@@ -30,7 +30,6 @@ serve(async (req) => {
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
         'Lovable-API-Key': lovableApiKey,
         'Content-Type': 'application/json',
       },
@@ -66,11 +65,12 @@ Focus on gut health implications and be as accurate as possible with nutrition e
             ]
           }
         ],
+        response_format: { type: 'json_object' },
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       console.error('AI Gateway error:', errorData);
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again shortly.' }), {
@@ -82,13 +82,14 @@ Focus on gut health implications and be as accurate as possible with nutrition e
           status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      throw new Error(`AI Gateway request failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+      const gatewayMessage = errorData.message || errorData.error?.message || errorData.title || 'Unknown error';
+      throw new Error(`AI Gateway request failed: ${response.status} - ${gatewayMessage}`);
     }
 
     const data = await response.json();
     const content = data.choices[0].message.content;
     
-    console.log('Raw OpenAI response:', content);
+    console.log('Raw Lovable AI response:', content);
     
     // Clean the content by removing markdown code blocks if present
     let cleanContent = content.trim();
@@ -103,9 +104,9 @@ Focus on gut health implications and be as accurate as possible with nutrition e
     try {
       nutritionInfo = JSON.parse(cleanContent);
     } catch (parseError) {
-      console.error('Failed to parse OpenAI response as JSON:', parseError);
+      console.error('Failed to parse Lovable AI response as JSON:', parseError);
       console.error('Cleaned content:', cleanContent);
-      throw new Error('Invalid response format from OpenAI');
+      throw new Error('Invalid response format from Lovable AI');
     }
 
     console.log('Successfully analyzed food image');
