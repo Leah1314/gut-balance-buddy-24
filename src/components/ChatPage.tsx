@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import QuickQuestions from "./QuickQuestions";
 import ImageUploadDialog from "./ImageUploadDialog";
+import VoiceInputButton from "./VoiceInputButton";
 
 interface Message {
   id: string;
@@ -225,6 +226,13 @@ const ChatPage = () => {
             <ImageUploadDialog 
               onImageUpload={handleImageUpload} 
               isLoading={isLoading}
+            />
+            <VoiceInputButton
+              disabled={isLoading}
+              onTranscript={(text) => {
+                setInput((prev) => (prev ? `${prev} ${text}` : text));
+                toast({ title: "已识别", description: "请确认后点击发送。" });
+              }}
             />
             <Textarea
               value={input}
