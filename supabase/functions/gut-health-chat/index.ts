@@ -29,19 +29,19 @@ serve(async (req) => {
     console.log('Include user data:', includeUserData);
     console.log('Image data provided:', imageData ? 'Yes' : 'No');
 
-    console.log('=== CHECKING OPENAI API KEY ===');
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      console.error('OpenAI API key not found');
+    console.log('=== CHECKING LOVABLE API KEY ===');
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) {
+      console.error('LOVABLE_API_KEY not found');
       return new Response(JSON.stringify({ 
-        error: 'OpenAI API key not configured',
+        error: 'AI service not configured',
         response: 'I apologize, but my AI service is not properly configured. Please contact support.'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    console.log('OpenAI API key found');
+    console.log('Lovable API key found');
 
     let systemPrompt = `You are a helpful gut health coach. Provide friendly, supportive advice about digestive health and nutrition. Keep your responses concise and practical.
     
@@ -267,30 +267,42 @@ serve(async (req) => {
     
     messages.push(userMessage);
     
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    const openAIResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Lovable-API-Key': lovableApiKey,
+        'X-Lovable-AIG-SDK': 'supabase-edge-function',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'google/gemini-3-flash-preview',
         messages: messages,
-        max_tokens: 800,
-        temperature: 0.7,
       }),
     });
 
-    console.log('OpenAI response status:', openAIResponse.status);
+    console.log('Lovable AI response status:', openAIResponse.status);
 
     if (!openAIResponse.ok) {
-      const errorText = await openAIResponse.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API error: ${openAIResponse.status}`);
+      const errorData = await openAIResponse.json().catch(() => ({}));
+      console.error('Lovable AI error:', openAIResponse.status, errorData);
+      if (openAIResponse.status === 429) {
+        return new Response(JSON.stringify({
+          error: 'Rate limit exceeded',
+          response: 'Too many requests right now. Please try again in a moment.'
+        }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      if (openAIResponse.status === 402) {
+        return new Response(JSON.stringify({
+          error: 'AI credits exhausted',
+          response: 'AI credits have run out. Please add credits to continue.'
+        }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const msg = errorData?.message || errorData?.error?.message || 'Unknown error';
+      throw new Error(`Lovable AI error: ${openAIResponse.status} - ${msg}`);
     }
 
     const data = await openAIResponse.json();
-    console.log('OpenAI response received');
+    console.log('Lovable AI response received');
 
     const aiResponse = data.choices[0].message.content;
     console.log('AI response:', aiResponse);
