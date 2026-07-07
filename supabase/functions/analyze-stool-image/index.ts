@@ -2,7 +2,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,20 +18,21 @@ serve(async (req) => {
   try {
     const { image } = await req.json();
 
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    if (!lovableApiKey) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    console.log('Analyzing stool image with OpenAI...');
+    console.log('Analyzing stool image with Lovable AI...');
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Lovable-API-Key': lovableApiKey,
+        'X-Lovable-AIG-SDK': 'supabase-edge-function',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-3-flash-preview',
         messages: [
           {
             role: 'system',
@@ -81,21 +82,26 @@ For valid stool images, respond with this exact JSON structure:
                 type: 'image_url',
                 image_url: {
                   url: `data:image/jpeg;base64,${image}`,
-                  detail: 'high'
                 }
               }
             ]
           }
         ],
-        max_tokens: 1000,
-        temperature: 0.3,
+        response_format: { type: 'json_object' },
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('OpenAI API error:', response.status, errorData);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Lovable AI error:', response.status, errorData);
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please try again later.');
+      }
+      if (response.status === 402) {
+        throw new Error('AI credits exhausted. Please add credits to continue.');
+      }
+      const msg = errorData?.message || errorData?.error?.message || 'Unknown error';
+      throw new Error(`Lovable AI error: ${response.status} - ${msg}`);
     }
 
     const data = await response.json();
