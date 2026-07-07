@@ -31,6 +31,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${lovableApiKey}`,
+        'Lovable-API-Key': lovableApiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
