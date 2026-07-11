@@ -25,3 +25,6 @@ dist-ssr
 
 # others
 /.clinerules/project_rules.md
+.env
+.env.*
+!.env.example
