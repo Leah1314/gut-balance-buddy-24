@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
@@ -8,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import QuickQuestions from "./QuickQuestions";
 import ImageUploadDialog from "./ImageUploadDialog";
+import GutlyMascot from "./gutly/GutlyMascot";
 
 interface Message {
   id: string;
@@ -157,105 +157,86 @@ const ChatPage = () => {
   if (!user) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <p>Please log in to access the chat.</p>
+        <p className="text-muted-foreground">Please log in to access the chat.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 h-full flex flex-col">
-      {/* Chat Messages - Enhanced for better readability */}
-      <Card className="flex-1 bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardContent className="p-4 sm:p-6 flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto min-h-[60vh] sm:min-h-[70vh]">
-            <div className="space-y-3">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[90%] sm:max-w-[85%] md:max-w-[80%] rounded-lg px-3 py-2 ${
-                      message.role === 'user'
-                        ? 'text-white'
-                        : 'bg-gray-100'
-                    }`}
-                    style={{
-                      backgroundColor: message.role === 'user' ? '#4A7C59' : '#F3F4F6',
-                      color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
-                    }}
-                  >
-                    {message.imageData && (
-                      <div className="mb-2">
-                        <img 
-                          src={message.imageData} 
-                          alt="Uploaded food" 
-                          className="w-full max-w-64 h-auto rounded-lg"
-                        />
-                      </div>
-                    )}
-                    <div className="whitespace-pre-wrap text-sm leading-snug">{message.content}</div>
-                    <div className="text-xs mt-1 opacity-75">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 rounded-lg px-5 py-4 flex items-center space-x-3">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span className="text-base" style={{ color: '#2E2E2E' }}>Thinking...</span>
-                  </div>
-                </div>
+    <div className="flex flex-col gap-5 h-full animate-fade-in">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto min-h-[60vh] sm:min-h-[70vh] pr-1">
+        <div className="space-y-5">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start items-start gap-3'}`}
+            >
+              {message.role === 'assistant' && (
+                <div className="shrink-0 mt-1"><GutlyMascot size={32} waving={false} /></div>
               )}
-              <div ref={messagesEndRef} />
+              <div
+                className={
+                  message.role === 'user'
+                    ? "max-w-[85%] rounded-2xl px-4 py-3 bg-primary text-primary-foreground shadow-soft"
+                    : "max-w-[90%] text-foreground"
+                }
+              >
+                {message.imageData && (
+                  <img
+                    src={message.imageData}
+                    alt="Uploaded"
+                    className="w-full max-w-64 h-auto rounded-2xl mb-2 shadow-soft"
+                  />
+                )}
+                <div className="whitespace-pre-wrap text-[15px] leading-relaxed">{message.content}</div>
+                <div className={`text-[11px] mt-1.5 ${message.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                  {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+          {isLoading && (
+            <div className="flex items-center gap-3">
+              <GutlyMascot size={32} />
+              <div className="flex items-center gap-2 text-muted-foreground text-[15px]">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Gutly is thinking…</span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
 
-      {/* Quick Questions */}
       <QuickQuestions onQuestionSelect={handleQuickQuestion} isLoading={isLoading} />
 
-      {/* Message Input - Enhanced for better usability */}
-      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
-        <CardContent className="p-4">
-          <form onSubmit={handleSubmit} className="flex space-x-3">
-            <ImageUploadDialog 
-              onImageUpload={handleImageUpload} 
-              isLoading={isLoading}
-            />
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask me about your gut health..."
-              className="flex-1 min-h-[52px] max-h-32 resize-none rounded-lg text-base leading-relaxed"
-              style={{
-                borderColor: '#D3D3D3',
-                color: '#2E2E2E'
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
-              }}
-            />
-            <Button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className="self-end text-white h-[52px] w-[52px] rounded-lg"
-              style={{
-                backgroundColor: '#4A7C59',
-                borderColor: '#4A7C59'
-              }}
-            >
-              <Send className="w-5 h-5" />
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      {/* Composer */}
+      <div className="card-soft p-3 flex items-end gap-2">
+        <ImageUploadDialog onImageUpload={handleImageUpload} isLoading={isLoading} />
+        <form onSubmit={handleSubmit} className="flex-1 flex items-end gap-2">
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask Gutly about your gut health…"
+            className="flex-1 min-h-[52px] max-h-32 resize-none rounded-2xl bg-muted/60 border-0 focus-visible:ring-1 text-[15px] leading-relaxed px-4 py-3"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+          />
+          <Button
+            type="submit"
+            size="icon"
+            disabled={!input.trim() || isLoading}
+            className="h-[52px] w-[52px] rounded-2xl"
+          >
+            <Send className="w-5 h-5" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -1,16 +1,15 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, Lock, Phone, KeyRound } from "lucide-react";
+import GutlyMascot from "@/components/gutly/GutlyMascot";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -121,23 +120,19 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-brand-background flex flex-col">
-      {/* Mobile-first full screen layout */}
-      <div className="flex-1 flex flex-col px-6 py-8 max-w-sm mx-auto w-full">
-        {/* Logo and branding section */}
-        <div className="flex flex-col items-center mb-12 mt-8">
-          <div className="w-16 h-16 flex items-center justify-center mb-6">
-            <img src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" alt="Logo" className="w-16 h-16 object-contain" />
-          </div>
-          <h1 className="text-2xl font-bold text-brand-text mb-1">Gutly</h1>
-          <p className="text-sm text-muted-foreground mb-2 italic">Gut Time</p>
-          <h2 className="text-3xl font-semibold text-brand-text text-center">
-            {isLogin ? "Welcome back" : "Create account"}
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex-1 flex flex-col px-6 py-10 max-w-sm mx-auto w-full">
+        {/* Branding */}
+        <div className="flex flex-col items-center mb-10 mt-6 animate-fade-in">
+          <GutlyMascot size={72} />
+          <h1 className="text-hero text-foreground mt-5 mb-1">Gutly</h1>
+          <p className="text-caption mb-8">Gut Time · your AI gut health companion</p>
+          <h2 className="text-card-title text-foreground text-center">
+            {isLogin ? "Welcome back" : "Create your account"}
           </h2>
         </div>
 
-        {/* Main content area */}
-        <div className="flex-1 flex flex-col space-y-4">
+        <div className="flex-1 flex flex-col">
           <Tabs
             value={authMethod}
             onValueChange={(v) => {
@@ -147,55 +142,49 @@ const Auth = () => {
             }}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 bg-brand-surface">
-              <TabsTrigger value="email">
+            <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/70 rounded-2xl p-1">
+              <TabsTrigger value="email" className="rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft">
                 <Mail className="w-4 h-4 mr-2" /> Email
               </TabsTrigger>
-              <TabsTrigger value="phone">
+              <TabsTrigger value="phone" className="rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft">
                 <Phone className="w-4 h-4 mr-2" /> Phone
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="email" className="mt-6">
-              <form onSubmit={handleEmailAuth} className="space-y-6">
-            <div className="space-y-3">
-              <Label htmlFor="email" className="text-brand-text text-base font-medium text-left block">
-                <Mail className="w-4 h-4 inline mr-2" />
-                Email
-              </Label>
-              <Input 
-                id="email" 
-                type="email" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
-                className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text" 
-                placeholder="Enter your email" 
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <Label htmlFor="password" className="text-brand-text text-base font-medium text-left block">
-                <Lock className="w-4 h-4 inline mr-2" />
-                Password
-              </Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
-                className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text" 
-                placeholder={isLogin ? "Enter your password" : "Create a password (min. 6 characters)"} 
-                minLength={isLogin ? undefined : 6} 
-              />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full h-12 text-white font-semibold text-base bg-brand-accent hover:bg-brand-accent-hover" 
-              disabled={loading}
-            >
+              <form onSubmit={handleEmailAuth} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-foreground text-[15px] font-medium">
+                    <Mail className="w-4 h-4 inline mr-2" /> Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    className="w-full h-12 text-base bg-card rounded-2xl"
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-foreground text-[15px] font-medium">
+                    <Lock className="w-4 h-4 inline mr-2" /> Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    className="w-full h-12 text-base bg-card rounded-2xl"
+                    placeholder={isLogin ? "Your password" : "Create a password (6+ characters)"}
+                    minLength={isLogin ? undefined : 6}
+                  />
+                </div>
+
+                <Button type="submit" size="lg" className="w-full" disabled={loading}>
               {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
             </Button>
               </form>
@@ -203,11 +192,10 @@ const Auth = () => {
 
             <TabsContent value="phone" className="mt-6">
               {!otpSent ? (
-                <form onSubmit={handleSendOtp} className="space-y-6">
-                  <div className="space-y-3">
-                    <Label htmlFor="phone" className="text-brand-text text-base font-medium text-left block">
-                      <Phone className="w-4 h-4 inline mr-2" />
-                      Phone number
+                <form onSubmit={handleSendOtp} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-foreground text-[15px] font-medium">
+                      <Phone className="w-4 h-4 inline mr-2" /> Phone number
                     </Label>
                     <Input
                       id="phone"
@@ -215,27 +203,20 @@ const Auth = () => {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       required
-                      className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text"
+                      className="w-full h-12 text-base bg-card rounded-2xl"
                       placeholder="+14155551234"
                     />
-                    <p className="text-xs text-brand-text/60 text-left">
-                      Include your country code (e.g. +1 for US).
-                    </p>
+                    <p className="text-caption">Include your country code (e.g. +1 for US).</p>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-white font-semibold text-base bg-brand-accent hover:bg-brand-accent-hover"
-                    disabled={loading}
-                  >
+                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
                     {loading ? "Sending..." : isLogin ? "Send sign-in code" : "Send sign-up code"}
                   </Button>
                 </form>
               ) : (
-                <form onSubmit={handleVerifyOtp} className="space-y-6">
-                  <div className="space-y-3">
-                    <Label htmlFor="otp" className="text-brand-text text-base font-medium text-left block">
-                      <KeyRound className="w-4 h-4 inline mr-2" />
-                      Verification code
+                <form onSubmit={handleVerifyOtp} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="otp" className="text-foreground text-[15px] font-medium">
+                      <KeyRound className="w-4 h-4 inline mr-2" /> Verification code
                     </Label>
                     <Input
                       id="otp"
@@ -245,29 +226,20 @@ const Auth = () => {
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       required
-                      className="w-full h-12 text-base bg-brand-surface border-brand-border text-brand-text tracking-widest text-center"
+                      className="w-full h-12 text-base bg-card rounded-2xl tracking-widest text-center"
                       placeholder="123456"
                       maxLength={8}
                     />
-                    <p className="text-xs text-brand-text/60 text-left">
-                      Code sent to {normalizePhone(phone)}.
-                    </p>
+                    <p className="text-caption">Code sent to {normalizePhone(phone)}.</p>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-white font-semibold text-base bg-brand-accent hover:bg-brand-accent-hover"
-                    disabled={loading}
-                  >
+                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
                     {loading ? "Verifying..." : "Verify & continue"}
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
-                    className="w-full text-brand-text"
-                    onClick={() => {
-                      setOtpSent(false);
-                      setOtp("");
-                    }}
+                    className="w-full"
+                    onClick={() => { setOtpSent(false); setOtp(""); }}
                     disabled={loading}
                   >
                     Use a different number
@@ -278,16 +250,11 @@ const Auth = () => {
           </Tabs>
         </div>
 
-        {/* Bottom section */}
         <div className="mt-8 text-center">
-          <Button 
-            variant="ghost" 
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setOtpSent(false);
-              setOtp("");
-            }}
-            className="text-base text-brand-text hover:bg-transparent" 
+          <Button
+            variant="ghost"
+            onClick={() => { setIsLogin(!isLogin); setOtpSent(false); setOtp(""); }}
+            className="text-[15px]"
             disabled={loading}
           >
             {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
