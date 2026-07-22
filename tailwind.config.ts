@@ -19,7 +19,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Poppins', 'system-ui', '-apple-system', 'sans-serif'],
+				sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'SF Pro Display', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
+				display: ['Fraunces', 'New York', 'ui-serif', 'Georgia', 'serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
