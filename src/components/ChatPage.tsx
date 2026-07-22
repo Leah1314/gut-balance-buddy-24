@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import QuickQuestions from "./QuickQuestions";
 import ImageUploadDialog from "./ImageUploadDialog";
-import VoiceInputButton from "./VoiceInputButton";
 
 interface Message {
   id: string;
