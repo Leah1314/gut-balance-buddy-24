@@ -133,15 +133,15 @@ const GutHealthCoach = () => {
           data-testid="health-coach-trigger"
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50"
           style={{
-            backgroundColor: '#4A7C59',
+            backgroundColor: '#3F8F68',
             color: '#FFFFFF'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#5B8C6B';
+            e.currentTarget.style.backgroundColor = '#367957';
             e.currentTarget.style.transform = 'scale(1.05)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#4A7C59';
+            e.currentTarget.style.backgroundColor = '#3F8F68';
             e.currentTarget.style.transform = 'scale(1)';
           }}
         >
@@ -149,10 +149,10 @@ const GutHealthCoach = () => {
         </Button>
       </SheetTrigger>
       
-      <SheetContent className="w-full sm:max-w-md bg-white" style={{ borderColor: '#D3D3D3' }}>
-        <SheetHeader className="pb-4" style={{ borderBottomColor: '#D3D3D3' }}>
-          <SheetTitle className="flex items-center gap-2" style={{ color: '#2E2E2E' }}>
-            <MessageCircle className="w-5 h-5" style={{ color: '#4A7C59' }} />
+      <SheetContent className="w-full sm:max-w-md bg-white" style={{ borderColor: '#ECE9E1' }}>
+        <SheetHeader className="pb-4" style={{ borderBottomColor: '#ECE9E1' }}>
+          <SheetTitle className="flex items-center gap-2" style={{ color: '#1D1D1F' }}>
+            <MessageCircle className="w-5 h-5" style={{ color: '#3F8F68' }} />
             Gut Health Coach
           </SheetTitle>
         </SheetHeader>
@@ -172,9 +172,9 @@ const GutHealthCoach = () => {
                       : 'border'
                   }`}
                   style={{
-                    backgroundColor: message.role === 'user' ? '#4A7C59' : '#F9F8F4',
-                    borderColor: message.role === 'assistant' ? '#D3D3D3' : 'transparent',
-                    color: message.role === 'user' ? '#FFFFFF' : '#2E2E2E'
+                    backgroundColor: message.role === 'user' ? '#3F8F68' : '#FAF9F5',
+                    borderColor: message.role === 'assistant' ? '#ECE9E1' : 'transparent',
+                    color: message.role === 'user' ? '#FFFFFF' : '#1D1D1F'
                   }}
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -190,9 +190,9 @@ const GutHealthCoach = () => {
                 <div
                   className="p-3 rounded-lg border flex items-center gap-2"
                   style={{
-                    backgroundColor: '#F9F8F4',
-                    borderColor: '#D3D3D3',
-                    color: '#2E2E2E'
+                    backgroundColor: '#FAF9F5',
+                    borderColor: '#ECE9E1',
+                    color: '#1D1D1F'
                   }}
                 >
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -203,7 +203,7 @@ const GutHealthCoach = () => {
           </div>
 
           {/* Input */}
-          <div className="pt-4 border-t" style={{ borderColor: '#D3D3D3' }}>
+          <div className="pt-4 border-t" style={{ borderColor: '#ECE9E1' }}>
             <div className="flex gap-2">
               <Input
                 value={inputMessage}
@@ -212,9 +212,9 @@ const GutHealthCoach = () => {
                 placeholder="Ask me about gut health..."
                 className="flex-1"
                 style={{
-                  borderColor: '#D3D3D3',
+                  borderColor: '#ECE9E1',
                   backgroundColor: '#FFFFFF',
-                  color: '#2E2E2E'
+                  color: '#1D1D1F'
                 }}
                 disabled={isLoading}
               />
@@ -223,17 +223,17 @@ const GutHealthCoach = () => {
                 disabled={!inputMessage.trim() || isLoading}
                 className="shrink-0"
                 style={{
-                  backgroundColor: '#4A7C59',
+                  backgroundColor: '#3F8F68',
                   color: '#FFFFFF'
                 }}
                 onMouseEnter={(e) => {
                   if (!e.currentTarget.disabled) {
-                    e.currentTarget.style.backgroundColor = '#5B8C6B';
+                    e.currentTarget.style.backgroundColor = '#367957';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!e.currentTarget.disabled) {
-                    e.currentTarget.style.backgroundColor = '#4A7C59';
+                    e.currentTarget.style.backgroundColor = '#3F8F68';
                   }
                 }}
               >

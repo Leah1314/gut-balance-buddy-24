@@ -34,7 +34,7 @@ const LanguageSelector = () => {
           variant="ghost"
           size="sm"
           className="flex items-center space-x-2"
-          style={{ color: '#2E2E2E' }}
+          style={{ color: '#1D1D1F' }}
         >
           <Globe className="w-4 h-4" />
           <span className="hidden sm:inline">{currentLang.name}</span>

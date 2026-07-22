@@ -119,10 +119,10 @@ const ImageUploadDialog = ({ onImageUpload, isLoading }: ImageUploadDialogProps)
         <Button
           variant="outline"
           size="sm"
-          className="h-12 w-12 rounded-lg border-[#D3D3D3] hover:bg-[#F8F9FA]"
+          className="h-12 w-12 rounded-lg border-[#ECE9E1] hover:bg-[#F3F1EA]"
           disabled={isLoading}
         >
-          <Camera className="w-5 h-5" style={{ color: '#4A7C59' }} />
+          <Camera className="w-5 h-5" style={{ color: '#3F8F68' }} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -136,7 +136,7 @@ const ImageUploadDialog = ({ onImageUpload, isLoading }: ImageUploadDialogProps)
               <div className="flex gap-2">
                 <Button
                   onClick={handleCameraClick}
-                  className="flex-1 h-16 flex-col gap-2 bg-[#4A7C59] hover:bg-[#3D6B4A] text-white"
+                  className="flex-1 h-16 flex-col gap-2 bg-[#3F8F68] hover:bg-[#367957] text-white"
                 >
                   <Camera className="w-6 h-6" />
                   <span className="text-sm">Camera</span>
@@ -144,7 +144,7 @@ const ImageUploadDialog = ({ onImageUpload, isLoading }: ImageUploadDialogProps)
                 <Button
                   onClick={handleGalleryClick}
                   variant="outline"
-                  className="flex-1 h-16 flex-col gap-2 border-[#4A7C59] text-[#4A7C59] hover:bg-[#F8F9FA]"
+                  className="flex-1 h-16 flex-col gap-2 border-[#3F8F68] text-[#3F8F68] hover:bg-[#F3F1EA]"
                 >
                   <Image className="w-6 h-6" />
                   <span className="text-sm">Gallery</span>
@@ -193,7 +193,7 @@ const ImageUploadDialog = ({ onImageUpload, isLoading }: ImageUploadDialogProps)
                 <Button
                   onClick={handleUpload}
                   disabled={isUploading}
-                  className="flex-1 bg-[#4A7C59] hover:bg-[#3D6B4A] text-white"
+                  className="flex-1 bg-[#3F8F68] hover:bg-[#367957] text-white"
                 >
                   {isUploading ? (
                     <span className="flex items-center gap-2">
