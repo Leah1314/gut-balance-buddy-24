@@ -163,10 +163,10 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5 h-full animate-fade-in">
+    <div className="flex flex-col gap-3 h-full animate-fade-in">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto min-h-[60vh] sm:min-h-[70vh] pr-1">
-        <div className="space-y-5">
+      <div className="flex-1 overflow-y-auto min-h-[55vh] sm:min-h-[65vh] pr-1">
+        <div className="space-y-4">
           {messages.map((message) => (
             <div
               key={message.id}
