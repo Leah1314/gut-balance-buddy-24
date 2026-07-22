@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -7,25 +7,322 @@ import {
   Lightbulb,
   ChevronDown,
   Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { parseAssistantResponse, type AssistantSection } from "./parseAssistant";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 /**
- * Renders an AI markdown reply as scannable Gutly cards:
- * summary → recommendation → good / avoid → tip → collapsible details.
- * The backend response is not modified — only its presentation.
+ * Two-layer AI experience (Apple Health / Oura style):
+ *
+ *  Layer 1 (Glance, always shown):
+ *    • one-sentence summary
+ *    • recommendation score dial
+ *    • up to 3 key recommendation cards
+ *    • one Gutly Tip
+ *    • "View Full Analysis" button
+ *
+ *  Layer 2 (Drawer, on demand):
+ *    • every parsed section with full markdown
  */
 export default function AssistantResponse({ content }: { content: string }) {
-  const sections = parseAssistantResponse(content);
+  const sections = useMemo(() => parseAssistantResponse(content), [content]);
+
+  const summary = sections.find((s) => s.kind === "summary") as
+    | Extract<AssistantSection, { kind: "summary" }>
+    | undefined;
+
+  const keyItems = pickKeyRecommendations(sections);
+  const tip = sections.find((s) => s.kind === "tip") as
+    | Extract<AssistantSection, { kind: "tip" }>
+    | undefined;
+
+  const score = useMemo(() => deriveScore(content, summary?.tone), [content, summary?.tone]);
 
   return (
-    <div className="space-y-3.5 max-w-[min(100%,42rem)]">
-      {sections.map((s, i) => (
-        <SectionRenderer key={i} section={s} />
-      ))}
+    <div className="max-w-[min(100%,42rem)]">
+      <div className="rounded-[22px] bg-card shadow-soft border border-border/40 p-5 space-y-5">
+        {/* Hero: summary + score dial */}
+        <div className="flex items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground mb-1.5">
+              Gutly's Take
+            </p>
+            <p className="text-[18px] font-semibold leading-[1.35] tracking-tight text-foreground">
+              {summary?.text ?? firstLine(content)}
+            </p>
+          </div>
+          <ScoreDial score={score.value} label={score.label} tone={score.tone} />
+        </div>
+
+        {/* Key recommendations */}
+        {keyItems.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              Key Recommendations
+            </p>
+            <div className="space-y-2">
+              {keyItems.map((k, i) => (
+                <KeyRecCard key={i} tone={k.tone} text={k.text} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Gutly Tip */}
+        {tip && <TipCard title={tip.title} text={tip.text} />}
+
+        {/* View full analysis */}
+        <FullAnalysisDrawer sections={sections} summary={summary?.text} />
+      </div>
     </div>
   );
+}
+
+/* --------------------------- Score derivation --------------------------- */
+
+function deriveScore(
+  content: string,
+  tone?: "positive" | "negative" | "neutral",
+): { value: number; label: string; tone: "positive" | "neutral" | "negative" } {
+  // Look for explicit numeric scores: "score: 82", "82/100", "8/10", "rating 7"
+  const hundred = content.match(/(?:score|rating)[^\d]{0,6}(\d{1,3})\s*(?:\/\s*100)?/i);
+  const tenth = content.match(/(\d{1,2})\s*\/\s*10\b/);
+  let value: number | null = null;
+  if (hundred) {
+    const v = parseInt(hundred[1], 10);
+    if (v >= 0 && v <= 100) value = v;
+  }
+  if (value === null && tenth) {
+    const v = parseInt(tenth[1], 10);
+    if (v >= 0 && v <= 10) value = v * 10;
+  }
+  if (value === null) {
+    value = tone === "positive" ? 86 : tone === "negative" ? 42 : 68;
+  }
+  const t: "positive" | "neutral" | "negative" =
+    value >= 75 ? "positive" : value >= 55 ? "neutral" : "negative";
+  const label = value >= 85 ? "Great" : value >= 70 ? "Good" : value >= 50 ? "Fair" : "Caution";
+  return { value, label, tone: t };
+}
+
+function ScoreDial({
+  score,
+  label,
+  tone,
+}: {
+  score: number;
+  label: string;
+  tone: "positive" | "neutral" | "negative";
+}) {
+  const size = 76;
+  const stroke = 7;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const pct = Math.max(0, Math.min(100, score)) / 100;
+  const dash = c * pct;
+  const color =
+    tone === "positive"
+      ? "hsl(var(--primary))"
+      : tone === "negative"
+      ? "hsl(25 85% 55%)"
+      : "hsl(var(--accent))";
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          strokeWidth={stroke}
+          stroke="hsl(var(--muted))"
+          fill="none"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          strokeWidth={stroke}
+          stroke={color}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${c - dash}`}
+          style={{ transition: "stroke-dasharray 500ms ease" }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-[20px] font-bold tabular-nums leading-none text-foreground">
+          {score}
+        </span>
+        <span
+          className="text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+          style={{ color }}
+        >
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------- Key recommendation picking ---------------------- */
+
+type KeyItem = { tone: "good" | "avoid" | "neutral"; text: string };
+
+function pickKeyRecommendations(sections: AssistantSection[]): KeyItem[] {
+  const items: KeyItem[] = [];
+  for (const s of sections) {
+    if (items.length >= 3) break;
+    if (s.kind === "good") {
+      for (const it of s.items) {
+        if (items.length >= 3) break;
+        items.push({ tone: "good", text: it });
+      }
+    } else if (s.kind === "avoid") {
+      for (const it of s.items) {
+        if (items.length >= 3) break;
+        items.push({ tone: "avoid", text: it });
+      }
+    }
+  }
+  if (items.length < 2) {
+    for (const s of sections) {
+      if (items.length >= 3) break;
+      if (s.kind === "recommendation") {
+        for (const it of s.items) {
+          if (items.length >= 3) break;
+          items.push({ tone: "neutral", text: it });
+        }
+      }
+    }
+  }
+  return items.map((i) => ({ ...i, text: shorten(i.text, 140) }));
+}
+
+function shorten(text: string, max: number): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
+}
+
+function firstLine(text: string) {
+  return text.split(/\r?\n/).find((l) => l.trim()) ?? text;
+}
+
+function KeyRecCard({ tone, text }: KeyItem) {
+  const cfg = {
+    good: {
+      bg: "bg-primary-soft/70 border-primary/15",
+      chipBg: "bg-primary/15 text-primary",
+      icon: <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2.5} />,
+    },
+    avoid: {
+      bg: "bg-[hsl(30_95%_96%)] border-[hsl(30_80%_82%)]/60",
+      chipBg: "bg-[hsl(25_85%_45%)]/15 text-[hsl(25_75%_35%)]",
+      icon: <AlertTriangle className="h-3.5 w-3.5" strokeWidth={2.5} />,
+    },
+    neutral: {
+      bg: "bg-muted/60 border-border/40",
+      chipBg: "bg-foreground/10 text-foreground/70",
+      icon: <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />,
+    },
+  }[tone];
+  return (
+    <div className={cn("rounded-2xl border p-3 flex gap-2.5 items-start", cfg.bg)}>
+      <span
+        className={cn(
+          "h-6 w-6 rounded-full flex items-center justify-center shrink-0",
+          cfg.chipBg,
+        )}
+      >
+        {cfg.icon}
+      </span>
+      <p className="text-[14.5px] leading-[1.5] text-foreground flex-1 min-w-0">
+        <InlineMarkdown text={text} />
+      </p>
+    </div>
+  );
+}
+
+/* ---------------------------- Full analysis ----------------------------- */
+
+function FullAnalysisDrawer({
+  sections,
+  summary,
+}: {
+  sections: AssistantSection[];
+  summary?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const detailSections = sections.filter((s) => s.kind !== "summary");
+  if (detailSections.length === 0) return null;
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <button
+          className={cn(
+            "w-full mt-1 h-11 rounded-2xl bg-foreground text-background",
+            "text-[14px] font-semibold tracking-tight",
+            "flex items-center justify-center gap-1.5",
+            "active:scale-[0.99] transition-transform",
+          )}
+        >
+          View Full Analysis
+          <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+        </button>
+      </DrawerTrigger>
+      <DrawerContent className="max-h-[92vh]">
+        <DrawerHeader className="text-left pb-2">
+          <DrawerTitle className="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            Full Analysis
+          </DrawerTitle>
+          {summary && (
+            <p className="text-[18px] font-semibold leading-[1.35] tracking-tight text-foreground mt-1">
+              {summary}
+            </p>
+          )}
+        </DrawerHeader>
+        <div className="px-4 pb-8 overflow-y-auto space-y-3.5">
+          {detailSections.map((s, i) => (
+            <SectionRenderer key={i} section={s} />
+          ))}
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
+function SectionRenderer({ section }: { section: AssistantSection }) {
+  switch (section.kind) {
+    case "summary":
+      return null;
+    case "recommendation":
+      return (
+        <RecommendationCard title={section.title} body={section.body} items={section.items} />
+      );
+    case "good":
+      return (
+        <ChecklistCard tone="good" title={section.title} items={section.items} body={section.body} />
+      );
+    case "avoid":
+      return (
+        <ChecklistCard tone="avoid" title={section.title} items={section.items} body={section.body} />
+      );
+    case "tip":
+      return <TipCard title={section.title} text={section.text} />;
+    case "details":
+      return <DetailsCard title={section.title} body={section.body} />;
+  }
 }
 
 function SectionRenderer({ section }: { section: AssistantSection }) {
