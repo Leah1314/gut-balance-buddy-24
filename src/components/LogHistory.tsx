@@ -1,13 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Utensils, Scroll, Calendar } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 import { format } from "date-fns";
 import { useTranslation } from 'react-i18next';
+import { cn } from "@/lib/utils";
 
 interface LogEntry {
   id: string;
@@ -114,134 +113,138 @@ const LogHistory = () => {
   const renderLogContent = (entry: LogEntry) => {
     if (entry.type === 'food') {
       return (
-        <div className="space-y-2">
-          <p className="font-medium">{entry.content}</p>
+        <div className="space-y-1.5">
+          <p className="text-[15px] font-medium text-foreground">{entry.content}</p>
           {entry.details?.description && (
-            <p className="text-sm text-gray-600">{entry.details.description}</p>
+            <p className="text-[13px] text-muted-foreground">{entry.details.description}</p>
           )}
           {entry.details?.analysis_result && (
-            <div className="text-sm">
-              <p className="text-gray-700">
-                🤖 {t('history.aiAnalysis')}: {typeof entry.details.analysis_result === 'string' 
-                  ? entry.details.analysis_result 
-                  : JSON.stringify(entry.details.analysis_result)}
-              </p>
-            </div>
+            <p className="text-[13px] text-foreground/70 line-clamp-2">
+              {typeof entry.details.analysis_result === 'string'
+                ? entry.details.analysis_result
+                : JSON.stringify(entry.details.analysis_result)}
+            </p>
           )}
         </div>
       );
     } else {
       const details = entry.details;
       return (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {details?.notes && (
-            <p className="font-medium">{details.notes}</p>
+            <p className="text-[15px] font-medium text-foreground">{details.notes}</p>
           )}
-          {details?.bristol_type && (
-            <p className="text-sm text-gray-600"><strong>{t('history.bristolType')}:</strong> {details.bristol_type}</p>
-          )}
-          {details?.consistency && (
-            <p className="text-sm text-gray-600"><strong>{t('history.consistency')}:</strong> {details.consistency}</p>
-          )}
-          {details?.color && (
-            <p className="text-sm text-gray-600"><strong>{t('history.color')}:</strong> {details.color}</p>
-          )}
-          {typeof details?.analysis_result === 'string' && details.analysis_result.includes('AI Analysis') && (
-            <div className="text-sm">
-              <p className="text-gray-700">
-                🤖 {details.analysis_result}
-              </p>
-            </div>
-          )}
+          <div className="flex flex-wrap gap-1.5">
+            {details?.bristol_type && (
+              <span className="text-[12px] px-2 py-0.5 rounded-full bg-primary-soft text-primary font-medium">
+                {t('history.bristolType')} {details.bristol_type}
+              </span>
+            )}
+            {details?.consistency && (
+              <span className="text-[12px] px-2 py-0.5 rounded-full bg-muted text-foreground/70">
+                {details.consistency}
+              </span>
+            )}
+            {details?.color && (
+              <span className="text-[12px] px-2 py-0.5 rounded-full bg-muted text-foreground/70">
+                {details.color}
+              </span>
+            )}
+          </div>
         </div>
       );
     }
   };
 
+  const filters = [
+    { id: 'all' as const, label: t('history.filterAll', 'All') },
+    { id: 'food' as const, label: t('history.filterFood', 'Food') },
+    { id: 'stool' as const, label: t('history.filterStool', 'Stool') },
+  ];
+  const [filter, setFilter] = useState<'all' | 'food' | 'stool'>('all');
+  const visible = filter === 'all' ? logEntries : logEntries.filter(e => e.type === filter);
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold mb-1" style={{ color: '#1D1D1F' }}>
-            {t('history.title')}
-          </h2>
-          <p className="text-base leading-tight" style={{ color: '#1D1D1F', opacity: 0.6 }}>
-            {t('history.subtitle')}
-          </p>
+    <div className="space-y-4">
+      {/* Filter chips + refresh */}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 flex gap-1.5 overflow-x-auto no-scrollbar">
+          {filters.map(f => {
+            const active = filter === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={cn(
+                  "px-3.5 h-8 rounded-full text-[13px] font-medium transition-all active:scale-[0.97] shrink-0",
+                  active
+                    ? "bg-primary text-primary-foreground shadow-soft"
+                    : "bg-muted text-foreground/70 hover:text-foreground"
+                )}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
         <Button
           onClick={handleRefresh}
           disabled={isRefreshing}
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-          style={{
-            borderColor: '#ECE9E1',
-            color: '#1D1D1F',
-            backgroundColor: 'transparent'
-          }}
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0 rounded-full"
         >
-          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          {t('history.refresh')}
+          <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
         </Button>
       </div>
 
       {/* Log Entries */}
-      <div className="space-y-4">
-        {logEntries.length === 0 ? (
-          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="p-8 text-center">
-              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">
-                {t('history.noLogsFound')}
-              </p>
-              <p className="text-sm text-gray-500">
-                {t('history.useTabs')}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          logEntries.map((entry) => (
-            <Card key={entry.id} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full" 
-                         style={{ backgroundColor: entry.type === 'food' ? '#E8F5E8' : '#E1F5FE' }}>
-                      {entry.type === 'food' ? (
-                        <Utensils className="w-5 h-5" style={{ color: '#3F8F68' }} />
-                      ) : (
-                        <Scroll className="w-5 h-5" style={{ color: '#2196F3' }} />
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg" style={{ color: '#1D1D1F' }}>
-                        {entry.title}
-                      </h3>
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs ${entry.type === 'food' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}
-                      >
-                        {entry.type === 'food' ? t('history.foodLog') : t('history.stoolLog')}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium" style={{ color: '#1D1D1F' }}>
-                      {formatTimestamp(entry.timestamp)}
-                    </p>
-                  </div>
+      {visible.length === 0 ? (
+        <div className="rounded-[var(--radius)] bg-card shadow-soft p-8 text-center animate-fade-in">
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-primary-soft flex items-center justify-center">
+            <Calendar className="w-6 h-6 text-primary" />
+          </div>
+          <p className="text-[15px] text-foreground font-medium mb-1">
+            {t('history.noLogsFound')}
+          </p>
+          <p className="text-[13px] text-muted-foreground">
+            {t('history.useTabs')}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {visible.map((entry) => (
+            <div
+              key={entry.id}
+              className="rounded-[var(--radius)] bg-card shadow-soft p-4 animate-fade-in flex items-start gap-3"
+            >
+              <div
+                className={cn(
+                  "shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center",
+                  entry.type === 'food' ? "bg-primary-soft" : "bg-accent/20"
+                )}
+              >
+                {entry.type === 'food' ? (
+                  <Utensils className="w-5 h-5 text-primary" />
+                ) : (
+                  <Scroll className="w-5 h-5 text-accent-foreground" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h3 className="text-[15px] font-semibold text-foreground truncate">
+                    {entry.title}
+                  </h3>
+                  <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">
+                    {formatTimestamp(entry.timestamp)}
+                  </span>
                 </div>
-                
-                <div className="text-left">
-                  {renderLogContent(entry)}
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+                {renderLogContent(entry)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
