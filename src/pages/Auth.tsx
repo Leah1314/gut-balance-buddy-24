@@ -129,7 +129,8 @@ const Auth = () => {
           <div className="w-16 h-16 flex items-center justify-center mb-6">
             <img src="/lovable-uploads/98b6daca-32d4-4d0a-aa72-75a1d85b5a10.png" alt="Logo" className="w-16 h-16 object-contain" />
           </div>
-          <h1 className="text-2xl font-bold text-brand-text mb-2">In and Out</h1>
+          <h1 className="text-2xl font-bold text-brand-text mb-1">Gutly</h1>
+          <p className="text-sm text-muted-foreground mb-2 italic">Gut Time</p>
           <h2 className="text-3xl font-semibold text-brand-text text-center">
             {isLogin ? "Welcome back" : "Create account"}
           </h2>
