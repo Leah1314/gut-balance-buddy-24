@@ -469,9 +469,9 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         </div>
       </SectionCard>
 
-      {/* Food Intake Summary — unified 4-up stat row */}
+      {/* Food Intake Summary — 2x2 stat grid + compact common-foods list */}
       <SectionCard icon={Heart} title={t('analytics.foodSummary')} description={t('analytics.dateRanges.7d')}>
-        <div className="grid grid-cols-4 gap-2 mb-3">
+        <div className="grid grid-cols-2 gap-2 mb-4">
           {[
             { label: t('analytics.totalMeals'), value: foodSummary.totalMeals },
             { label: t('analytics.foodVariety'), value: `${foodSummary.varietyScore}%` },
@@ -482,15 +482,15 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
               danger: foodSummary.processedRatio > 30,
             },
           ].map((s, i) => (
-            <div key={i} className="rounded-2xl bg-muted/60 p-2.5 text-center">
+            <div key={i} className="rounded-2xl bg-muted/60 px-3 py-2.5 flex items-baseline justify-between gap-2">
+              <p className="text-[11px] text-muted-foreground leading-tight flex-1 min-w-0">
+                {s.label}
+              </p>
               <p className={cn(
-                "text-[18px] font-semibold tabular-nums leading-tight",
+                "text-[20px] font-semibold tabular-nums leading-none shrink-0",
                 s.danger ? "text-destructive" : "text-primary"
               )}>
                 {s.value}
-              </p>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground mt-0.5 leading-tight">
-                {s.label}
               </p>
             </div>
           ))}
@@ -498,19 +498,24 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
         {foodSummary.topFoods.length > 0 && (
           <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
               {t('analytics.mostCommonFoods')}
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <ul className="space-y-1.5">
               {foodSummary.topFoods.map((food, index) => (
-                <span
+                <li
                   key={index}
-                  className="px-2.5 py-1 bg-primary-soft text-primary rounded-full text-[12px] font-medium"
+                  className="flex items-center gap-2.5 rounded-xl bg-primary-soft/60 px-3 py-2"
                 >
-                  {food}
-                </span>
+                  <span className="h-5 w-5 rounded-full bg-primary/15 text-primary text-[11px] font-semibold flex items-center justify-center shrink-0 tabular-nums">
+                    {index + 1}
+                  </span>
+                  <span className="text-[13px] text-primary/90 font-medium leading-snug line-clamp-2 flex-1 min-w-0">
+                    {food}
+                  </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
       </SectionCard>
