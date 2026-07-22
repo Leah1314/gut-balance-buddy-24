@@ -120,17 +120,20 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 flex flex-col px-6 py-10 max-w-sm mx-auto w-full">
+    <div className="min-h-screen bg-background flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-6 max-w-sm mx-auto w-full">
         {/* Branding */}
-        <div className="flex flex-col items-center mb-10 mt-6 animate-fade-in">
-          <GutlyMascot size={72} />
-          <h1 className="text-hero text-foreground mt-5 mb-1">Gutly</h1>
-          <p className="text-caption mb-8">Gut Time · your AI gut health companion</p>
-          <h2 className="text-card-title text-foreground text-center">
-            {isLogin ? "Welcome back" : "Create your account"}
-          </h2>
+        <div className="flex flex-col items-center mb-8 mt-2 animate-fade-in">
+          <div className="animate-breathe">
+            <GutlyMascot size={64} />
+          </div>
+          <h1 className="font-display text-[44px] leading-none font-semibold text-foreground mt-4 tracking-[-0.02em]">Gutly</h1>
+          <p className="text-caption mt-2">Gut Time · your AI gut health companion</p>
         </div>
+
+        <h2 className="text-section text-foreground mb-6">
+          {isLogin ? "Welcome back" : "Create account"}
+        </h2>
 
         <div className="flex-1 flex flex-col">
           <Tabs
@@ -142,20 +145,20 @@ const Auth = () => {
             }}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/70 rounded-2xl p-1">
-              <TabsTrigger value="email" className="rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft">
+            <TabsList className="grid w-full grid-cols-2 h-11 bg-muted/70 rounded-xl p-1">
+              <TabsTrigger value="email" className="rounded-lg text-[14px] font-medium data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-foreground text-muted-foreground">
                 <Mail className="w-4 h-4 mr-2" /> Email
               </TabsTrigger>
-              <TabsTrigger value="phone" className="rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft">
+              <TabsTrigger value="phone" className="rounded-lg text-[14px] font-medium data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-foreground text-muted-foreground">
                 <Phone className="w-4 h-4 mr-2" /> Phone
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="email" className="mt-6">
-              <form onSubmit={handleEmailAuth} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground text-[15px] font-medium">
-                    <Mail className="w-4 h-4 inline mr-2" /> Email
+              <form onSubmit={handleEmailAuth} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-foreground text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+                    Email
                   </Label>
                   <Input
                     id="email"
@@ -163,14 +166,13 @@ const Auth = () => {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
-                    className="w-full h-12 text-base bg-card rounded-2xl"
                     placeholder="you@example.com"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-foreground text-[15px] font-medium">
-                    <Lock className="w-4 h-4 inline mr-2" /> Password
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+                    Password
                   </Label>
                   <Input
                     id="password"
@@ -178,24 +180,23 @@ const Auth = () => {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
-                    className="w-full h-12 text-base bg-card rounded-2xl"
-                    placeholder={isLogin ? "Your password" : "Create a password (6+ characters)"}
+                    placeholder={isLogin ? "Your password" : "6+ characters"}
                     minLength={isLogin ? undefined : 6}
                   />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full" disabled={loading}>
-              {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
-            </Button>
+                <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+                  {loading ? "Please wait…" : isLogin ? "Sign In" : "Create Account"}
+                </Button>
               </form>
             </TabsContent>
 
             <TabsContent value="phone" className="mt-6">
               {!otpSent ? (
-                <form onSubmit={handleSendOtp} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-foreground text-[15px] font-medium">
-                      <Phone className="w-4 h-4 inline mr-2" /> Phone number
+                <form onSubmit={handleSendOtp} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="phone" className="text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+                      Phone number
                     </Label>
                     <Input
                       id="phone"
@@ -203,20 +204,19 @@ const Auth = () => {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       required
-                      className="w-full h-12 text-base bg-card rounded-2xl"
-                      placeholder="+14155551234"
+                      placeholder="+1 415 555 1234"
                     />
-                    <p className="text-caption">Include your country code (e.g. +1 for US).</p>
+                    <p className="text-caption pl-1">Include your country code.</p>
                   </div>
-                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                    {loading ? "Sending..." : isLogin ? "Send sign-in code" : "Send sign-up code"}
+                  <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+                    {loading ? "Sending…" : isLogin ? "Send sign-in code" : "Send sign-up code"}
                   </Button>
                 </form>
               ) : (
-                <form onSubmit={handleVerifyOtp} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="otp" className="text-foreground text-[15px] font-medium">
-                      <KeyRound className="w-4 h-4 inline mr-2" /> Verification code
+                <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="otp" className="text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+                      Verification code
                     </Label>
                     <Input
                       id="otp"
@@ -226,14 +226,14 @@ const Auth = () => {
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       required
-                      className="w-full h-12 text-base bg-card rounded-2xl tracking-widest text-center"
+                      className="tracking-[0.4em] text-center text-[20px] font-semibold"
                       placeholder="123456"
                       maxLength={8}
                     />
-                    <p className="text-caption">Code sent to {normalizePhone(phone)}.</p>
+                    <p className="text-caption pl-1">Code sent to {normalizePhone(phone)}.</p>
                   </div>
-                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                    {loading ? "Verifying..." : "Verify & continue"}
+                  <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+                    {loading ? "Verifying…" : "Verify & continue"}
                   </Button>
                   <Button
                     type="button"
@@ -254,10 +254,10 @@ const Auth = () => {
           <Button
             variant="ghost"
             onClick={() => { setIsLogin(!isLogin); setOtpSent(false); setOtp(""); }}
-            className="text-[15px]"
+            className="text-[15px] font-medium text-muted-foreground"
             disabled={loading}
           >
-            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+            {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
           </Button>
         </div>
       </div>
