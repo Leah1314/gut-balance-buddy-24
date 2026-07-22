@@ -8,8 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import QuickQuestions from "./QuickQuestions";
 import ImageUploadDialog from "./ImageUploadDialog";
 import GutlyMascot from "./gutly/GutlyMascot";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import AssistantResponse from "./gutly/chat/AssistantResponse";
 
 interface Message {
   id: string;
@@ -192,19 +191,7 @@ const ChatPage = () => {
                   />
                 )}
                 {message.role === 'assistant' ? (
-                  <div className="text-[14px] leading-[1.5] space-y-1.5
-                    [&_h1]:text-[15px] [&_h1]:font-semibold [&_h1]:mt-2 [&_h1]:mb-1
-                    [&_h2]:text-[14px] [&_h2]:font-semibold [&_h2]:mt-2 [&_h2]:mb-1
-                    [&_h3]:text-[14px] [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-0.5 [&_h3]:text-primary
-                    [&_p]:my-0.5
-                    [&_ul]:my-1 [&_ul]:pl-4 [&_ul]:list-disc [&_ul]:space-y-0.5
-                    [&_ol]:my-1 [&_ol]:pl-4 [&_ol]:list-decimal [&_ol]:space-y-0.5
-                    [&_li]:my-0 [&_li]:leading-snug
-                    [&_strong]:font-semibold [&_strong]:text-foreground
-                    [&_code]:text-[13px] [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded
-                    [&_hr]:my-2 [&_hr]:border-border">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
-                  </div>
+                  <AssistantResponse content={message.content} />
                 ) : (
                   <div className="whitespace-pre-wrap text-[15px] leading-relaxed">{message.content}</div>
                 )}
