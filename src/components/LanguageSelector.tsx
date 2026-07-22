@@ -15,8 +15,7 @@ const LanguageSelector = () => {
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
 
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'zh', name: '中文', flag: '🇨🇳' }
+    { code: 'en', name: 'English', flag: '🇺🇸' }
   ];
 
   const handleLanguageChange = (languageCode: string) => {

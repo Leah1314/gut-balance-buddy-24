@@ -178,10 +178,15 @@
     },
     "activityLevels": {
       "sedentary": "Sedentary (little to no exercise)",
-      "lightlyActive": "Lightly Active (light exercise 1-3 days/week)",
-      "moderatelyActive": "Moderately Active (moderate exercise 3-5 days/week)",
-      "veryActive": "Very Active (hard exercise 6-7 days/week)",
-      "extraActive": "Extra Active (very hard exercise, physical job)"
+      "sedentaryDesc": "Little to no exercise",
+      "light": "Lightly Active",
+      "lightDesc": "Light exercise 1-3 days/week",
+      "moderate": "Moderately Active",
+      "moderateDesc": "Moderate exercise 3-5 days/week",
+      "active": "Active",
+      "activeDesc": "Hard exercise 6-7 days/week",
+      "veryActive": "Very Active",
+      "veryActiveDesc": "Twice daily or high intensity"
     },
     "addMedicalCondition": "Add medical condition...",
     "customRestrictions": "Custom Restrictions",

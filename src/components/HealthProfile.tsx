@@ -247,8 +247,8 @@ const HealthProfile = () => {
     <div className="pb-24 px-1">
       {/* Header - More compact */}
       <div className="text-center mb-6">
-        <h2 className="text-xl font-semibold mb-1 text-gray-900">{t('health.title')}</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-2xl font-semibold mb-1 text-foreground">{t('health.title')}</h2>
+        <p className="text-sm text-muted-foreground">
           {t('health.subtitle')}
         </p>
       </div>
@@ -256,16 +256,16 @@ const HealthProfile = () => {
       <div className="space-y-6">
         {/* Basic Information */}
         <Collapsible open={expandedSection === 'basic'} onOpenChange={() => toggleSection('basic')}>
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-blue-600" />
+                    <User className="w-4 h-4 text-primary" />
                     <span>{t('health.basicInfo')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-normal">
+                    <span className="text-xs text-muted-foreground font-normal">
                       {getSummaryText('basic')}
                     </span>
                     {expandedSection === 'basic' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -274,12 +274,12 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-4 pb-6">
+              <CardContent className="px-5 pb-6">
                 <div className="space-y-6">
                   {/* Age */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700 flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-blue-500" />
+                    <Label className="text-sm font-medium text-foreground flex items-center">
+                      <Calendar className="w-4 h-4 mr-2 text-primary" />
                       {t('health.age')}
                     </Label>
                     <Input 
@@ -293,8 +293,8 @@ const HealthProfile = () => {
 
                   {/* Gender */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700 flex items-center">
-                      <User className="w-4 h-4 mr-2 text-purple-500" />
+                    <Label className="text-sm font-medium text-foreground flex items-center">
+                      <User className="w-4 h-4 mr-2 text-primary" />
                       {t('health.gender')}
                     </Label>
                     <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
@@ -313,8 +313,8 @@ const HealthProfile = () => {
 
                   {/* Weight */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700 flex items-center">
-                      <Scale className="w-4 h-4 mr-2 text-green-500" />
+                    <Label className="text-sm font-medium text-foreground flex items-center">
+                      <Scale className="w-4 h-4 mr-2 text-primary" />
                       {t('health.weight')}
                     </Label>
                     <Input 
@@ -329,8 +329,8 @@ const HealthProfile = () => {
 
                   {/* Height */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700 flex items-center">
-                      <Ruler className="w-4 h-4 mr-2 text-orange-500" />
+                    <Label className="text-sm font-medium text-foreground flex items-center">
+                      <Ruler className="w-4 h-4 mr-2 text-primary" />
                       {t('health.height')}
                     </Label>
                     <Input 
@@ -349,16 +349,16 @@ const HealthProfile = () => {
 
         {/* Activity Level */}
         <Collapsible open={expandedSection === 'activity'} onOpenChange={() => toggleSection('activity')}>
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
-                    <Heart className="w-4 h-4 text-red-600" />
+                    <Heart className="w-4 h-4 text-primary" />
                     <span>{t('health.activityLevel')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-normal">
+                    <span className="text-xs text-muted-foreground font-normal">
                       {getSummaryText('activity')}
                     </span>
                     {expandedSection === 'activity' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -367,24 +367,24 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-4 pb-4">
-                <div className="space-y-2">
+              <CardContent className="px-5 pb-5">
+                <div className="space-y-2.5">
                   {activityLevels.map(level => (
-                    <Button 
-                      key={level.value} 
-                      variant={formData.activity_level === level.value ? "default" : "outline"} 
-                      onClick={() => handleInputChange('activity_level', level.value)} 
-                      className={`w-full h-auto py-3 px-3 text-left justify-start ${
-                        formData.activity_level === level.value 
-                          ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                          : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+                    <button
+                      key={level.value}
+                      type="button"
+                      onClick={() => handleInputChange('activity_level', level.value)}
+                      className={`w-full text-left rounded-2xl border transition-all py-3.5 px-4 ${
+                        formData.activity_level === level.value
+                          ? 'bg-primary text-primary-foreground border-primary shadow-soft'
+                          : 'bg-card text-foreground border-border hover:border-primary/40 hover:bg-muted/40'
                       }`}
                     >
-                      <div className="w-full text-left">
-                        <p className="font-medium text-sm">{level.label}</p>
-                        <p className="text-xs opacity-80">{level.description}</p>
-                      </div>
-                    </Button>
+                      <p className="font-medium text-sm leading-tight">{level.label}</p>
+                      <p className={`text-xs mt-0.5 ${formData.activity_level === level.value ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                        {level.description}
+                      </p>
+                    </button>
                   ))}
                 </div>
               </CardContent>
@@ -394,16 +394,16 @@ const HealthProfile = () => {
 
         {/* Dietary Restrictions */}
         <Collapsible open={expandedSection === 'dietary'} onOpenChange={() => toggleSection('dietary')}>
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <span>🥗</span>
                     <span>{t('health.dietaryRestrictions')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-normal">
+                    <span className="text-xs text-muted-foreground font-normal">
                       {getSummaryText('dietary')}
                     </span>
                     {expandedSection === 'dietary' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -412,26 +412,30 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-4 pb-4">
+              <CardContent className="px-5 pb-5">
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   {dietaryOptions.map(option => (
-                    <Button 
-                      key={option} 
-                      variant={formData.dietary_restrictions[option] ? "default" : "outline"} 
-                      onClick={() => handleDietaryRestrictionToggle(option)} 
-                      className={`text-xs h-9 ${formData.dietary_restrictions[option] ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => handleDietaryRestrictionToggle(option)}
+                      className={`text-xs h-10 rounded-full border transition-all font-medium ${
+                        formData.dietary_restrictions[option]
+                          ? 'bg-primary text-primary-foreground border-primary shadow-soft'
+                          : 'bg-card text-foreground border-border hover:border-primary/40'
+                      }`}
                     >
                       {option}
-                    </Button>
+                    </button>
                   ))}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">{t('health.customNotes')}</Label>
+                  <Label className="text-sm font-medium text-foreground">{t('health.customNotes')}</Label>
                   <Textarea 
                     placeholder={t('health.anyOtherRestrictions')} 
                     value={formData.custom_restrictions} 
                     onChange={e => handleInputChange('custom_restrictions', e.target.value)} 
-                    className="text-sm min-h-[60px]"
+                    className="text-sm min-h-[60px] rounded-2xl"
                     rows={2}
                   />
                 </div>
@@ -442,16 +446,16 @@ const HealthProfile = () => {
 
         {/* Medical Conditions */}
         <Collapsible open={expandedSection === 'medical'} onOpenChange={() => toggleSection('medical')}>
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-orange-600" />
+                    <AlertCircle className="w-4 h-4 text-primary" />
                     <span>{t('health.medicalConditions')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-normal">
+                    <span className="text-xs text-muted-foreground font-normal">
                       {getSummaryText('medical')}
                     </span>
                     {expandedSection === 'medical' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -460,10 +464,10 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-4 pb-4">
+              <CardContent className="px-5 pb-5">
                 <div className="flex space-x-2 mb-3">
                   <Input 
-                    placeholder="Add medical condition..." 
+                    placeholder={t('health.addMedicalCondition')} 
                     value={newCondition} 
                     onChange={e => setNewCondition(e.target.value)} 
                     onKeyPress={e => {
@@ -471,12 +475,13 @@ const HealthProfile = () => {
                         addMedicalCondition();
                       }
                     }} 
-                    className="h-9 text-sm"
+                    className="h-11 text-sm rounded-full"
                   />
-                  <Button 
-                    onClick={addMedicalCondition} 
-                    disabled={!newCondition.trim()} 
-                    className="bg-green-600 text-white hover:bg-green-700 h-9 px-3"
+                  <Button
+                    onClick={addMedicalCondition}
+                    disabled={!newCondition.trim()}
+                    size="icon"
+                    className="h-11 w-11 rounded-full shrink-0"
                   >
                     <Plus className="w-4 h-4" />
                   </Button>
@@ -484,9 +489,9 @@ const HealthProfile = () => {
                 
                 <div className="flex flex-wrap gap-2">
                   {formData.medical_conditions.map((condition, index) => (
-                    <Badge key={index} variant="secondary" className="flex items-center space-x-1 text-xs">
+                    <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs rounded-full px-3 py-1 bg-primary/10 text-primary hover:bg-primary/15">
                       <span>{condition}</span>
-                      <button onClick={() => removeMedicalCondition(index)} className="ml-1 hover:text-red-600">
+                      <button onClick={() => removeMedicalCondition(index)} className="ml-1 hover:text-destructive">
                         <X className="w-3 h-3" />
                       </button>
                     </Badge>
@@ -499,16 +504,16 @@ const HealthProfile = () => {
 
         {/* Medications & Symptoms */}
         <Collapsible open={expandedSection === 'medications'} onOpenChange={() => toggleSection('medications')}>
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <span>💊</span>
                     <span>{t('health.medicationsAndSymptoms')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-normal">
+                    <span className="text-xs text-muted-foreground font-normal">
                       {getSummaryText('medications')}
                     </span>
                     {expandedSection === 'medications' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -517,10 +522,10 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-4 pb-4">
+              <CardContent className="px-5 pb-5">
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('health.currentMedications')}</Label>
+                    <Label className="text-sm font-medium text-foreground mb-2 block">{t('health.currentMedications')}</Label>
                     <div className="flex space-x-2 mb-2">
                       <Input 
                         placeholder={t('health.addMedication')} 
@@ -531,12 +536,13 @@ const HealthProfile = () => {
                             addMedication();
                           }
                         }} 
-                        className="h-9 text-sm"
+                        className="h-11 text-sm rounded-full"
                       />
-                      <Button 
-                        onClick={addMedication} 
-                        disabled={!newMedication.trim()} 
-                        className="bg-green-600 text-white hover:bg-green-700 h-9 px-3"
+                      <Button
+                        onClick={addMedication}
+                        disabled={!newMedication.trim()}
+                        size="icon"
+                        className="h-11 w-11 rounded-full shrink-0"
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
@@ -544,9 +550,9 @@ const HealthProfile = () => {
                     
                     <div className="flex flex-wrap gap-2 mb-3">
                       {formData.medications.map((medication, index) => (
-                        <Badge key={index} variant="secondary" className="flex items-center space-x-1 text-xs">
+                        <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs rounded-full px-3 py-1 bg-primary/10 text-primary hover:bg-primary/15">
                           <span>{medication}</span>
-                          <button onClick={() => removeMedication(index)} className="ml-1 hover:text-red-600">
+                          <button onClick={() => removeMedication(index)} className="ml-1 hover:text-destructive">
                             <X className="w-3 h-3" />
                           </button>
                         </Badge>
@@ -555,12 +561,12 @@ const HealthProfile = () => {
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">{t('health.currentSymptoms')}</Label>
+                    <Label className="text-sm font-medium text-foreground mb-2 block">{t('health.currentSymptoms')}</Label>
                     <Textarea 
                       placeholder={t('health.describeSymptoms')} 
                       value={formData.symptoms_notes} 
                       onChange={e => handleInputChange('symptoms_notes', e.target.value)} 
-                      className="text-sm min-h-[80px]"
+                      className="text-sm min-h-[80px] rounded-2xl"
                       rows={3}
                     />
                   </div>
@@ -572,23 +578,23 @@ const HealthProfile = () => {
 
         {/* Test Results Upload */}
         <Collapsible open={expandedSection === 'uploads'} onOpenChange={() => toggleSection('uploads')}>
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-4 cursor-pointer hover:bg-gray-50 transition-colors">
+              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
-                    <FileText className="w-4 h-4 text-purple-600" />
+                    <FileText className="w-4 h-4 text-primary" />
                     <span>{t('health.testResults')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-500 font-normal">📄 {t('health.uploadFiles')}</span>
+                    <span className="text-xs text-muted-foreground font-normal">📄 {t('health.uploadFiles')}</span>
                     {expandedSection === 'uploads' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </div>
                 </CardTitle>
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-4 pb-4">
+              <CardContent className="px-5 pb-5">
                 <TestResultsUpload />
               </CardContent>
             </CollapsibleContent>
@@ -601,14 +607,11 @@ const HealthProfile = () => {
         <div className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 ${
           hasUnsavedChanges ? 'opacity-100 scale-100' : 'opacity-40 scale-95'
         }`}>
-          <Button 
-            onClick={handleSave} 
-            disabled={loading || !hasUnsavedChanges} 
-            className={`px-4 py-2 h-10 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 ${
-              hasUnsavedChanges 
-                ? 'bg-green-600/90 hover:bg-green-700 text-white' 
-                : 'bg-green-400/60 text-green-800 cursor-not-allowed'
-            }`}
+          <Button
+            onClick={handleSave}
+            disabled={loading || !hasUnsavedChanges}
+            size="lg"
+            className="px-6 h-12 rounded-full shadow-lg"
           >
             <Save className="w-4 h-4 mr-2" />
             {loading ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
