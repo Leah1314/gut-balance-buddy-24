@@ -8,7 +8,6 @@ import { useStoolLogs } from '@/hooks/useStoolLogs';
 import MonthlyActivityCalendar from './MonthlyActivityCalendar';
 import { useTranslation } from 'react-i18next';
 import SectionCard from './gutly/SectionCard';
-import StatNumber from './gutly/StatNumber';
 import { cn } from '@/lib/utils';
 
 interface DayScore {
