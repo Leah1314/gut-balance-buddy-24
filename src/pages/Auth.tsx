@@ -121,17 +121,17 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="flex-1 flex flex-col px-6 pt-8 pb-6 max-w-sm mx-auto w-full">
+      <div className="flex-1 flex flex-col px-6 pt-4 pb-4 max-w-sm mx-auto w-full">
         {/* Branding */}
-        <div className="flex flex-col items-center mb-8 mt-2 animate-fade-in">
+        <div className="flex flex-col items-center mb-4 animate-fade-in">
           <div className="animate-breathe">
-            <GutlyMascot size={64} />
+            <GutlyMascot size={44} />
           </div>
-          <h1 className="font-display text-[44px] leading-none font-semibold text-foreground mt-4 tracking-[-0.02em]">Gutly</h1>
-          <p className="text-caption mt-2">Gut Time · your AI gut health companion</p>
+          <h1 className="font-display text-[32px] leading-none font-semibold text-foreground mt-2 tracking-[-0.02em]">Gutly</h1>
+          <p className="text-caption mt-1">Gut Time · your AI gut health companion</p>
         </div>
 
-        <h2 className="text-section text-foreground mb-6">
+        <h2 className="text-[22px] font-semibold text-foreground mb-3 tracking-tight">
           {isLogin ? "Welcome back" : "Create account"}
         </h2>
 
@@ -154,10 +154,10 @@ const Auth = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="email" className="mt-6">
-              <form onSubmit={handleEmailAuth} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-foreground text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+            <TabsContent value="email" className="mt-4">
+              <form onSubmit={handleEmailAuth} className="space-y-3">
+                <div className="space-y-1">
+                  <Label htmlFor="email" className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
                     Email
                   </Label>
                   <Input
@@ -170,8 +170,8 @@ const Auth = () => {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+                <div className="space-y-1">
+                  <Label htmlFor="password" className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
                     Password
                   </Label>
                   <Input
@@ -185,17 +185,17 @@ const Auth = () => {
                   />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+                <Button type="submit" size="lg" className="w-full mt-1" disabled={loading}>
                   {loading ? "Please wait…" : isLogin ? "Sign In" : "Create Account"}
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="phone" className="mt-6">
+            <TabsContent value="phone" className="mt-4">
               {!otpSent ? (
-                <form onSubmit={handleSendOtp} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="phone" className="text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+                <form onSubmit={handleSendOtp} className="space-y-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="phone" className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
                       Phone number
                     </Label>
                     <Input
@@ -208,14 +208,14 @@ const Auth = () => {
                     />
                     <p className="text-caption pl-1">Include your country code.</p>
                   </div>
-                  <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+                  <Button type="submit" size="lg" className="w-full mt-1" disabled={loading}>
                     {loading ? "Sending…" : isLogin ? "Send sign-in code" : "Send sign-up code"}
                   </Button>
                 </form>
               ) : (
-                <form onSubmit={handleVerifyOtp} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="otp" className="text-[13px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
+                <form onSubmit={handleVerifyOtp} className="space-y-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="otp" className="text-[12px] font-medium tracking-wide uppercase text-muted-foreground pl-1">
                       Verification code
                     </Label>
                     <Input
@@ -232,7 +232,7 @@ const Auth = () => {
                     />
                     <p className="text-caption pl-1">Code sent to {normalizePhone(phone)}.</p>
                   </div>
-                  <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+                  <Button type="submit" size="lg" className="w-full mt-1" disabled={loading}>
                     {loading ? "Verifying…" : "Verify & continue"}
                   </Button>
                   <Button
@@ -250,11 +250,11 @@ const Auth = () => {
           </Tabs>
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-4 text-center">
           <Button
             variant="ghost"
             onClick={() => { setIsLogin(!isLogin); setOtpSent(false); setOtp(""); }}
-            className="text-[15px] font-medium text-muted-foreground"
+            className="text-[14px] font-medium text-muted-foreground h-9"
             disabled={loading}
           >
             {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
