@@ -325,56 +325,6 @@ function SectionRenderer({ section }: { section: AssistantSection }) {
   }
 }
 
-function SectionRenderer({ section }: { section: AssistantSection }) {
-  switch (section.kind) {
-    case "summary":
-      return <SummaryBlock text={section.text} tone={section.tone} />;
-    case "recommendation":
-      return (
-        <RecommendationCard title={section.title} body={section.body} items={section.items} />
-      );
-    case "good":
-      return <ChecklistCard tone="good" title={section.title} items={section.items} body={section.body} />;
-    case "avoid":
-      return <ChecklistCard tone="avoid" title={section.title} items={section.items} body={section.body} />;
-    case "tip":
-      return <TipCard title={section.title} text={section.text} />;
-    case "details":
-      return <DetailsCard title={section.title} body={section.body} />;
-  }
-}
-
-/* ------------------------------- Summary -------------------------------- */
-
-function SummaryBlock({
-  text,
-  tone,
-}: {
-  text: string;
-  tone: "positive" | "negative" | "neutral";
-}) {
-  const dot =
-    tone === "positive"
-      ? "bg-primary"
-      : tone === "negative"
-      ? "bg-destructive"
-      : "bg-accent";
-  return (
-    <div className="flex items-start gap-2.5">
-      <span
-        className={cn(
-          "mt-[7px] h-2.5 w-2.5 rounded-full shrink-0",
-          dot,
-          "shadow-[0_0_0_4px_hsl(var(--primary)/0.10)]"
-        )}
-      />
-      <p className="text-[17px] font-semibold text-foreground leading-[1.4] tracking-tight">
-        {text}
-      </p>
-    </div>
-  );
-}
-
 /* ---------------------------- Recommendation ---------------------------- */
 
 function RecommendationCard({
