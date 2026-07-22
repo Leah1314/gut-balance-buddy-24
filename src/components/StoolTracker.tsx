@@ -1,15 +1,12 @@
 
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Save,
-  Calendar,
-  Clock,
   Camera,
   Edit,
   FileText
@@ -25,6 +22,7 @@ import { NotesSection } from "./stool/NotesSection";
 import StoolImageAnalyzer from "./StoolImageAnalyzer";
 import SuccessCard from "./stool/SuccessCard";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
+import SectionCard from "./gutly/SectionCard";
 
 const StoolTracker = () => {
   const { t } = useTranslation();
@@ -145,64 +143,52 @@ const StoolTracker = () => {
       )}
 
       <Tabs defaultValue="camera" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm">
+        <TabsList className="grid w-full grid-cols-2 h-14 bg-muted/70 rounded-2xl p-1.5">
           <TabsTrigger 
             value="camera" 
-            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-11 text-sm font-medium"
           >
             <Camera className="w-4 h-4" />
             <span>{t('food.aiAnalysis')}</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manual" 
-            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-11 text-sm font-medium"
           >
             <Edit className="w-4 h-4" />
             <span>{t('food.manualEntry')}</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="camera">
+        <TabsContent value="camera" className="mt-6">
           <StoolImageAnalyzer />
         </TabsContent>
 
-        <TabsContent value="manual" className="space-y-6">
-          {/* General Bowel/Digestive Symptoms */}
-          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-lg">
-                <FileText className="w-5 h-5 text-orange-600" />
-                <span>{t('stool.generalSymptoms')}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-900 text-left block">
-                  {t('stool.generalSymptomsDescription')}
-                </Label>
-                <Textarea
-                  placeholder={t('stool.generalSymptomsPlaceholder')}
-                  value={generalSymptoms}
-                  onChange={(e) => setGeneralSymptoms(e.target.value)}
-                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 min-h-[100px] text-sm rounded-lg resize-none"
-                  maxLength={500}
-                />
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">
-                    {generalSymptoms.length}/500 {t('common.characters')}
-                  </span>
-                  <Button 
-                    onClick={handleSaveGeneralSymptom}
-                    disabled={!generalSymptoms.trim() || isSavingSymptom}
-                    className="bg-orange-600 text-white hover:bg-orange-700 font-medium h-10 px-6 rounded-lg"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    {isSavingSymptom ? t('buttons.saving') : t('stool.saveSymptom')}
-                  </Button>
-                </div>
+        <TabsContent value="manual" className="space-y-6 mt-6">
+          <SectionCard icon={FileText} title={t('stool.generalSymptoms')} description={t('stool.generalSymptomsDescription')}>
+            <div className="space-y-3">
+              <Textarea
+                placeholder={t('stool.generalSymptomsPlaceholder')}
+                value={generalSymptoms}
+                onChange={(e) => setGeneralSymptoms(e.target.value)}
+                className="min-h-[110px] text-[15px] rounded-2xl resize-none border-border/60 bg-background/60"
+                maxLength={500}
+              />
+              <div className="flex justify-between items-center gap-3">
+                <span className="text-caption">
+                  {generalSymptoms.length}/500 {t('common.characters')}
+                </span>
+                <Button
+                  onClick={handleSaveGeneralSymptom}
+                  disabled={!generalSymptoms.trim() || isSavingSymptom}
+                  className="px-6"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  {isSavingSymptom ? t('buttons.saving') : t('stool.saveSymptom')}
+                </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
 
           {/* Date/Time Header */}
           <DateTimeHeader />
@@ -234,23 +220,11 @@ const StoolTracker = () => {
 
           {/* Save Button */}
           <div className="text-center pt-4">
-            <Button 
+            <Button
               onClick={handleSave}
               disabled={isSaving || !selectedType || !selectedConsistency || !selectedColor}
-              className="px-8 py-3 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                backgroundColor: '#3F8F68'
-              }}
-              onMouseEnter={(e) => {
-                if (!isSaving && selectedType && selectedConsistency && selectedColor) {
-                  e.currentTarget.style.backgroundColor = '#367957';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSaving) {
-                  e.currentTarget.style.backgroundColor = '#3F8F68';
-                }
-              }}
+              size="lg"
+              className="px-10"
             >
               <Save className="w-4 h-4 mr-2 stroke-2" />
               {isSaving ? t('buttons.saving') : t('buttons.saveEntry')}

@@ -1,26 +1,27 @@
 
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { 
-  Camera, 
-  Upload, 
-  Loader2, 
-  AlertCircle,
+  Camera,
+  Upload,
+  Loader2,
   CheckCircle,
-  Zap,
-  Heart,
+  Sparkles,
   Save,
-  Info
+  Info,
+  Lightbulb,
+  Leaf
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 import SuccessCard from "./stool/SuccessCard";
+import SectionCard from "./gutly/SectionCard";
+import GutlySays from "./gutly/GutlySays";
+import StatNumber from "./gutly/StatNumber";
 
 interface StoolAnalysisData {
   bristolType: number;
@@ -195,12 +196,6 @@ const StoolImageAnalyzer = () => {
     return t(`stool.bristolDescriptions.${type}`) || "Unknown";
   };
 
-  const getHealthScoreColor = (score: number) => {
-    if (score >= 8) return { color: '#3F8F68', backgroundColor: '#FAF9F5', borderColor: '#3F8F68' };
-    if (score >= 6) return { color: '#B8860B', backgroundColor: '#FFF8DC', borderColor: '#DAA520' };
-    return { color: '#DC143C', backgroundColor: '#FFE4E1', borderColor: '#DC143C' };
-  };
-
   return (
     <div className="space-y-6">
       {/* Success Card Overlay */}
@@ -211,208 +206,137 @@ const StoolImageAnalyzer = () => {
         />
       )}
 
-      {/* Image Upload */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Camera className="w-5 h-5 text-blue-600" />
-            <span>{t('stool.aiStoolAnalysis')}</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                <p className="mb-2 text-sm text-gray-500">
-                  <span className="font-semibold">{t('stool.clickToUpload')}</span> {t('stool.uploadStoolPhoto')}
-                </p>
-                <p className="text-xs text-gray-500">{t('food.maxFileSize')}</p>
-              </div>
-              <Input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageSelect}
-              />
-            </label>
-          </div>
-
-          {imagePreview && (
-            <div className="space-y-3">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-48 object-cover rounded-lg border"
-              />
-              <Button
-                onClick={analyzeImage}
-                disabled={isAnalyzing}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('stool.analyzingWithAI')}
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4 mr-2" />
-                    {t('food.analyzeWithAI')}
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Not Stool Image Message */}
-      {isNotStoolImage && (
-        <Card className="bg-blue-50 border-blue-200 shadow-sm">
-          <CardContent className="p-6 text-center">
-            <Info className="w-8 h-8 mx-auto mb-3 text-blue-500" />
-            <h3 className="text-lg font-semibold mb-2 text-blue-700">{t('stool.notStool')}</h3>
-            <p className="text-blue-600 mb-4">{notStoolMessage}</p>
-            <p className="text-sm text-blue-500">
-              {t('stool.pleaseUploadStool')}
-            </p>
-          </CardContent>
-        </Card>
+      {/* Intro */}
+      {!imagePreview && !analysisData && (
+        <GutlySays title={t('stool.aiStoolAnalysis')}>
+          {t('stool.uploadStoolPhoto')}
+        </GutlySays>
       )}
 
-      {/* Analysis Results */}
+      {/* Upload zone */}
+      {!imagePreview && (
+        <label className="block cursor-pointer group">
+          <div className="rounded-[var(--radius)] bg-card shadow-soft border-2 border-dashed border-primary/25 hover:border-primary/50 hover:bg-primary-soft/30 transition-all p-8 text-center animate-fade-in">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+              <Upload className="w-6 h-6" strokeWidth={2} />
+            </div>
+            <p className="text-[15px] text-foreground">
+              <span className="font-semibold text-primary">{t('stool.clickToUpload')}</span>{" "}
+              <span className="text-muted-foreground">{t('stool.uploadStoolPhoto')}</span>
+            </p>
+            <p className="text-caption mt-1">{t('food.maxFileSize')}</p>
+          </div>
+          <Input type="file" className="hidden" accept="image/*" onChange={handleImageSelect} />
+        </label>
+      )}
+
+      {/* Preview + analyze */}
+      {imagePreview && !analysisData && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="relative rounded-[var(--radius)] overflow-hidden shadow-card">
+            <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover" />
+          </div>
+          <div className="flex gap-3">
+            <label className="flex-1">
+              <div className="h-12 rounded-full bg-primary-soft text-primary-soft-foreground text-sm font-medium flex items-center justify-center gap-2 cursor-pointer hover:bg-primary-soft/80 transition-colors active:scale-[0.98]">
+                <Camera className="w-4 h-4" />
+                {t('food.retake') || 'Retake'}
+              </div>
+              <Input type="file" className="hidden" accept="image/*" onChange={handleImageSelect} />
+            </label>
+            <Button onClick={analyzeImage} disabled={isAnalyzing} className="flex-1">
+              {isAnalyzing ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('stool.analyzingWithAI')}</>
+              ) : (
+                <><Sparkles className="w-4 h-4 mr-2" />{t('food.analyzeWithAI')}</>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Not stool */}
+      {isNotStoolImage && (
+        <SectionCard icon={Info} title={t('stool.notStool')} tone="accent">
+          <p className="text-body text-foreground/80">{notStoolMessage}</p>
+          <p className="text-caption mt-2">{t('stool.pleaseUploadStool')}</p>
+        </SectionCard>
+      )}
+
+      {/* Analysis results */}
       {analysisData && (
-        <div className="space-y-4">
-          {/* Health Score */}
-          <Card className="shadow-sm" 
-                style={{ 
-                  backgroundColor: '#FAF9F5', 
-                  borderColor: '#3F8F68' 
-                }}>
-            <CardContent className="p-6 text-center">
-              <Heart className="w-8 h-8 mx-auto mb-3 stroke-2" style={{ color: '#3F8F68' }} />
-              <h3 className="text-lg font-semibold mb-2" style={{ color: '#1D1D1F' }}>{t('stool.healthScore')}</h3>
-              <div className="inline-flex items-center px-6 py-3 rounded-full text-2xl font-bold border"
-                   style={getHealthScoreColor(analysisData.healthScore)}>
-                {analysisData.healthScore}/10
-              </div>
-            </CardContent>
-          </Card>
+        <div className="space-y-6 animate-fade-in">
+          {imagePreview && (
+            <div className="rounded-[var(--radius)] overflow-hidden shadow-card">
+              <img src={imagePreview} alt="Analyzed" className="w-full h-56 object-cover" />
+            </div>
+          )}
 
-          {/* Bristol Type Result */}
-          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span>{t('stool.bristolStoolType')}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-3xl font-bold text-blue-600 mb-2">
-                  Type {analysisData.bristolType}
-                </div>
-                <p className="text-sm text-gray-600">
-                  {getBristolDescription(analysisData.bristolType)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <GutlySays title={t('stool.healthScore')}>
+            {analysisData.insights?.[0] || t('stool.stoolAnalysisCompleted')}
+          </GutlySays>
 
-          {/* Analysis Details */}
-          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>{t('stool.analysisDetails')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-lg font-bold text-green-600">{analysisData.consistency}</p>
-                  <p className="text-sm text-gray-600">{t('stool.consistency')}</p>
-                </div>
-                <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                  <p className="text-lg font-bold text-yellow-600">{analysisData.color}</p>
-                  <p className="text-sm text-gray-600">{t('stool.color')}</p>
-                </div>
+          <SectionCard>
+            <StatNumber
+              value={analysisData.healthScore * 10}
+              max={100}
+              label={t('stool.healthScore')}
+            />
+            <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-border/40">
+              <div className="text-center">
+                <p className="text-caption mb-1">{t('stool.bristolStoolType')}</p>
+                <p className="text-lg font-semibold text-foreground">Type {analysisData.bristolType}</p>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* AI Insights */}
-          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>{t('food.aiInsights')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {analysisData.insights.map((insight, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <p className="text-sm text-gray-700">{insight}</p>
-                  </div>
-                ))}
+              <div className="text-center">
+                <p className="text-caption mb-1">{t('stool.consistency')}</p>
+                <p className="text-lg font-semibold text-foreground capitalize">{analysisData.consistency}</p>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Recommendations */}
-          <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>{t('stool.recommendations')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {analysisData.recommendations.map((recommendation, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <p className="text-sm text-gray-700">{recommendation}</p>
-                  </div>
-                ))}
+              <div className="text-center">
+                <p className="text-caption mb-1">{t('stool.color')}</p>
+                <p className="text-lg font-semibold text-foreground capitalize">{analysisData.color}</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-caption text-center mt-3">{getBristolDescription(analysisData.bristolType)}</p>
+          </SectionCard>
 
-          {/* Symptoms & Notes */}
-          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>{t('stool.symptomsAndNotes')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={userNotes}
-                onChange={(e) => setUserNotes(e.target.value)}
-                placeholder={`${t('stool.addSymptoms')} ${t('stool.stomachPainExample')}`}
-                className="min-h-[80px] resize-none"
-                maxLength={500}
-              />
-              <div className="text-right text-xs text-gray-500 mt-1">
-                {userNotes.length}/500 {t('common.characters')}
-              </div>
-            </CardContent>
-          </Card>
+          <SectionCard icon={Lightbulb} title={t('food.aiInsights')}>
+            <ul className="space-y-3">
+              {analysisData.insights.map((insight, i) => (
+                <li key={i} className="flex gap-3 text-body">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                  <span className="text-foreground/80">{insight}</span>
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
 
-          {/* Save to Log Button */}
-          <div className="text-center pt-4">
-            <Button 
-              onClick={saveAnalysisToLog}
-              disabled={isSaving}
-              className="px-8 py-3 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                backgroundColor: '#3F8F68'
-              }}
-              onMouseEnter={(e) => {
-                if (!isSaving) {
-                  e.currentTarget.style.backgroundColor = '#367957';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSaving) {
-                  e.currentTarget.style.backgroundColor = '#3F8F68';
-                }
-              }}
-            >
-              <Save className="w-4 h-4 mr-2 stroke-2" />
+          <SectionCard icon={Leaf} title={t('stool.recommendations')} tone="soft">
+            <ul className="space-y-3">
+              {analysisData.recommendations.map((rec, i) => (
+                <li key={i} className="flex gap-3 text-body">
+                  <CheckCircle className="w-4 h-4 mt-1 text-primary shrink-0" />
+                  <span className="text-foreground/80">{rec}</span>
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
+
+          <SectionCard title={t('stool.symptomsAndNotes')}>
+            <Textarea
+              value={userNotes}
+              onChange={(e) => setUserNotes(e.target.value)}
+              placeholder={`${t('stool.addSymptoms')} ${t('stool.stomachPainExample')}`}
+              className="min-h-[90px] text-[15px] rounded-2xl resize-none border-border/60 bg-background/60"
+              maxLength={500}
+            />
+            <div className="text-right text-caption mt-2">
+              {userNotes.length}/500 {t('common.characters')}
+            </div>
+          </SectionCard>
+
+          <div className="text-center pt-2">
+            <Button onClick={saveAnalysisToLog} disabled={isSaving} size="lg" className="px-10">
+              <Save className="w-4 h-4 mr-2" />
               {isSaving ? t('buttons.saving') : t('food.saveToLog')}
             </Button>
           </div>
