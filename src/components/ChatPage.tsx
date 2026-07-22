@@ -226,13 +226,6 @@ const ChatPage = () => {
               onImageUpload={handleImageUpload} 
               isLoading={isLoading}
             />
-            <VoiceInputButton
-              disabled={isLoading}
-              onTranscript={(text) => {
-                setInput((prev) => (prev ? `${prev} ${text}` : text));
-                toast({ title: "已识别", description: "请确认后点击发送。" });
-              }}
-            />
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
