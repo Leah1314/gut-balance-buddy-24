@@ -15,17 +15,17 @@ interface Props {
 export const SectionCard = ({ icon: Icon, title, description, action, children, className, tone = "default" }: Props) => {
   const bg = tone === "soft" ? "bg-primary-soft" : tone === "accent" ? "bg-accent/20" : "bg-card";
   return (
-    <section className={cn("rounded-[var(--radius)] shadow-soft p-6 animate-fade-in", bg, className)}>
+    <section className={cn("rounded-[var(--radius)] shadow-soft p-4 animate-fade-in", bg, className)}>
       {(Icon || title || description) && (
-        <header className="flex items-start gap-3 mb-4">
+        <header className="flex items-start gap-3 mb-3">
           {Icon && (
-            <div className="shrink-0 h-11 w-11 rounded-2xl bg-primary-soft text-primary flex items-center justify-center">
-              <Icon className="w-5 h-5" strokeWidth={2} />
+            <div className="shrink-0 h-9 w-9 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+              <Icon className="w-4 h-4" strokeWidth={2} />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            {title && <h3 className="text-card-title text-foreground">{title}</h3>}
-            {description && <p className="text-caption mt-1">{description}</p>}
+            {title && <h3 className="text-[17px] font-semibold text-foreground tracking-tight">{title}</h3>}
+            {description && <p className="text-caption mt-0.5">{description}</p>}
           </div>
           {action && <div className="shrink-0">{action}</div>}
         </header>

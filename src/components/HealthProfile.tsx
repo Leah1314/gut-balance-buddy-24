@@ -246,19 +246,19 @@ const HealthProfile = () => {
   return (
     <div className="pb-24 px-1">
       {/* Header - More compact */}
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold mb-1 text-foreground">{t('health.title')}</h2>
-        <p className="text-sm text-muted-foreground">
+      <div className="mb-4">
+        <h2 className="text-[24px] font-semibold leading-tight text-foreground tracking-tight">{t('health.title')}</h2>
+        <p className="text-[13px] text-muted-foreground mt-0.5">
           {t('health.subtitle')}
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-2.5">
         {/* Basic Information */}
         <Collapsible open={expandedSection === 'basic'} onOpenChange={() => toggleSection('basic')}>
           <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-primary" />
@@ -274,7 +274,7 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-5 pb-6">
+              <CardContent className="px-4 pb-4">
                 <div className="space-y-6">
                   {/* Age */}
                   <div className="space-y-2">
@@ -351,7 +351,7 @@ const HealthProfile = () => {
         <Collapsible open={expandedSection === 'activity'} onOpenChange={() => toggleSection('activity')}>
           <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <Heart className="w-4 h-4 text-primary" />
@@ -367,7 +367,7 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="px-4 pb-4">
                 <div className="space-y-2.5">
                   {activityLevels.map(level => (
                     <button
@@ -396,7 +396,7 @@ const HealthProfile = () => {
         <Collapsible open={expandedSection === 'dietary'} onOpenChange={() => toggleSection('dietary')}>
           <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <span>🥗</span>
@@ -412,7 +412,7 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="px-4 pb-4">
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   {dietaryOptions.map(option => (
                     <button
@@ -448,7 +448,7 @@ const HealthProfile = () => {
         <Collapsible open={expandedSection === 'medical'} onOpenChange={() => toggleSection('medical')}>
           <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <AlertCircle className="w-4 h-4 text-primary" />
@@ -464,7 +464,7 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="px-4 pb-4">
                 <div className="flex space-x-2 mb-3">
                   <Input 
                     placeholder={t('health.addMedicalCondition')} 
@@ -506,7 +506,7 @@ const HealthProfile = () => {
         <Collapsible open={expandedSection === 'medications'} onOpenChange={() => toggleSection('medications')}>
           <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <span>💊</span>
@@ -522,7 +522,7 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="px-4 pb-4">
                 <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium text-foreground mb-2 block">{t('health.currentMedications')}</Label>
@@ -580,7 +580,7 @@ const HealthProfile = () => {
         <Collapsible open={expandedSection === 'uploads'} onOpenChange={() => toggleSection('uploads')}>
           <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">
             <CollapsibleTrigger asChild>
-              <CardHeader className="py-4 px-5 cursor-pointer hover:bg-muted/40 transition-colors">
+              <CardHeader className="py-3 px-4 cursor-pointer hover:bg-muted/40 transition-colors">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
                     <FileText className="w-4 h-4 text-primary" />
@@ -594,7 +594,7 @@ const HealthProfile = () => {
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="px-4 pb-4">
                 <TestResultsUpload />
               </CardContent>
             </CollapsibleContent>

@@ -131,38 +131,38 @@ const FoodDiary = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Tabs defaultValue="camera" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-14 bg-muted/70 rounded-2xl p-1.5">
+        <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/70 rounded-2xl p-1">
           <TabsTrigger 
             value="camera" 
-            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-11 text-sm font-medium"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-10 text-[13px] font-medium"
           >
             <Camera className="w-4 h-4" />
             <span>{t('food.aiAnalysis')}</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manual" 
-            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-11 text-sm font-medium"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-10 text-[13px] font-medium"
           >
             <Edit className="w-4 h-4" />
             <span>{t('food.manualEntry')}</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="camera" className="mt-6">
+        <TabsContent value="camera" className="mt-4">
           <FoodImageAnalyzer />
         </TabsContent>
 
-        <TabsContent value="manual" className="space-y-6 mt-6">
+        <TabsContent value="manual" className="space-y-4 mt-4">
           {/* General Food Notes/Symptoms */}
           <SectionCard icon={FileText} title={t('food.generalNotes')} description={t('food.generalNotesDescription')}>
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Textarea
                 placeholder={t('food.generalNotesPlaceholder')}
                 value={generalNotes}
                 onChange={(e) => setGeneralNotes(e.target.value)}
-                className="min-h-[110px] text-[15px] rounded-2xl resize-none border-border/60 bg-background/60"
+                className="min-h-[90px] text-[15px] rounded-2xl resize-none border-border/60 bg-background/60"
                 maxLength={500}
               />
               <div className="flex justify-between items-center gap-3">
@@ -183,32 +183,32 @@ const FoodDiary = () => {
 
           {/* Add Food Entry */}
           <SectionCard icon={Plus} title={t('food.logFood')}>
-            <div className="space-y-6">
-              <div className="space-y-3">
+            <div className="space-y-4">
+              <div className="space-y-2">
                 <Label className="text-caption font-medium text-foreground/80 block">{t('food.mealType')}</Label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-4 gap-2">
                   {mealTypes.map(meal => (
                     <Button 
                       key={meal.id} 
                       variant={selectedMeal === meal.id ? "default" : "soft"}
                       onClick={() => setSelectedMeal(meal.id)} 
-                      className="h-12 gap-2 justify-center font-medium"
+                      className="h-10 gap-1 px-1 justify-center font-medium"
                     >
-                      <meal.icon className="w-4 h-4" />
-                      <span className="text-sm">{meal.label}</span>
+                      <meal.icon className="w-3.5 h-3.5" />
+                      <span className="text-[12px]">{meal.label}</span>
                     </Button>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label className="text-caption font-medium text-foreground/80 block">{t('food.whatDidYouEat')}</Label>
                 <div className="flex gap-2">
                   <Input 
                     placeholder={t('food.enterFoodItem')} 
                     value={newFood} 
                     onChange={e => setNewFood(e.target.value)} 
-                    className="flex-1 h-12 text-[15px] rounded-2xl border-border/60 bg-background/60"
+                    className="flex-1 h-11 text-[15px] rounded-2xl border-border/60 bg-background/60"
                     onKeyPress={e => {
                       if (e.key === 'Enter') {
                         handleAddFood();
@@ -218,22 +218,22 @@ const FoodDiary = () => {
                   <Button 
                     onClick={handleAddFood} 
                     disabled={!newFood.trim()} 
-                    className="h-12 w-12 p-0 shrink-0"
+                    className="h-11 w-11 p-0 shrink-0"
                   >
                     <Plus className="w-5 h-5" />
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label className="text-caption font-medium text-foreground/80 block">{t('food.quickAdd')}</Label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-1.5">
                   {commonFoods.map(food => (
                     <Button
                       key={food}
                       variant={selectedFoods.includes(food) ? "default" : "soft"}
                       onClick={() => handleQuickAdd(food)}
-                      className="text-xs h-10 px-2"
+                      className="text-[11px] h-8 px-1"
                     >
                       {food}
                     </Button>
@@ -241,7 +241,7 @@ const FoodDiary = () => {
                 </div>
                 
                 {selectedFoods.length > 0 && (
-                  <div className="space-y-4 pt-2">
+                  <div className="space-y-2 pt-2">
                     <Label className="text-caption font-medium text-foreground/80 block">{t('food.selectedFoods')}</Label>
                     <div className="flex flex-wrap gap-2">
                       {selectedFoods.map((food, index) => (
