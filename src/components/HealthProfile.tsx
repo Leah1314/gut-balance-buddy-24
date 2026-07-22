@@ -246,14 +246,14 @@ const HealthProfile = () => {
   return (
     <div className="pb-24 px-1">
       {/* Header - More compact */}
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold mb-1 text-foreground">{t('health.title')}</h2>
-        <p className="text-sm text-muted-foreground">
+      <div className="mb-4">
+        <h2 className="text-[24px] font-semibold leading-tight text-foreground tracking-tight">{t('health.title')}</h2>
+        <p className="text-[13px] text-muted-foreground mt-0.5">
           {t('health.subtitle')}
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-2.5">
         {/* Basic Information */}
         <Collapsible open={expandedSection === 'basic'} onOpenChange={() => toggleSection('basic')}>
           <Card className="bg-card border-border/60 shadow-soft rounded-3xl overflow-hidden">

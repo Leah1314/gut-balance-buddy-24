@@ -133,7 +133,7 @@ const StoolTracker = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Success Card Overlay */}
       {showSuccessCard && (
         <SuccessCard 
@@ -143,35 +143,35 @@ const StoolTracker = () => {
       )}
 
       <Tabs defaultValue="camera" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-14 bg-muted/70 rounded-2xl p-1.5">
+        <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/70 rounded-2xl p-1">
           <TabsTrigger 
             value="camera" 
-            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-11 text-sm font-medium"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-10 text-[13px] font-medium"
           >
             <Camera className="w-4 h-4" />
             <span>{t('food.aiAnalysis')}</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manual" 
-            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-11 text-sm font-medium"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-10 text-[13px] font-medium"
           >
             <Edit className="w-4 h-4" />
             <span>{t('food.manualEntry')}</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="camera" className="mt-6">
+        <TabsContent value="camera" className="mt-4">
           <StoolImageAnalyzer />
         </TabsContent>
 
-        <TabsContent value="manual" className="space-y-6 mt-6">
+        <TabsContent value="manual" className="space-y-4 mt-4">
           <SectionCard icon={FileText} title={t('stool.generalSymptoms')} description={t('stool.generalSymptomsDescription')}>
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Textarea
                 placeholder={t('stool.generalSymptomsPlaceholder')}
                 value={generalSymptoms}
                 onChange={(e) => setGeneralSymptoms(e.target.value)}
-                className="min-h-[110px] text-[15px] rounded-2xl resize-none border-border/60 bg-background/60"
+                className="min-h-[90px] text-[15px] rounded-2xl resize-none border-border/60 bg-background/60"
                 maxLength={500}
               />
               <div className="flex justify-between items-center gap-3">
@@ -219,7 +219,7 @@ const StoolTracker = () => {
           />
 
           {/* Save Button */}
-          <div className="text-center pt-4">
+          <div className="text-center pt-2">
             <Button
               onClick={handleSave}
               disabled={isSaving || !selectedType || !selectedConsistency || !selectedColor}
