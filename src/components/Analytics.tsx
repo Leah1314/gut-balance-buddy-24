@@ -368,30 +368,26 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       </SectionCard>
 
       {/* Historical Trend Chart */}
-      <SectionCard
-        icon={TrendingUp}
-        title={t('analytics.historicalTrends')}
-        action={
-          <div className="flex gap-0.5 p-0.5 rounded-full bg-muted">
-            {(['7d','30d','all'] as const).map(r => (
-              <button
-                key={r}
-                onClick={() => setDateRange(r)}
-                className={cn(
-                  "px-2.5 h-6 rounded-full text-[11px] font-medium transition-all",
-                  dateRange === r
-                    ? "bg-card text-primary shadow-soft"
-                    : "text-foreground/60"
-                )}
-              >
-                {t(`analytics.dateRanges.${r}`)}
-              </button>
-            ))}
-          </div>
-        }
-      >
+      <SectionCard icon={TrendingUp} title={t('analytics.historicalTrends')}>
+        {/* Range selector — full width row under header */}
+        <div className="flex gap-0.5 p-0.5 rounded-full bg-muted mb-3">
+          {(['7d','30d','all'] as const).map(r => (
+            <button
+              key={r}
+              onClick={() => setDateRange(r)}
+              className={cn(
+                "flex-1 h-7 rounded-full text-[12px] font-medium transition-all",
+                dateRange === r
+                  ? "bg-card text-primary shadow-soft"
+                  : "text-foreground/60"
+              )}
+            >
+              {t(`analytics.dateRanges.${r}`)}
+            </button>
+          ))}
+        </div>
         {/* Custom legend chips */}
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center justify-end gap-3 mb-1">
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-primary" />
             <span className="text-[11px] text-muted-foreground font-medium">{t('analytics.foodScore')}</span>
@@ -401,10 +397,10 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
             <span className="text-[11px] text-muted-foreground font-medium">{t('analytics.stoolScore')}</span>
           </div>
         </div>
-        <div className="h-48 -ml-2">
+        <div className="h-48 -ml-1">
             {filteredHistoricalData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredHistoricalData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <LineChart data={filteredHistoricalData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                   <XAxis 
                     dataKey="displayDate" 
                     axisLine={false}
@@ -414,10 +410,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                   />
                   <YAxis 
                     domain={[0, 100]}
+                    ticks={[0, 25, 50, 75, 100]}
                     axisLine={false}
                     tickLine={false}
                     tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
-                    width={28}
+                    width={32}
                   />
                   <Tooltip 
                     contentStyle={{ 
