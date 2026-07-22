@@ -281,7 +281,6 @@ const StoolImageAnalyzer = () => {
               value={analysisData.healthScore * 10}
               max={100}
               label={t('stool.healthScore')}
-              suffix="/100"
             />
             <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-border/40">
               <div className="text-center">
