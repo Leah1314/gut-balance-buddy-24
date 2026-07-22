@@ -47,15 +47,15 @@ export default function AssistantResponse({ content }: { content: string }) {
   const score = useMemo(() => deriveScore(content, summary?.tone), [content, summary?.tone]);
 
   return (
-    <div className="max-w-[min(100%,42rem)]">
-      <div className="rounded-[22px] bg-card shadow-soft border border-border/40 p-5 space-y-5">
+    <div className="w-full max-w-[42rem]">
+      <div className="rounded-[22px] bg-card shadow-soft border border-border/40 p-4 sm:p-5 space-y-4 sm:space-y-5">
         {/* Hero: summary + score dial */}
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground mb-1.5">
               Gutly's Take
             </p>
-            <p className="text-[18px] font-semibold leading-[1.35] tracking-tight text-foreground">
+            <p className="text-[16px] sm:text-[18px] font-semibold leading-[1.4] tracking-tight text-foreground break-words">
               {summary?.text ?? firstLine(content)}
             </p>
           </div>
@@ -122,8 +122,8 @@ function ScoreDial({
   label: string;
   tone: "positive" | "neutral" | "negative";
 }) {
-  const size = 76;
-  const stroke = 7;
+  const size = 64;
+  const stroke = 6;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, score)) / 100;

@@ -180,7 +180,7 @@ const ChatPage = () => {
                 className={
                   message.role === 'user'
                     ? "max-w-[85%] rounded-2xl px-4 py-3 bg-primary text-primary-foreground shadow-soft"
-                    : "max-w-[90%] text-foreground"
+                    : "flex-1 min-w-0 text-foreground"
                 }
               >
                 {message.imageData && (
