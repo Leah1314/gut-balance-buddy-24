@@ -133,17 +133,17 @@ const FoodDiary = () => {
   return (
     <div className="space-y-4">
       <Tabs defaultValue="camera" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm h-12">
+        <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/70 rounded-2xl p-1">
           <TabsTrigger 
             value="camera" 
-            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white h-10 text-sm"
+            className="flex items-center space-x-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-10 text-sm"
           >
             <Camera className="w-4 h-4" />
             <span>{t('food.aiAnalysis')}</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manual" 
-            className="flex items-center space-x-2 data-[state=active]:bg-green-600 data-[state=active]:text-white h-10 text-sm"
+            className="flex items-center space-x-2 rounded-xl data-[state=active]:bg-card data-[state=active]:shadow-soft data-[state=active]:text-primary h-10 text-sm"
           >
             <Edit className="w-4 h-4" />
             <span>{t('food.manualEntry')}</span>
