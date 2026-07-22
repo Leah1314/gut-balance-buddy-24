@@ -27,7 +27,7 @@ const QuickQuestions = ({ onQuestionSelect, isLoading }: QuickQuestionsProps) =>
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium mb-3" style={{ color: '#2E2E2E' }}>{t('chat.quickQuestions')}</p>
+      <p className="text-sm font-medium mb-3" style={{ color: '#1D1D1F' }}>{t('chat.quickQuestions')}</p>
       {quickQs.map(q => (
         <button
           key={q}
@@ -36,20 +36,20 @@ const QuickQuestions = ({ onQuestionSelect, isLoading }: QuickQuestionsProps) =>
           disabled={isLoading || loadingQuestion !== null}
           className="w-full rounded border px-4 py-2 text-left hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-wait text-sm"
           style={{
-            borderColor: '#D3D3D3',
-            color: '#2E2E2E',
+            borderColor: '#ECE9E1',
+            color: '#1D1D1F',
             backgroundColor: 'transparent'
           }}
           onMouseEnter={e => {
             if (!e.currentTarget.disabled) {
-              e.currentTarget.style.backgroundColor = '#F9F8F4';
-              e.currentTarget.style.borderColor = '#4A7C59';
+              e.currentTarget.style.backgroundColor = '#FAF9F5';
+              e.currentTarget.style.borderColor = '#3F8F68';
             }
           }}
           onMouseLeave={e => {
             if (!e.currentTarget.disabled) {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#D3D3D3';
+              e.currentTarget.style.borderColor = '#ECE9E1';
             }
           }}
         >

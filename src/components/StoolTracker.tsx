@@ -239,16 +239,16 @@ const StoolTracker = () => {
               disabled={isSaving || !selectedType || !selectedConsistency || !selectedColor}
               className="px-8 py-3 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: '#4A7C59'
+                backgroundColor: '#3F8F68'
               }}
               onMouseEnter={(e) => {
                 if (!isSaving && selectedType && selectedConsistency && selectedColor) {
-                  e.currentTarget.style.backgroundColor = '#5B8C6B';
+                  e.currentTarget.style.backgroundColor = '#367957';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isSaving) {
-                  e.currentTarget.style.backgroundColor = '#4A7C59';
+                  e.currentTarget.style.backgroundColor = '#3F8F68';
                 }
               }}
             >

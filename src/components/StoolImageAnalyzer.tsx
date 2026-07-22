@@ -196,7 +196,7 @@ const StoolImageAnalyzer = () => {
   };
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 8) return { color: '#4A7C59', backgroundColor: '#F9F8F4', borderColor: '#4A7C59' };
+    if (score >= 8) return { color: '#3F8F68', backgroundColor: '#FAF9F5', borderColor: '#3F8F68' };
     if (score >= 6) return { color: '#B8860B', backgroundColor: '#FFF8DC', borderColor: '#DAA520' };
     return { color: '#DC143C', backgroundColor: '#FFE4E1', borderColor: '#DC143C' };
   };
@@ -287,12 +287,12 @@ const StoolImageAnalyzer = () => {
           {/* Health Score */}
           <Card className="shadow-sm" 
                 style={{ 
-                  backgroundColor: '#F9F8F4', 
-                  borderColor: '#4A7C59' 
+                  backgroundColor: '#FAF9F5', 
+                  borderColor: '#3F8F68' 
                 }}>
             <CardContent className="p-6 text-center">
-              <Heart className="w-8 h-8 mx-auto mb-3 stroke-2" style={{ color: '#4A7C59' }} />
-              <h3 className="text-lg font-semibold mb-2" style={{ color: '#2E2E2E' }}>{t('stool.healthScore')}</h3>
+              <Heart className="w-8 h-8 mx-auto mb-3 stroke-2" style={{ color: '#3F8F68' }} />
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#1D1D1F' }}>{t('stool.healthScore')}</h3>
               <div className="inline-flex items-center px-6 py-3 rounded-full text-2xl font-bold border"
                    style={getHealthScoreColor(analysisData.healthScore)}>
                 {analysisData.healthScore}/10
@@ -399,16 +399,16 @@ const StoolImageAnalyzer = () => {
               disabled={isSaving}
               className="px-8 py-3 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: '#4A7C59'
+                backgroundColor: '#3F8F68'
               }}
               onMouseEnter={(e) => {
                 if (!isSaving) {
-                  e.currentTarget.style.backgroundColor = '#5B8C6B';
+                  e.currentTarget.style.backgroundColor = '#367957';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isSaving) {
-                  e.currentTarget.style.backgroundColor = '#4A7C59';
+                  e.currentTarget.style.backgroundColor = '#3F8F68';
                 }
               }}
             >

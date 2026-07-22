@@ -371,13 +371,13 @@ const FoodImageAnalyzer = () => {
               onClick={saveAnalysisToLog}
               className="w-full h-12 text-white font-medium transition-colors rounded-lg"
               style={{
-                backgroundColor: '#4A7C59'
+                backgroundColor: '#3F8F68'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#5B8C6B';
+                e.currentTarget.style.backgroundColor = '#367957';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#4A7C59';
+                e.currentTarget.style.backgroundColor = '#3F8F68';
               }}
             >
               <Save className="w-5 h-5 mr-2 stroke-2" />

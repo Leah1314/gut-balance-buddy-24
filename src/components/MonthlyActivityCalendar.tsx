@@ -201,12 +201,12 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
 
   return (
     <>
-      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#ECE9E1' }}>
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
-              <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#4A7C59' }} />
-              <span style={{ color: '#2E2E2E' }}>{t('analytics.monthlyActivityCalendar')}</span>
+              <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#3F8F68' }} />
+              <span style={{ color: '#1D1D1F' }}>{t('analytics.monthlyActivityCalendar')}</span>
             </CardTitle>
             <div className="flex items-center justify-center sm:justify-end space-x-2">
               <Button
@@ -217,7 +217,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <span className="text-xs sm:text-sm font-medium min-w-[80px] sm:min-w-[100px] text-center" style={{ color: '#2E2E2E' }}>
+              <span className="text-xs sm:text-sm font-medium min-w-[80px] sm:min-w-[100px] text-center" style={{ color: '#1D1D1F' }}>
                 {format(currentMonth, 'MMM yyyy', { locale: i18n.language === 'zh' ? zhCN : undefined })}
               </span>
               <Button
@@ -270,15 +270,15 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
           <div className="mt-3 sm:mt-4 flex flex-wrap gap-x-3 gap-y-1 sm:gap-4 text-[10px] sm:text-xs justify-center">
             <div className="flex items-center space-x-1">
               <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded" style={{ backgroundColor: '#E8F5E8' }}></div>
-              <span style={{ color: '#2E2E2E' }}>{t('history.foodEntry')}</span>
+              <span style={{ color: '#1D1D1F' }}>{t('history.foodEntry')}</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded" style={{ backgroundColor: '#FFF3E0' }}></div>
-              <span style={{ color: '#2E2E2E' }}>{t('history.stoolEntry')}</span>
+              <span style={{ color: '#1D1D1F' }}>{t('history.stoolEntry')}</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded" style={{ backgroundColor: '#E3F2FD' }}></div>
-              <span style={{ color: '#2E2E2E' }}>{t('history.bothEntries')}</span>
+              <span style={{ color: '#1D1D1F' }}>{t('history.bothEntries')}</span>
             </div>
           </div>
         </CardContent>
@@ -298,7 +298,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
               {/* Food Logs Section */}
               {selectedActivity.hasFoodLogs && (
                 <div>
-                  <h4 className="font-medium text-sm mb-2" style={{ color: '#4A7C59' }}>
+                  <h4 className="font-medium text-sm mb-2" style={{ color: '#3F8F68' }}>
                     {t('history.foodLog')} ({selectedActivity.foodCount})
                   </h4>
                   <div className="space-y-2">
@@ -362,7 +362,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
               <Button
                 onClick={() => setShowAddForm(true)}
                 className="w-full"
-                style={{ backgroundColor: '#4A7C59', color: 'white' }}
+                style={{ backgroundColor: '#3F8F68', color: 'white' }}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Entry for This Date
@@ -465,7 +465,7 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
                     onClick={handleSaveEntry}
                     disabled={saving}
                     className="flex-1"
-                    style={{ backgroundColor: '#4A7C59', color: 'white' }}
+                    style={{ backgroundColor: '#3F8F68', color: 'white' }}
                   >
                     {saving ? 'Saving...' : 'Save'}
                   </Button>

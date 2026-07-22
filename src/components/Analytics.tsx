@@ -317,21 +317,21 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-2xl font-semibold mb-2" style={{ color: '#2E2E2E' }}>
+        <h2 className="text-2xl font-semibold mb-2" style={{ color: '#1D1D1F' }}>
           {t('analytics.title')}
         </h2>
-        <p className="text-sm" style={{ color: '#2E2E2E', opacity: 0.7 }}>
+        <p className="text-sm" style={{ color: '#1D1D1F', opacity: 0.7 }}>
           {t('analytics.subtitle')}
         </p>
       </div>
 
       {/* Today's Score Card */}
-      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#ECE9E1' }}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between">
-            <span style={{ color: '#2E2E2E' }}>{t('analytics.todayScore')}</span>
+            <span style={{ color: '#1D1D1F' }}>{t('analytics.todayScore')}</span>
             <div className="flex items-center space-x-2">
-              {getTrendDirection() === 'up' && <TrendingUp className="w-5 h-5" style={{ color: '#4A7C59' }} />}
+              {getTrendDirection() === 'up' && <TrendingUp className="w-5 h-5" style={{ color: '#3F8F68' }} />}
               {getTrendDirection() === 'down' && <TrendingDown className="w-5 h-5" style={{ color: '#E74C3C' }} />}
               <span className="text-2xl">{getScoreEmoji(todayScore)}</span>
             </div>
@@ -339,10 +339,10 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-4">
-            <span className="text-3xl font-bold" style={{ color: '#4A7C59' }}>
+            <span className="text-3xl font-bold" style={{ color: '#3F8F68' }}>
               {todayScore}
             </span>
-            <span className="text-sm font-medium" style={{ color: '#2E2E2E' }}>
+            <span className="text-sm font-medium" style={{ color: '#1D1D1F' }}>
               {getScoreLabel(todayScore)}
             </span>
           </div>
@@ -355,12 +355,12 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       </Card>
 
       {/* Historical Trend Chart */}
-      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#ECE9E1' }}>
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5" style={{ color: '#4A7C59' }} />
-              <span style={{ color: '#2E2E2E' }}>{t('analytics.historicalTrends')}</span>
+              <TrendingUp className="w-5 h-5" style={{ color: '#3F8F68' }} />
+              <span style={{ color: '#1D1D1F' }}>{t('analytics.historicalTrends')}</span>
             </CardTitle>
             <div className="flex space-x-1 sm:space-x-2">
               <Button
@@ -368,7 +368,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 size="sm"
                 onClick={() => setDateRange('7d')}
                 className="flex-1 sm:flex-none text-xs sm:text-sm px-2 sm:px-3"
-                style={dateRange === '7d' ? { backgroundColor: '#4A7C59' } : {}}
+                style={dateRange === '7d' ? { backgroundColor: '#3F8F68' } : {}}
               >
                 {t('analytics.dateRanges.7d')}
               </Button>
@@ -377,7 +377,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 size="sm"
                 onClick={() => setDateRange('30d')}
                 className="flex-1 sm:flex-none text-xs sm:text-sm px-2 sm:px-3"
-                style={dateRange === '30d' ? { backgroundColor: '#4A7C59' } : {}}
+                style={dateRange === '30d' ? { backgroundColor: '#3F8F68' } : {}}
               >
                 {t('analytics.dateRanges.30d')}
               </Button>
@@ -386,7 +386,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 size="sm"
                 onClick={() => setDateRange('all')}
                 className="flex-1 sm:flex-none text-xs sm:text-sm px-2 sm:px-3"
-                style={dateRange === 'all' ? { backgroundColor: '#4A7C59' } : {}}
+                style={dateRange === 'all' ? { backgroundColor: '#3F8F68' } : {}}
               >
                 {t('analytics.dateRanges.all')}
               </Button>
@@ -402,18 +402,18 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                     dataKey="displayDate" 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 11, fill: '#2E2E2E' }}
+                    tick={{ fontSize: 11, fill: '#1D1D1F' }}
                   />
                   <YAxis 
                     domain={[0, 100]}
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 11, fill: '#2E2E2E' }}
+                    tick={{ fontSize: 11, fill: '#1D1D1F' }}
                   />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'white', 
-                      border: '1px solid #D3D3D3',
+                      border: '1px solid #ECE9E1',
                       borderRadius: '8px',
                       fontSize: '12px'
                     }}
@@ -422,14 +422,14 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                   <Line 
                     type="monotone" 
                     dataKey="foodScore" 
-                    stroke="#4A7C59" 
+                    stroke="#3F8F68" 
                     strokeWidth={2}
                     dot={(props) => {
                       const { payload } = props;
                       if (payload?.foodScore === null || payload?.foodScore === undefined) {
                         return null;
                       }
-                      return <circle {...props} fill="#4A7C59" strokeWidth={2} r={4} />;
+                      return <circle {...props} fill="#3F8F68" strokeWidth={2} r={4} />;
                     }}
                      name="Food Score"
                      connectNulls={true}
@@ -466,35 +466,35 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
       {/* Food & Stool Scores */}
       <div className="grid grid-cols-2 gap-4">
-        <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+        <Card className="bg-white shadow-sm" style={{ borderColor: '#ECE9E1' }}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium" style={{ color: '#2E2E2E' }}>
+            <CardTitle className="text-sm font-medium" style={{ color: '#1D1D1F' }}>
               {t('analytics.foodScore')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xl font-bold" style={{ color: '#4A7C59' }}>
+              <span className="text-xl font-bold" style={{ color: '#3F8F68' }}>
                 {foodScore !== null ? foodScore : '--'}
               </span>
-              <Apple className="w-4 h-4" style={{ color: '#4A7C59' }} />
+              <Apple className="w-4 h-4" style={{ color: '#3F8F68' }} />
             </div>
             <Progress value={foodScore || 0} className="h-2" />
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+        <Card className="bg-white shadow-sm" style={{ borderColor: '#ECE9E1' }}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium" style={{ color: '#2E2E2E' }}>
+            <CardTitle className="text-sm font-medium" style={{ color: '#1D1D1F' }}>
               {t('analytics.stoolScore')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xl font-bold" style={{ color: '#4A7C59' }}>
+              <span className="text-xl font-bold" style={{ color: '#3F8F68' }}>
                 {stoolScore !== null ? stoolScore : '--'}
               </span>
-              <Target className="w-4 h-4" style={{ color: '#4A7C59' }} />
+              <Target className="w-4 h-4" style={{ color: '#3F8F68' }} />
             </div>
             <Progress value={stoolScore || 0} className="h-2" />
           </CardContent>
@@ -502,22 +502,22 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       </div>
 
       {/* Food Intake Summary */}
-      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#ECE9E1' }}>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Heart className="w-5 h-5" style={{ color: '#4A7C59' }} />
-            <span style={{ color: '#2E2E2E' }}>{t('analytics.foodSummary')}</span>
+            <Heart className="w-5 h-5" style={{ color: '#3F8F68' }} />
+            <span style={{ color: '#1D1D1F' }}>{t('analytics.foodSummary')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-sm text-gray-600">{t('analytics.totalMeals')}</p>
-              <p className="text-2xl font-bold" style={{ color: '#4A7C59' }}>{foodSummary.totalMeals}</p>
+              <p className="text-2xl font-bold" style={{ color: '#3F8F68' }}>{foodSummary.totalMeals}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('analytics.foodVariety')}</p>
-              <p className="text-2xl font-bold" style={{ color: '#4A7C59' }}>{foodSummary.varietyScore}%</p>
+              <p className="text-2xl font-bold" style={{ color: '#3F8F68' }}>{foodSummary.varietyScore}%</p>
             </div>
           </div>
           
@@ -540,11 +540,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
                <p className="text-sm text-gray-600">{t('analytics.fiberFoods')}</p>
-               <p className="font-semibold" style={{ color: '#4A7C59' }}>{foodSummary.fiberFoods} {t('analytics.servings')}</p>
+               <p className="font-semibold" style={{ color: '#3F8F68' }}>{foodSummary.fiberFoods} {t('analytics.servings')}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">{t('analytics.processedFoods')}</p>
-              <p className="font-semibold" style={{ color: foodSummary.processedRatio > 30 ? '#E74C3C' : '#4A7C59' }}>
+              <p className="font-semibold" style={{ color: foodSummary.processedRatio > 30 ? '#E74C3C' : '#3F8F68' }}>
                 {foodSummary.processedRatio}%
               </p>
             </div>
@@ -556,15 +556,15 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       <MonthlyActivityCalendar foodLogs={foodLogs} stoolLogs={stoolLogs} onEntryAdded={handleEntryAdded} />
 
       {/* Personalized Suggestions */}
-      <Card className="bg-white shadow-sm" style={{ borderColor: '#D3D3D3' }}>
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#ECE9E1' }}>
         <CardContent className="p-4">
-          <h3 className="font-semibold mb-3 flex items-center space-x-2" style={{ color: '#2E2E2E' }}>
+          <h3 className="font-semibold mb-3 flex items-center space-x-2" style={{ color: '#1D1D1F' }}>
             <Calendar className="w-4 h-4" />
             <span>{t('analytics.personalizedRecommendations')}</span>
           </h3>
           <div className="space-y-2 mb-4">
             {getPersonalizedSuggestions().map((suggestion, index) => (
-              <p key={index} className="text-sm flex items-start space-x-2" style={{ color: '#2E2E2E', opacity: 0.8 }}>
+              <p key={index} className="text-sm flex items-start space-x-2" style={{ color: '#1D1D1F', opacity: 0.8 }}>
                 <span className="text-green-600 font-bold">•</span>
                 <span>{suggestion}</span>
               </p>
@@ -573,7 +573,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
           <Button 
             onClick={onSwitchToChat}
             className="w-full flex items-center justify-center space-x-2"
-            style={{ backgroundColor: '#4A7C59' }}
+            style={{ backgroundColor: '#3F8F68' }}
           >
             <MessageCircle className="w-4 h-4" />
             <span>{t('analytics.askGutCoach')}</span>

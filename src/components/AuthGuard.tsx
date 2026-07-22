@@ -21,10 +21,10 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9F8F4' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FAF9F5' }}>
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#4A7C59' }} />
-          <p style={{ color: '#2E2E2E' }}>Loading...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#3F8F68' }} />
+          <p style={{ color: '#1D1D1F' }}>Loading...</p>
         </div>
       </div>
     );
@@ -32,9 +32,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F9F8F4' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FAF9F5' }}>
         <div className="text-center">
-          <p style={{ color: '#2E2E2E' }}>Redirecting to login...</p>
+          <p style={{ color: '#1D1D1F' }}>Redirecting to login...</p>
         </div>
       </div>
     );

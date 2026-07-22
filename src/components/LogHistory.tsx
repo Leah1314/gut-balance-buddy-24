@@ -163,10 +163,10 @@ const LogHistory = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold mb-1" style={{ color: '#2E2E2E' }}>
+          <h2 className="text-2xl font-semibold mb-1" style={{ color: '#1D1D1F' }}>
             {t('history.title')}
           </h2>
-          <p className="text-base leading-tight" style={{ color: '#2E2E2E', opacity: 0.6 }}>
+          <p className="text-base leading-tight" style={{ color: '#1D1D1F', opacity: 0.6 }}>
             {t('history.subtitle')}
           </p>
         </div>
@@ -177,8 +177,8 @@ const LogHistory = () => {
           size="sm"
           className="flex items-center gap-2"
           style={{
-            borderColor: '#D3D3D3',
-            color: '#2E2E2E',
+            borderColor: '#ECE9E1',
+            color: '#1D1D1F',
             backgroundColor: 'transparent'
           }}
         >
@@ -210,13 +210,13 @@ const LogHistory = () => {
                     <div className="flex items-center justify-center w-10 h-10 rounded-full" 
                          style={{ backgroundColor: entry.type === 'food' ? '#E8F5E8' : '#E1F5FE' }}>
                       {entry.type === 'food' ? (
-                        <Utensils className="w-5 h-5" style={{ color: '#4A7C59' }} />
+                        <Utensils className="w-5 h-5" style={{ color: '#3F8F68' }} />
                       ) : (
                         <Scroll className="w-5 h-5" style={{ color: '#2196F3' }} />
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg" style={{ color: '#2E2E2E' }}>
+                      <h3 className="font-semibold text-lg" style={{ color: '#1D1D1F' }}>
                         {entry.title}
                       </h3>
                       <Badge 
@@ -228,7 +228,7 @@ const LogHistory = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium" style={{ color: '#2E2E2E' }}>
+                    <p className="text-sm font-medium" style={{ color: '#1D1D1F' }}>
                       {formatTimestamp(entry.timestamp)}
                     </p>
                   </div>
