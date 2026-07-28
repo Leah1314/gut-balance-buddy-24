@@ -240,7 +240,7 @@ const StoolImageAnalyzer = () => {
             <label className="flex-1">
               <div className="h-12 rounded-full bg-primary-soft text-primary-soft-foreground text-sm font-medium flex items-center justify-center gap-2 cursor-pointer hover:bg-primary-soft/80 transition-colors active:scale-[0.98]">
                 <Camera className="w-4 h-4" />
-                {t('food.retake') || 'Retake'}
+                Retake
               </div>
               <Input type="file" className="hidden" accept="image/*" onChange={handleImageSelect} />
             </label>
@@ -248,7 +248,7 @@ const StoolImageAnalyzer = () => {
               {isAnalyzing ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('stool.analyzingWithAI')}</>
               ) : (
-                <><Sparkles className="w-4 h-4 mr-2" />{t('food.analyzeWithAI')}</>
+                <><Sparkles className="w-4 h-4 mr-2" />Analyze with AI</>
               )}
             </Button>
           </div>
