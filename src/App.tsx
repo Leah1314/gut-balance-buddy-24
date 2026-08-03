@@ -21,6 +21,8 @@ function App() {
         <Router>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            {import.meta.env.DEV && <Route path="/design-preview" element={<Index />} />}
+            {import.meta.env.DEV && <Route path="/auth-preview" element={<Auth previewMode />} />}
             <Route
               path="/"
               element={

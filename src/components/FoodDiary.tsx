@@ -16,7 +16,7 @@ import SectionCard from "./gutly/SectionCard";
 const FoodDiary = () => {
   const { t } = useTranslation();
   const [newFood, setNewFood] = useState("");
-  const [selectedMeal, setSelectedMeal] = useState("breakfast");
+  const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const [generalNotes, setGeneralNotes] = useState("");
   const [isSavingNote, setIsSavingNote] = useState(false);
@@ -49,19 +49,19 @@ const FoodDiary = () => {
     }
 
     const foodLogData = {
-      food_name: newFood,
-      description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`
+      food_name: newFood.trim(),
+      description: selectedMeal ? `${getMealLabel(selectedMeal)} entry` : undefined
     };
 
     console.log('Adding food log:', foodLogData);
     const result = await addFoodLog(foodLogData);
     
     if (result) {
-      toast.success(`✅ Successfully added "${newFood}" to your ${selectedMeal} log!`);
+      toast.success(`Added "${newFood.trim()}"${selectedMeal ? ` to ${getMealLabel(selectedMeal).toLowerCase()}` : ''}`);
       setNewFood("");
       console.log('Food log added successfully:', result);
     } else {
-      toast.error("❌ Failed to add food item. Please try again.");
+      toast.error("Could not save this food item. Please try again.");
       console.error('Failed to add food log');
     }
   };
@@ -78,33 +78,33 @@ const FoodDiary = () => {
 
   const handleLogSelectedFoods = async () => {
     if (selectedFoods.length === 0) {
-      toast.error("请至少选择一个食物项目");
+      toast.error("Choose at least one food item");
       return;
     }
 
     for (const food of selectedFoods) {
       const foodLogData = {
         food_name: food,
-        description: `${selectedMeal.charAt(0).toUpperCase() + selectedMeal.slice(1)} entry`
+        description: selectedMeal ? `${getMealLabel(selectedMeal)} entry` : undefined
       };
 
       console.log('Quick adding food:', foodLogData);
       const result = await addFoodLog(foodLogData);
       
       if (!result) {
-        toast.error(`❌ Failed to add "${food}". Please try again.`);
+        toast.error(`Could not save "${food}". Please try again.`);
         console.error('Quick add failed for:', food);
         return;
       }
     }
 
-    toast.success(`✅ Successfully logged ${selectedFoods.length} food item${selectedFoods.length > 1 ? 's' : ''} to your ${selectedMeal}!`);
+    toast.success(`Logged ${selectedFoods.length} food item${selectedFoods.length > 1 ? 's' : ''}`);
     setSelectedFoods([]);
   };
 
   const handleSaveGeneralNote = async () => {
     if (!generalNotes.trim()) {
-      toast.error("请输入一些备注或症状");
+      toast.error("Add a note first");
       return;
     }
 
@@ -119,15 +119,23 @@ const FoodDiary = () => {
     const result = await addFoodLog(noteData);
     
     if (result) {
-      toast.success("✅ Food note saved successfully!");
+      toast.success("Meal note saved");
       setGeneralNotes("");
       console.log('General note saved:', result);
     } else {
-      toast.error("❌ Failed to save note. Please try again.");
+      toast.error("Could not save this note. Please try again.");
       console.error('Failed to save general note');
     }
 
     setIsSavingNote(false);
+  };
+
+  const getMealLabel = (mealId: string) => {
+    return mealTypes.find(meal => meal.id === mealId)?.label || mealId;
+  };
+
+  const toggleMeal = (mealId: string) => {
+    setSelectedMeal(current => current === mealId ? null : mealId);
   };
 
   return (
@@ -170,6 +178,7 @@ const FoodDiary = () => {
                   {generalNotes.length}/500 {t('common.characters')}
                 </span>
                 <Button
+                  type="button"
                   onClick={handleSaveGeneralNote}
                   disabled={!generalNotes.trim() || isSavingNote}
                   className="px-6"
@@ -185,13 +194,17 @@ const FoodDiary = () => {
           <SectionCard icon={Plus} title={t('food.logFood')}>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-caption font-medium text-foreground/80 block">{t('food.mealType')}</Label>
+                <Label className="text-caption font-medium text-foreground/80 block">
+                  {t('food.mealType')} <span className="font-normal text-muted-foreground">(optional)</span>
+                </Label>
                 <div className="grid grid-cols-4 gap-2">
                   {mealTypes.map(meal => (
                     <Button 
+                      type="button"
                       key={meal.id} 
                       variant={selectedMeal === meal.id ? "default" : "soft"}
-                      onClick={() => setSelectedMeal(meal.id)} 
+                      aria-pressed={selectedMeal === meal.id}
+                      onClick={() => toggleMeal(meal.id)} 
                       className="h-10 gap-1 px-1 justify-center font-medium"
                     >
                       <meal.icon className="w-3.5 h-3.5" />
@@ -216,6 +229,7 @@ const FoodDiary = () => {
                     }} 
                   />
                   <Button 
+                    type="button"
                     onClick={handleAddFood} 
                     disabled={!newFood.trim()} 
                     className="h-11 w-11 p-0 shrink-0"
@@ -230,6 +244,7 @@ const FoodDiary = () => {
                 <div className="grid grid-cols-4 gap-1.5">
                   {commonFoods.map(food => (
                     <Button
+                      type="button"
                       key={food}
                       variant={selectedFoods.includes(food) ? "default" : "soft"}
                       onClick={() => handleQuickAdd(food)}
@@ -255,6 +270,7 @@ const FoodDiary = () => {
                       ))}
                     </div>
                     <Button
+                      type="button"
                       onClick={handleLogSelectedFoods}
                       className="w-full"
                       size="lg"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { TrendingUp, MessageCircle, Calendar, Target, Apple, Heart, TrendingDown, Sparkles } from 'lucide-react';
 import { useFoodLogs } from '@/hooks/useFoodLogs';
 import { useStoolLogs } from '@/hooks/useStoolLogs';
@@ -29,6 +29,51 @@ interface FoodSummary {
 interface AnalyticsProps {
   onSwitchToChat: () => void;
 }
+
+const clampScore = (score: number) => Math.max(0, Math.min(100, Math.round(score)));
+
+const stringifyAnalysis = (value: unknown) => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return '';
+  }
+};
+
+const normalizeScoreValue = (value: number, scale?: number) => {
+  if (scale === 10 || (!scale && value <= 10)) {
+    return clampScore(value * 10);
+  }
+
+  return clampScore(value);
+};
+
+const extractScoreFromText = (value: unknown): number | null => {
+  const text = stringifyAnalysis(value);
+  if (!text) return null;
+
+  const scoreWithScale = text.match(
+    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3})(?:\s*\/\s*(10|100))?/i
+  );
+
+  if (scoreWithScale) {
+    return normalizeScoreValue(Number(scoreWithScale[1]), scoreWithScale[2] ? Number(scoreWithScale[2]) : undefined);
+  }
+
+  const jsonScore = text.match(/\b(?:gutHealthRating|healthScore|score|rating)"?\s*[:=]\s*(\d{1,3})(?:\.\d+)?/i);
+  if (jsonScore) {
+    return normalizeScoreValue(Number(jsonScore[1]));
+  }
+
+  return null;
+};
+
+const averageScores = (scores: number[]) => {
+  if (scores.length === 0) return null;
+  return clampScore(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+};
 
 const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const { t } = useTranslation();
@@ -77,6 +122,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
     if (dayLogs.length === 0) return null;
 
+    const explicitScores = dayLogs
+      .map(log => extractScoreFromText(log.analysis_result) ?? extractScoreFromText(log.description))
+      .filter((score): score is number => score !== null);
+
+    const explicitAverage = averageScores(explicitScores);
+    if (explicitAverage !== null) return explicitAverage;
+
     let score = 0;
     
     // Meal frequency scoring (optimal: 3-5 meals)
@@ -121,6 +173,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     });
 
     if (dayLogs.length === 0) return null;
+
+    const explicitScores = dayLogs
+      .map(log => extractScoreFromText(log.notes))
+      .filter((score): score is number => score !== null);
+
+    const explicitAverage = averageScores(explicitScores);
+    if (explicitAverage !== null) return explicitAverage;
 
     const latestLog = dayLogs[0];
     let score = 0;
@@ -417,6 +476,10 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                     width={32}
                   />
                   <Tooltip 
+                    formatter={(value, name) => [
+                      value === null || value === undefined ? 'No entry' : `${value}/100`,
+                      name,
+                    ]}
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
@@ -467,6 +530,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
               </div>
             )}
         </div>
+        {filteredHistoricalData.length > 0 && (
+          <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+            Scores are normalized to 100. Trend lines connect logged score days.
+          </p>
+        )}
       </SectionCard>
 
       {/* Food Intake Summary — 2x2 stat grid + compact common-foods list */}

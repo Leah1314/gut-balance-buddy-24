@@ -1,5 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface BristolStoolChartProps {
   selectedType: number | null;
@@ -20,7 +21,10 @@ export const BristolStoolChart = ({ selectedType, onTypeSelect }: BristolStoolCh
   return (
     <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
       <CardHeader>
-        <CardTitle>Bristol Stool Chart</CardTitle>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle>Bristol Stool Chart</CardTitle>
+          <Badge variant="secondary">Type 1-7, not a score</Badge>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-3">

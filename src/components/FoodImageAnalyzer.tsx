@@ -39,6 +39,7 @@ const FoodImageAnalyzer = () => {
   const [nutritionData, setNutritionData] = useState<NutritionData | null>(null);
   const [userNotes, setUserNotes] = useState<string>("");
   const { addFoodLog } = useFoodLogs();
+  const gutScore = nutritionData ? Math.round(nutritionData.gutHealthRating * 10) : null;
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -153,7 +154,7 @@ const FoodImageAnalyzer = () => {
     const imageUrl = URL.createObjectURL(selectedImage);
     
     const nutritionInfo = `Nutrition: ${nutritionData.calories} cal, ${nutritionData.protein}g protein, ${nutritionData.carbs}g carbs, ${nutritionData.fat}g fat`;
-    const aiAnalysis = `AI Analysis - Gut Health Rating: ${nutritionData.gutHealthRating}/10. ${nutritionData.insights.join('. ')}`;
+    const aiAnalysis = `AI Analysis - Gut Fit Score: ${Math.round(nutritionData.gutHealthRating * 10)}/100. ${nutritionData.insights.join('. ')}`;
     
     // Combine nutrition info, AI analysis, and user notes
     let fullDescription = nutritionInfo;
@@ -313,13 +314,16 @@ const FoodImageAnalyzer = () => {
           {/* Gut Health Rating */}
           <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">{t('food.gutHealthRating')}</CardTitle>
+              <CardTitle className="text-base">Gut fit score</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className={`text-center p-4 rounded-lg ${getRatingColor(nutritionData.gutHealthRating)}`}>
                 <div className="text-2xl font-bold mb-2">
-                  {nutritionData.gutHealthRating}/10
+                  {gutScore}/100
                 </div>
+                <p className="mb-2 text-xs font-medium uppercase tracking-wide opacity-75">
+                  AI meal rating
+                </p>
                 <p className="text-sm">
                   {nutritionData.gutHealthRating >= 8 ? t('food.excellentForGut') :
                    nutritionData.gutHealthRating >= 6 ? t('food.goodChoice') :

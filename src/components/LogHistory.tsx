@@ -17,6 +17,14 @@ interface LogEntry {
   details?: any;
 }
 
+const normalizeHistoricalScoreText = (value: unknown) => {
+  const text = typeof value === 'string' ? value : JSON.stringify(value);
+
+  return text
+    .replace(/Gut Health Rating:\s*(\d{1,2})\/10/gi, (_, score) => `Gut Fit Score: ${Number(score) * 10}/100`)
+    .replace(/Health Score:\s*(\d{1,2})\/10/gi, (_, score) => `Stool Health Score: ${Number(score) * 10}/100`);
+};
+
 const LogHistory = () => {
   const { t } = useTranslation();
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
@@ -120,9 +128,7 @@ const LogHistory = () => {
           )}
           {entry.details?.analysis_result && (
             <p className="text-[13px] text-foreground/70 line-clamp-2">
-              {typeof entry.details.analysis_result === 'string'
-                ? entry.details.analysis_result
-                : JSON.stringify(entry.details.analysis_result)}
+              {normalizeHistoricalScoreText(entry.details.analysis_result)}
             </p>
           )}
         </div>
@@ -137,7 +143,12 @@ const LogHistory = () => {
           <div className="flex flex-wrap gap-1.5">
             {details?.bristol_type && (
               <span className="text-[12px] px-2 py-0.5 rounded-full bg-primary-soft text-primary font-medium">
-                {t('history.bristolType')} {details.bristol_type}
+                Bristol Type {details.bristol_type}
+              </span>
+            )}
+            {details?.bristol_type && (
+              <span className="text-[12px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                1-7 classification
               </span>
             )}
             {details?.consistency && (

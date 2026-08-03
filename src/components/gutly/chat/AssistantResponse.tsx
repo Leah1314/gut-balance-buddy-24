@@ -24,7 +24,7 @@ import {
  *
  *  Layer 1 (Glance, always shown):
  *    • one-sentence summary
- *    • recommendation score dial
+ *    • an optional score only when the assistant explicitly provides one
  *    • up to 3 key recommendation cards
  *    • one Gutly Tip
  *    • "View Full Analysis" button
@@ -44,12 +44,12 @@ export default function AssistantResponse({ content }: { content: string }) {
     | Extract<AssistantSection, { kind: "tip" }>
     | undefined;
 
-  const score = useMemo(() => deriveScore(content, summary?.tone), [content, summary?.tone]);
+  const score = useMemo(() => extractExplicitScore(content), [content]);
 
   return (
     <div className="w-full max-w-[42rem]">
       <div className="rounded-[22px] bg-card shadow-soft border border-border/40 p-4 sm:p-5 space-y-4 sm:space-y-5">
-        {/* Hero: summary + score dial */}
+        {/* Hero: summary + an optional, evidence-backed score */}
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground mb-1.5">
@@ -59,7 +59,7 @@ export default function AssistantResponse({ content }: { content: string }) {
               {summary?.text ?? firstLine(content)}
             </p>
           </div>
-          <ScoreDial score={score.value} label={score.label} tone={score.tone} />
+          {score && <ScoreDial score={score.value} label={score.label} tone={score.tone} />}
         </div>
 
         {/* Key recommendations */}
@@ -86,27 +86,26 @@ export default function AssistantResponse({ content }: { content: string }) {
   );
 }
 
-/* --------------------------- Score derivation --------------------------- */
+/* ------------------------- Optional score display ----------------------- */
 
-function deriveScore(
+function extractExplicitScore(
   content: string,
-  tone?: "positive" | "negative" | "neutral",
-): { value: number; label: string; tone: "positive" | "neutral" | "negative" } {
-  // Look for explicit numeric scores: "score: 82", "82/100", "8/10", "rating 7"
-  const hundred = content.match(/(?:score|rating)[^\d]{0,6}(\d{1,3})\s*(?:\/\s*100)?/i);
-  const tenth = content.match(/(\d{1,2})\s*\/\s*10\b/);
+): { value: number; label: string; tone: "positive" | "neutral" | "negative" } | null {
+  // Never invent a score. Show one only when the response explicitly provides
+  // a score or rating based on a relevant meal, report, or tracked pattern.
+  const hasScoringContext =
+    /\b(score|rating|analysis|meal|food|report|result|tracked|pattern)\b/i.test(content);
+  if (!hasScoringContext) return null;
+
+  const hundred = content.match(
+    /(?:(?:overall|gut|health|meal|food)\s+)?score[^\d]{0,6}(\d{1,3})\s*(?:\/\s*100)?/i,
+  );
   let value: number | null = null;
   if (hundred) {
     const v = parseInt(hundred[1], 10);
     if (v >= 0 && v <= 100) value = v;
   }
-  if (value === null && tenth) {
-    const v = parseInt(tenth[1], 10);
-    if (v >= 0 && v <= 10) value = v * 10;
-  }
-  if (value === null) {
-    value = tone === "positive" ? 86 : tone === "negative" ? 42 : 68;
-  }
+  if (value === null) return null;
   const t: "positive" | "neutral" | "negative" =
     value >= 75 ? "positive" : value >= 55 ? "neutral" : "negative";
   const label = value >= 85 ? "Great" : value >= 70 ? "Good" : value >= 50 ? "Fair" : "Caution";

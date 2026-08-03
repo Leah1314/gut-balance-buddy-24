@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -132,6 +133,14 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
   };
 
   const selectedActivity = selectedDate ? dayActivities.get(format(selectedDate, 'yyyy-MM-dd')) : null;
+
+  const normalizeHistoricalScoreText = (value: unknown) => {
+    const text = typeof value === 'string' ? value : JSON.stringify(value);
+
+    return text
+      .replace(/Gut Health Rating:\s*(\d{1,2})\/10/gi, (_, score) => `Gut Fit Score: ${Number(score) * 10}/100`)
+      .replace(/Health Score:\s*(\d{1,2})\/10/gi, (_, score) => `Stool Health Score: ${Number(score) * 10}/100`);
+  };
 
   const buildBackdatedTimestamp = (date: Date) => {
     // Use noon local time on the selected date so it lands on the right day in any tz
@@ -306,7 +315,10 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
                       <div key={index} className="p-2 rounded border" style={{ borderColor: '#E8F5E8', backgroundColor: '#F8FDF8' }}>
                         <p className="font-medium text-sm">{log.food_name}</p>
                         {log.description && (
-                          <p className="text-xs text-gray-600">{log.description}</p>
+                          <p className="text-xs text-gray-600">{normalizeHistoricalScoreText(log.description)}</p>
+                        )}
+                        {log.analysis_result && (
+                          <p className="text-xs text-gray-600">{normalizeHistoricalScoreText(log.analysis_result)}</p>
                         )}
                         <p className="text-xs text-gray-500">
                           {format(parseISO(log.created_at), 'h:mm a', { locale: i18n.language === 'zh' ? zhCN : undefined })}
@@ -326,8 +338,17 @@ const MonthlyActivityCalendar = ({ foodLogs, stoolLogs, onEntryAdded }: MonthlyA
                   <div className="space-y-2">
                     {selectedActivity.stoolLogs.map((log, index) => (
                       <div key={index} className="p-2 rounded border" style={{ borderColor: '#FFF3E0', backgroundColor: '#FFFBF5' }}>
-                        <div className="flex justify-between text-sm">
-                          <span>{t('history.bristolType')}: {log.bristol_type}</span>
+                        <div className="flex justify-between gap-2 text-sm">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {log.bristol_type ? (
+                              <>
+                                <Badge variant="secondary">Bristol Type {log.bristol_type}</Badge>
+                                <Badge variant="outline">1-7 classification</Badge>
+                              </>
+                            ) : (
+                              <span>{t('history.bristolType')}: N/A</span>
+                            )}
+                          </div>
                           <span className="text-xs text-gray-500">
                             {format(parseISO(log.created_at), 'h:mm a', { locale: i18n.language === 'zh' ? zhCN : undefined })}
                           </span>
