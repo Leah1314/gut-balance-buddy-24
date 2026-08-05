@@ -3,10 +3,18 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
-import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/supabase/vite";
+
+const maybeLoadMcpPlugin = async () => {
+  try {
+    const { mcpPlugin } = await import("@lovable.dev/mcp-js/stacks/supabase/vite");
+    return mcpPlugin();
+  } catch {
+    return null;
+  }
+};
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(async ({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -15,7 +23,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
-    mcpPlugin(),
+    await maybeLoadMcpPlugin(),
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: null,
