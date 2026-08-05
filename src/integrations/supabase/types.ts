@@ -149,45 +149,6 @@ export type Database = {
         }
         Relationships: []
       }
-      wellness_logs: {
-        Row: {
-          created_at: string
-          exercise_minutes: number
-          id: string
-          notes: string | null
-          sleep_hours: number
-          stress_level: number
-          updated_at: string
-          user_id: string
-          water_glasses: number
-          wellness_score: number
-        }
-        Insert: {
-          created_at?: string
-          exercise_minutes: number
-          id?: string
-          notes?: string | null
-          sleep_hours: number
-          stress_level: number
-          updated_at?: string
-          user_id: string
-          water_glasses: number
-          wellness_score: number
-        }
-        Update: {
-          created_at?: string
-          exercise_minutes?: number
-          id?: string
-          notes?: string | null
-          sleep_hours?: number
-          stress_level?: number
-          updated_at?: string
-          user_id?: string
-          water_glasses?: number
-          wellness_score?: number
-        }
-        Relationships: []
-      }
       user_health_profiles: {
         Row: {
           activity_level: string | null
@@ -255,6 +216,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      wellness_logs: {
+        Row: {
+          created_at: string
+          exercise_minutes: number
+          id: string
+          notes: string | null
+          sleep_hours: number
+          stress_level: number
+          updated_at: string
+          user_id: string
+          water_glasses: number
+          wellness_score: number
+        }
+        Insert: {
+          created_at?: string
+          exercise_minutes: number
+          id?: string
+          notes?: string | null
+          sleep_hours: number
+          stress_level: number
+          updated_at?: string
+          user_id: string
+          water_glasses: number
+          wellness_score: number
+        }
+        Update: {
+          created_at?: string
+          exercise_minutes?: number
+          id?: string
+          notes?: string | null
+          sleep_hours?: number
+          stress_level?: number
+          updated_at?: string
+          user_id?: string
+          water_glasses?: number
+          wellness_score?: number
+        }
+        Relationships: []
       }
     }
     Views: {
