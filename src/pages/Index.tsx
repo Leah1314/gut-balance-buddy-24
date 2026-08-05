@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
-  Apple,
   ArrowLeft,
   ArrowRight,
   BarChart3,
@@ -44,16 +43,26 @@ import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
 import ChatPage from "@/components/ChatPage";
 import HealthProfile from "@/components/HealthProfile";
-import LogHistory from "@/components/LogHistory";
 import Analytics from "@/components/Analytics";
 import UserMenu from "@/components/UserMenu";
 import LanguageSelector from "@/components/LanguageSelector";
 import GutlyMascot from "@/components/gutly/GutlyMascot";
 import GutlyLogoMark from "@/components/gutly/GutlyLogoMark";
+import { useFoodLogs } from "@/hooks/useFoodLogs";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 type MainView = "today" | "insights" | "coach" | "profile";
 type NavView = MainView | "log";
 type LogView = "food" | "stool";
+type TimelineItem = {
+  id: string;
+  createdAt: string;
+  time: string;
+  title: string;
+  detail: string;
+  icon: typeof Utensils;
+  tone: string;
+};
 
 const mainNavigation = [
   { id: "today" as NavView, label: "Today", icon: Home },
@@ -99,6 +108,44 @@ const logOptions = [
     tone: "bg-violet-100 text-violet-700",
   },
 ];
+
+const formatTimelineTime = (value: string) =>
+  new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+const formatTimelineDay = (value: string) => {
+  const date = new Date(value);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (date.toDateString() === today.toDateString()) return "Today";
+  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+
+  return date.toLocaleDateString([], { month: "short", day: "numeric" });
+};
+
+const getFoodTitle = (log: any) => {
+  const name = log.food_name || "Food note";
+  return name.length > 42 ? `${name.slice(0, 39).trim()}…` : name;
+};
+
+const getFoodDetail = (log: any) => {
+  const parts = ["Food log"];
+  const description = typeof log.description === "string" ? log.description.trim() : "";
+  if (description) {
+    parts.push(description.length > 48 ? `${description.slice(0, 45).trim()}…` : description);
+  }
+  parts.push(formatTimelineDay(log.created_at));
+  return parts.join(" · ");
+};
+
+const getStoolDetail = (log: any) => {
+  const parts = ["Stool log"];
+  if (log.consistency) parts.push(log.consistency);
+  if (log.color) parts.push(log.color);
+  parts.push(formatTimelineDay(log.created_at));
+  return parts.join(" · ");
+};
 
 function QuickLogDrawer({
   children,
@@ -202,6 +249,59 @@ function TodayOverview({
   onInsights: () => void;
   onCoach: () => void;
 }) {
+  const { foodLogs } = useFoodLogs();
+  const { getStoolLogs } = useStoolLogs();
+  const [stoolLogs, setStoolLogs] = useState<any[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadStoolLogs = async () => {
+      const logs = await getStoolLogs();
+      if (isMounted) {
+        setStoolLogs(logs);
+      }
+    };
+
+    loadStoolLogs();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const timelineItems = useMemo<TimelineItem[]>(() => {
+    const foodItems: TimelineItem[] = foodLogs.map((log) => ({
+      id: `food-${log.id}`,
+      createdAt: log.created_at,
+      time: formatTimelineTime(log.created_at),
+      title: getFoodTitle(log),
+      detail: getFoodDetail(log),
+      icon: Utensils,
+      tone: "bg-orange-100 text-orange-700",
+    }));
+
+    const stoolItems: TimelineItem[] = stoolLogs.map((log) => ({
+      id: `stool-${log.id}`,
+      createdAt: log.created_at,
+      time: formatTimelineTime(log.created_at),
+      title: `Stool type ${log.bristol_type ?? "recorded"}`,
+      detail: getStoolDetail(log),
+      icon: Scroll,
+      tone: "bg-amber-100 text-amber-800",
+    }));
+
+    return [...foodItems, ...stoolItems]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 4);
+  }, [foodLogs, stoolLogs]);
+
+  const timelineTitle =
+    timelineItems.length > 0 &&
+    timelineItems.every((item) => new Date(item.createdAt).toDateString() === new Date().toDateString())
+      ? "Today’s timeline"
+      : "Latest timeline";
+
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
       <section className="relative overflow-hidden rounded-[24px] bg-primary px-5 py-5 text-primary-foreground shadow-card sm:rounded-[28px] sm:px-8 sm:py-9">
@@ -343,35 +443,40 @@ function TodayOverview({
         <CardHeader className="flex-row items-center justify-between gap-4 p-6 pb-4">
           <div>
             <CardDescription>Recent activity</CardDescription>
-            <CardTitle className="mt-1 text-xl">Today’s timeline</CardTitle>
+            <CardTitle className="mt-1 text-xl">{timelineTitle}</CardTitle>
           </div>
-          <Button variant="ghost" size="sm">View history</Button>
+          <Button variant="ghost" size="sm" onClick={onInsights}>View history</Button>
         </CardHeader>
         <CardContent className="px-6 pb-6">
-          <div className="flex flex-col">
-            {[
-              { time: "8:10 AM", title: "Oats, berries and yogurt", detail: "Breakfast · 3 plants", icon: Utensils },
-              { time: "10:45 AM", title: "Feeling comfortable", detail: "Symptom check-in · Mild bloating", icon: HeartPulse },
-              { time: "1:20 PM", title: "Grain bowl and greens", detail: "Lunch · 4 plants", icon: Apple },
-            ].map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.time}>
-                  <div className="grid grid-cols-[72px_40px_1fr] items-center gap-3 py-3">
-                    <span className="text-xs font-medium text-muted-foreground">{item.time}</span>
-                    <span className="flex size-10 items-center justify-center rounded-2xl bg-muted text-foreground">
-                      <Icon aria-hidden="true" />
-                    </span>
-                    <div>
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{item.detail}</p>
+          {timelineItems.length > 0 ? (
+            <div className="flex flex-col">
+              {timelineItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.id}>
+                    <div className="grid grid-cols-[64px_38px_1fr] items-center gap-3 py-3 sm:grid-cols-[72px_40px_1fr]">
+                      <span className="text-xs font-medium text-muted-foreground">{item.time}</span>
+                      <span className={cn("flex size-9 items-center justify-center rounded-2xl sm:size-10", item.tone)}>
+                        <Icon aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">{item.title}</p>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">{item.detail}</p>
+                      </div>
                     </div>
+                    {index < timelineItems.length - 1 && <Separator />}
                   </div>
-                  {index < 2 && <Separator />}
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-muted/50 px-4 py-5 text-center">
+              <p className="font-medium">No recent logs yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Log a meal or stool entry and it will appear here automatically.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
