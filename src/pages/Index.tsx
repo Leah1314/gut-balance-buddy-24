@@ -112,6 +112,20 @@ const logOptions = [
 const formatTimelineTime = (value: string) =>
   new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
+const formatHeroDate = (date: Date) =>
+  date.toLocaleDateString([], {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
+const getGreeting = (date: Date) => {
+  const hour = date.getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+};
+
 const formatTimelineDay = (value: string) => {
   const date = new Date(value);
   const today = new Date();
@@ -252,6 +266,9 @@ function TodayOverview({
   const { foodLogs } = useFoodLogs();
   const { getStoolLogs } = useStoolLogs();
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
+  const today = useMemo(() => new Date(), []);
+  const heroDate = useMemo(() => formatHeroDate(today), [today]);
+  const greeting = useMemo(() => getGreeting(today), [today]);
 
   useEffect(() => {
     let isMounted = true;
@@ -307,10 +324,10 @@ function TodayOverview({
       <section className="relative overflow-hidden rounded-[24px] bg-primary px-5 py-5 text-primary-foreground shadow-card sm:rounded-[28px] sm:px-8 sm:py-9">
         <div className="relative z-10 max-w-xl">
           <Badge className="mb-3 border-white/20 bg-white/15 text-white hover:bg-white/15 sm:mb-4">
-            Tuesday, July 28
+            {heroDate}
           </Badge>
           <h1 className="max-w-lg text-[2rem] font-semibold leading-tight tracking-tight sm:text-4xl">
-            Good afternoon, Leah.
+            {greeting}, Leah.
           </h1>
           <p className="mt-2 max-w-md text-base leading-relaxed text-white/80 sm:mt-3">
             Your week is looking consistent. One quick check-in will keep today’s picture complete.
