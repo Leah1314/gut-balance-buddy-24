@@ -6,6 +6,7 @@ import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
 import AuthGuard from "@/components/AuthGuard";
+import PWAManager from "@/components/pwa/PWAManager";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ function App() {
           </Routes>
           <ShadcnToaster />
           <SonnerToaster />
+          <PWAManager />
         </Router>
       </AuthProvider>
     </QueryClientProvider>

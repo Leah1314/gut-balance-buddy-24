@@ -435,7 +435,7 @@ const Index = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setActiveMainView(item.id)}
+                onClick={() => setActiveMainView(item.id as MainView)}
                 className={cn(
                   "flex min-h-12 items-center gap-3 rounded-2xl px-4 text-sm font-medium transition-colors",
                   active ? "bg-primary-soft text-primary-soft-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -508,7 +508,7 @@ const Index = () => {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setActiveMainView(item.id)}
+                onClick={() => setActiveMainView(item.id as MainView)}
                 className={cn(
                   "flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-xs font-medium",
                   active ? "text-primary" : "text-muted-foreground"
