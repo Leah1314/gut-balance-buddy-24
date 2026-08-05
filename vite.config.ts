@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
       devOptions: { enabled: false },
       includeAssets: ["favicon.png", "apple-touch-icon.png", "robots.txt"],
       manifest: {
-        name: "Gutly — Gut Time",
+        name: "Gutly - Know Your Gut",
         short_name: "Gutly",
         description: "Track your digestive health with AI-powered food and stool tracking.",
         start_url: "/",
