@@ -374,23 +374,23 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {/* Hero — today's score with inline food/stool split */}
-      <SectionCard className="!p-5">
-        <div className="flex items-start justify-between gap-4">
+      <SectionCard className="!p-4 sm:!p-5">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <p className="text-caption uppercase tracking-wider">
               {t('analytics.todayScore')}
             </p>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-[52px] font-semibold tabular-nums text-primary leading-none">
+              <span className="text-[44px] font-semibold tabular-nums text-primary leading-none sm:text-[52px]">
                 {todayScore}
               </span>
               <span className="text-[13px] font-medium text-foreground/70">
                 {getScoreLabel(todayScore)}
               </span>
             </div>
-            <Progress value={todayScore} className="h-1.5 mt-3 bg-muted" />
+            <Progress value={todayScore} className="h-1.5 mt-2 bg-muted sm:mt-3" />
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             {getTrendDirection() === 'up' && <TrendingUp className="w-4 h-4 text-primary" />}
@@ -400,7 +400,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         </div>
 
         {/* Food + Stool split inside hero */}
-        <div className="mt-4 pt-4 border-t border-border/60 grid grid-cols-2 gap-4">
+        <div className="mt-3 grid grid-cols-2 gap-3 border-t border-border/60 pt-3 sm:mt-4 sm:gap-4 sm:pt-4">
           <div className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-full bg-primary-soft flex items-center justify-center shrink-0">
               <Apple className="w-4 h-4 text-primary" />
@@ -435,7 +435,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
               key={r}
               onClick={() => setDateRange(r)}
               className={cn(
-                "flex-1 h-7 rounded-full text-[12px] font-medium transition-all",
+                "flex-1 h-8 rounded-full text-[12px] font-medium transition-all min-[390px]:h-7",
                 dateRange === r
                   ? "bg-card text-primary shadow-soft"
                   : "text-foreground/60"
@@ -446,7 +446,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
           ))}
         </div>
         {/* Custom legend chips */}
-        <div className="flex items-center justify-end gap-3 mb-1">
+        <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 mb-1">
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-primary" />
             <span className="text-[11px] text-muted-foreground font-medium">{t('analytics.foodScore')}</span>
@@ -456,16 +456,16 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
             <span className="text-[11px] text-muted-foreground font-medium">{t('analytics.stoolScore')}</span>
           </div>
         </div>
-        <div className="h-48 -ml-1">
+        <div className="h-44 -mx-1 min-[390px]:h-48 sm:h-56 sm:mx-0">
             {filteredHistoricalData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredHistoricalData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                <LineChart data={filteredHistoricalData} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
                   <XAxis 
                     dataKey="displayDate" 
                     axisLine={false}
                     tickLine={false}
                     tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
-                    minTickGap={16}
+                    minTickGap={10}
                   />
                   <YAxis 
                     domain={[0, 100]}
@@ -473,7 +473,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
-                    width={32}
+                    width={28}
                   />
                   <Tooltip 
                     formatter={(value, name) => [
@@ -521,9 +521,9 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
+              <div className="flex h-full items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <Calendar className="w-7 h-7 mx-auto mb-1.5 opacity-50" />
+                  <Calendar className="mx-auto mb-1 h-6 w-6 opacity-50 sm:h-7 sm:w-7" />
                   <p className="text-[14px]">{t('analytics.noDataYet')}</p>
                   <p className="text-[12px] opacity-70">{t('analytics.startLogging')}</p>
                 </div>

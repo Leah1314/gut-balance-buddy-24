@@ -166,20 +166,20 @@ const ChatPage = () => {
   return (
     <div className="flex flex-col gap-3 h-full animate-fade-in">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto min-h-[55vh] sm:min-h-[65vh] pr-1">
-        <div className="space-y-4">
+      <div className="flex-1 overflow-y-auto min-h-[55vh] sm:min-h-[65vh]">
+        <div className="flex flex-col gap-4">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start items-start gap-3'}`}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start items-start gap-2 min-[390px]:gap-3'}`}
             >
               {message.role === 'assistant' && (
-                <div className="shrink-0 mt-1"><GutlyMascot size={32} waving={false} /></div>
+                <div className="shrink-0 mt-1"><GutlyMascot size={28} waving={false} /></div>
               )}
               <div
                 className={
                   message.role === 'user'
-                    ? "max-w-[85%] rounded-2xl px-4 py-3 bg-primary text-primary-foreground shadow-soft"
+                    ? "max-w-[88%] rounded-2xl px-4 py-3 bg-primary text-primary-foreground shadow-soft"
                     : "flex-1 min-w-0 text-foreground"
                 }
               >
@@ -217,7 +217,7 @@ const ChatPage = () => {
       <QuickQuestions onQuestionSelect={handleQuickQuestion} isLoading={isLoading} />
 
       {/* Composer */}
-      <div className="card-soft p-3 flex items-end gap-2">
+      <div className="card-soft p-2.5 flex items-end gap-2 min-[390px]:p-3">
         <ImageUploadDialog onImageUpload={handleImageUpload} isLoading={isLoading} />
         <form onSubmit={handleSubmit} className="flex-1 flex items-end gap-2">
           <Textarea

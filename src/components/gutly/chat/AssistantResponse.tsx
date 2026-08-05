@@ -48,14 +48,14 @@ export default function AssistantResponse({ content }: { content: string }) {
 
   return (
     <div className="w-full max-w-[42rem]">
-      <div className="rounded-[22px] bg-card shadow-soft border border-border/40 p-4 sm:p-5 space-y-4 sm:space-y-5">
+      <div className="rounded-[22px] bg-card shadow-soft border border-border/40 p-3.5 min-[390px]:p-4 sm:p-5 flex flex-col gap-4 sm:gap-5">
         {/* Hero: summary + an optional, evidence-backed score */}
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground mb-1.5">
               Gutly's Take
             </p>
-            <p className="text-[16px] sm:text-[18px] font-semibold leading-[1.4] tracking-tight text-foreground break-words">
+            <p className="text-[15.5px] sm:text-[18px] font-semibold leading-[1.4] tracking-tight text-foreground break-words">
               {summary?.text ?? firstLine(content)}
             </p>
           </div>
@@ -64,11 +64,11 @@ export default function AssistantResponse({ content }: { content: string }) {
 
         {/* Key recommendations */}
         {keyItems.length > 0 && (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
               Key Recommendations
             </p>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {keyItems.map((k, i) => (
                 <KeyRecCard key={i} tone={k.tone} text={k.text} />
               ))}
@@ -245,7 +245,7 @@ function KeyRecCard({ tone, text }: KeyItem) {
       >
         {cfg.icon}
       </span>
-      <p className="text-[14.5px] leading-[1.5] text-foreground flex-1 min-w-0">
+      <p className="text-[14px] leading-[1.5] text-foreground flex-1 min-w-0 min-[390px]:text-[14.5px]">
         <InlineMarkdown text={text} />
       </p>
     </div>

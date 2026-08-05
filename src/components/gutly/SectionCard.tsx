@@ -15,9 +15,9 @@ interface Props {
 export const SectionCard = ({ icon: Icon, title, description, action, children, className, tone = "default" }: Props) => {
   const bg = tone === "soft" ? "bg-primary-soft" : tone === "accent" ? "bg-accent/20" : "bg-card";
   return (
-    <section className={cn("rounded-[var(--radius)] shadow-soft p-4 animate-fade-in", bg, className)}>
+    <section className={cn("rounded-[var(--radius)] shadow-soft p-3 animate-fade-in min-[390px]:p-3.5 sm:p-4", bg, className)}>
       {(Icon || title || description) && (
-        <header className="flex items-start gap-3 mb-3">
+        <header className="mb-2.5 flex items-start gap-3 sm:mb-3">
           {Icon && (
             <div className="shrink-0 h-9 w-9 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
               <Icon className="w-4 h-4" strokeWidth={2} />

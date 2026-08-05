@@ -203,23 +203,23 @@ function TodayOverview({
   onCoach: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-6">
-      <section className="relative overflow-hidden rounded-[28px] bg-primary px-6 py-7 text-primary-foreground shadow-card sm:px-8 sm:py-9">
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <section className="relative overflow-hidden rounded-[24px] bg-primary px-5 py-5 text-primary-foreground shadow-card sm:rounded-[28px] sm:px-8 sm:py-9">
         <div className="relative z-10 max-w-xl">
-          <Badge className="mb-4 border-white/20 bg-white/15 text-white hover:bg-white/15">
+          <Badge className="mb-3 border-white/20 bg-white/15 text-white hover:bg-white/15 sm:mb-4">
             Tuesday, July 28
           </Badge>
-          <h1 className="max-w-lg text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="max-w-lg text-[2rem] font-semibold leading-tight tracking-tight sm:text-4xl">
             Good afternoon, Leah.
           </h1>
-          <p className="mt-3 max-w-md text-base leading-relaxed text-white/80">
+          <p className="mt-2 max-w-md text-base leading-relaxed text-white/80 sm:mt-3">
             Your week is looking consistent. One quick check-in will keep today’s picture complete.
           </p>
           <QuickLogDrawer>
             <Button
               variant="secondary"
               size="lg"
-              className="mt-6 bg-white text-primary hover:bg-white/90"
+              className="mt-4 bg-white text-primary hover:bg-white/90 sm:mt-6"
             >
               <Plus data-icon="inline-start" />
               Log something
@@ -232,52 +232,52 @@ function TodayOverview({
         <div className="absolute -right-16 -top-24 size-64 rounded-full bg-white/10" />
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <Card className="border border-border/50 shadow-none">
-          <CardHeader className="gap-3 p-5">
-            <div className="flex items-center justify-between">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+          <CardHeader className="gap-2 p-2.5 min-[390px]:p-3 sm:gap-3 sm:p-5">
+            <div className="flex items-center justify-between gap-1.5">
+              <span className="flex size-8 items-center justify-center rounded-2xl bg-primary-soft text-primary sm:size-10">
                 <Check aria-hidden="true" />
               </span>
-              <Badge variant="secondary">1 remaining</Badge>
+              <Badge variant="secondary" className="hidden text-[11px] min-[390px]:inline-flex sm:inline-flex">1 left</Badge>
             </div>
             <div>
-              <CardDescription>Today’s picture</CardDescription>
-              <CardTitle className="mt-1 text-xl">2 of 3 logged</CardTitle>
+              <CardDescription className="text-[11px] leading-tight sm:text-sm">Today</CardDescription>
+              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">2/3 logged</CardTitle>
             </div>
           </CardHeader>
         </Card>
         <Card className="border border-border/50 shadow-none">
-          <CardHeader className="gap-3 p-5">
-            <div className="flex items-center justify-between">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-800">
+          <CardHeader className="gap-2 p-2.5 min-[390px]:p-3 sm:gap-3 sm:p-5">
+            <div className="flex items-center justify-between gap-1.5">
+              <span className="flex size-8 items-center justify-center rounded-2xl bg-amber-100 text-amber-800 sm:size-10">
                 <Scroll aria-hidden="true" />
               </span>
-              <Badge variant="secondary">Normal</Badge>
+              <Badge variant="secondary" className="text-[11px]">Normal</Badge>
             </div>
             <div>
-              <CardDescription>Last bowel movement</CardDescription>
-              <CardTitle className="mt-1 text-xl">Type 4 · 9:10 AM</CardTitle>
+              <CardDescription className="text-[11px] leading-tight sm:text-sm">Stool</CardDescription>
+              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">Type 4</CardTitle>
             </div>
           </CardHeader>
         </Card>
         <Card className="border border-border/50 shadow-none">
-          <CardHeader className="gap-3 p-5">
-            <div className="flex items-center justify-between">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+          <CardHeader className="gap-2 p-2.5 min-[390px]:p-3 sm:gap-3 sm:p-5">
+            <div className="flex items-center justify-between gap-1.5">
+              <span className="flex size-8 items-center justify-center rounded-2xl bg-rose-100 text-rose-700 sm:size-10">
                 <HeartPulse aria-hidden="true" />
               </span>
-              <Badge className="bg-primary-soft text-primary hover:bg-primary-soft">Low</Badge>
+              <Badge className="bg-primary-soft text-[11px] text-primary hover:bg-primary-soft">Low</Badge>
             </div>
             <div>
-              <CardDescription>Symptoms today</CardDescription>
-              <CardTitle className="mt-1 text-xl">Mild bloating</CardTitle>
+              <CardDescription className="text-[11px] leading-tight sm:text-sm">Symptoms</CardDescription>
+              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">Mild</CardTitle>
             </div>
           </CardHeader>
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+      <div className="grid gap-3 sm:gap-4 lg:grid-cols-[1.35fr_0.65fr]">
         <Card className="border border-border/50 shadow-none">
           <CardHeader className="p-6 pb-4">
             <div className="flex items-start justify-between gap-4">
@@ -459,15 +459,15 @@ const Index = () => {
       </aside>
 
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/85 backdrop-blur-xl lg:ml-64">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3 lg:hidden">
-            <GutlyLogoMark className="size-9" />
-            <span className="font-display text-2xl font-semibold">Gutly</span>
+        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-3 min-[390px]:px-4 sm:h-16 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2.5 lg:hidden">
+            <GutlyLogoMark className="size-7 shrink-0 min-[390px]:size-8 sm:size-9" />
+            <span className="truncate font-display text-[1.55rem] font-semibold leading-none min-[390px]:text-[1.7rem] sm:text-2xl">Gutly</span>
           </div>
           <div className="hidden lg:block">
             <p className="text-sm text-muted-foreground">Personal wellness workspace</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 min-[390px]:gap-2">
             <LanguageSelector />
             <UserMenu />
             <Button
@@ -483,20 +483,20 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="pb-28 lg:ml-64 lg:pb-10">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{renderContent()}</div>
+      <main className="pb-24 lg:ml-64 lg:pb-10">
+        <div className="mx-auto w-full max-w-6xl px-3 py-3 min-[390px]:px-4 sm:px-6 sm:py-8">{renderContent()}</div>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-card/90 px-3 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden" aria-label="Primary navigation">
-        <div className="mx-auto grid max-w-xl grid-cols-4 gap-1 py-2">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-card/90 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl min-[390px]:px-3 lg:hidden" aria-label="Primary navigation">
+        <div className="mx-auto grid w-full max-w-md grid-cols-4 gap-1 py-1.5">
           {mainNavigation.map((item) => {
             const Icon = item.icon;
             const active = activeMainView === item.id;
             if (item.id === "log") {
               return (
                 <QuickLogDrawer key={item.id}>
-                  <Button variant="ghost" className="h-auto min-h-14 flex-col gap-1 rounded-2xl px-2 py-1 text-xs text-muted-foreground">
-                    <span className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Button variant="ghost" className="h-auto min-h-12 flex-col gap-0.5 rounded-2xl px-2 py-1 text-xs text-muted-foreground">
+                    <span className="flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
                       <Plus aria-hidden="true" />
                     </span>
                     Log
@@ -510,7 +510,7 @@ const Index = () => {
                 type="button"
                 onClick={() => setActiveMainView(item.id as MainView)}
                 className={cn(
-                  "flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-xs font-medium",
+                  "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1 text-xs font-medium",
                   active ? "text-primary" : "text-muted-foreground"
                 )}
               >
