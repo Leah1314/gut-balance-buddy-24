@@ -9,6 +9,7 @@ import AuthGuard from "@/components/AuthGuard";
 import PWAManager from "@/components/pwa/PWAManager";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import OAuthConsent from "./pages/OAuthConsent";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 import "./i18n";
@@ -22,6 +23,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             {import.meta.env.DEV && <Route path="/design-preview" element={<Index />} />}
             {import.meta.env.DEV && <Route path="/auth-preview" element={<Auth previewMode />} />}
             <Route
