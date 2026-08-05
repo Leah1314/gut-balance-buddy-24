@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, redirectPath?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -67,9 +67,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, redirectPath?: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const safePath = redirectPath && /^\/(?!\/)/.test(redirectPath) ? redirectPath : "/";
+      const redirectUrl = `${window.location.origin}${safePath}`;
       const { error } = await supabase.auth.signUp({
         email,
         password,
