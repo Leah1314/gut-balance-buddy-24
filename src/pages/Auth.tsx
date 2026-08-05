@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, ShieldCheck, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -27,16 +27,20 @@ const Auth = ({ previewMode = false }: { previewMode?: boolean }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, signUp, signIn } = useAuth();
+  const [params] = useSearchParams();
+  const rawNext = params.get("next") ?? "";
+  // Only allow same-origin relative paths.
+  const next = /^\/(?!\/)/.test(rawNext) ? rawNext : "/";
 
   useEffect(() => {
-    if (user && !previewMode) navigate("/");
-  }, [user, navigate, previewMode]);
+    if (user && !previewMode) navigate(next);
+  }, [user, navigate, previewMode, next]);
 
   const handleEmailAuth = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
     try {
-      const { error } = isLogin ? await signIn(email, password) : await signUp(email, password);
+      const { error } = isLogin ? await signIn(email, password) : await signUp(email, password, next);
       if (error) {
         let errorMessage = error.message;
         if (error.message.includes("Invalid login credentials")) {
@@ -50,7 +54,7 @@ const Auth = ({ previewMode = false }: { previewMode?: boolean }) => {
       }
       if (isLogin) {
         toast({ title: "Welcome back!", description: "You've been signed in successfully." });
-        navigate("/");
+        navigate(next);
       } else {
         toast({ title: "Account created!", description: "Please check your email to confirm your account." });
       }
