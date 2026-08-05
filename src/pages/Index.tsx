@@ -63,6 +63,11 @@ type TimelineItem = {
   icon: typeof Utensils;
   tone: string;
 };
+type DayActivity = {
+  key: string;
+  label: string;
+  count: number;
+};
 
 const mainNavigation = [
   { id: "today" as NavView, label: "Today", icon: Home },
@@ -160,6 +165,107 @@ const getStoolDetail = (log: any) => {
   parts.push(formatTimelineDay(log.created_at));
   return parts.join(" · ");
 };
+
+const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+
+const getStartOfDay = (date: Date) => {
+  const next = new Date(date);
+  next.setHours(0, 0, 0, 0);
+  return next;
+};
+
+const getDaysAgo = (date: Date, days: number) => {
+  const next = getStartOfDay(date);
+  next.setDate(next.getDate() - days);
+  return next;
+};
+
+const getStoolTypeLabel = (type?: number | null) => {
+  if (!type) return "--";
+  return `Type ${type}`;
+};
+
+const getStoolStatus = (type?: number | null) => {
+  if (!type) return "No log";
+  if (type >= 3 && type <= 4) return "Normal";
+  if (type === 2 || type === 5) return "Watch";
+  return "Check";
+};
+
+const getSymptomSeverityFromNotes = (notes?: string | null) => {
+  if (!notes?.trim()) return null;
+  if (/\b(severe|intense|bad|worse|painful)\b/i.test(notes)) return { label: "Severe", badge: "High" };
+  if (/\b(moderate|medium|some|bloated|bloating|cramp|pain|gas|reflux|heartburn)\b/i.test(notes)) {
+    return { label: "Moderate", badge: "Medium" };
+  }
+  if (/\b(mild|little|slight|minor|comfortable|normal|fine|ok)\b/i.test(notes)) return { label: "Mild", badge: "Low" };
+  return { label: "Logged", badge: "Logged" };
+};
+
+const getSymptomSignal = (symptomNotes?: string | null, stoolLog?: any) => {
+  const noteSignal = getSymptomSeverityFromNotes(symptomNotes);
+  if (noteSignal) return noteSignal;
+
+  const type = stoolLog?.bristol_type;
+  const consistency = `${stoolLog?.consistency ?? ""} ${stoolLog?.notes ?? ""}`.toLowerCase();
+
+  if (!type && !consistency.trim()) return { label: "None logged", badge: "Clear" };
+
+  if (type === 7 || /\b(watery|diarrhea|diarrhoea|urgent)\b/i.test(consistency)) {
+    return { label: "Diarrhea", badge: "High" };
+  }
+
+  if (type === 6) {
+    return { label: "Loose", badge: "Medium" };
+  }
+
+  if (type === 1 || /\b(hard|constipat|painful)\b/i.test(consistency)) {
+    return { label: "Constipation", badge: "High" };
+  }
+
+  if (type === 2) {
+    return { label: "Constipation", badge: "Medium" };
+  }
+
+  if (type === 5) {
+    return { label: "Soft", badge: "Mild" };
+  }
+
+  if (type >= 3 && type <= 4) {
+    return { label: "Normal", badge: "Clear" };
+  }
+
+  return { label: "Logged", badge: "Check" };
+};
+
+const getRecentLogCount = (items: { created_at: string }[], start: Date, end: Date) =>
+  items.filter((item) => {
+    const createdAt = new Date(item.created_at);
+    return createdAt >= start && createdAt < end;
+  }).length;
+
+const getLoggedDayCount = (items: { created_at: string }[], start: Date, end: Date) => {
+  const days = new Set<string>();
+  items.forEach((item) => {
+    const createdAt = new Date(item.created_at);
+    if (createdAt >= start && createdAt < end) {
+      days.add(createdAt.toDateString());
+    }
+  });
+  return days.size;
+};
+
+const getWeekActivity = (items: { created_at: string }[], today: Date): DayActivity[] =>
+  Array.from({ length: 7 }, (_, index) => {
+    const day = getDaysAgo(today, 6 - index);
+    const nextDay = new Date(day);
+    nextDay.setDate(day.getDate() + 1);
+    return {
+      key: day.toISOString(),
+      label: day.toLocaleDateString([], { weekday: "short" }).slice(0, 1),
+      count: getRecentLogCount(items, day, nextDay),
+    };
+  });
 
 function QuickLogDrawer({
   children,
@@ -319,6 +425,59 @@ function TodayOverview({
       ? "Today’s timeline"
       : "Latest timeline";
 
+  const stoolEntries = useMemo(
+    () => stoolLogs.filter((log) => log.bristol_type !== null && log.bristol_type !== undefined),
+    [stoolLogs],
+  );
+  const symptomEntries = useMemo(
+    () => stoolLogs.filter((log) => log.notes?.trim() && (log.bristol_type === null || log.bristol_type === undefined)),
+    [stoolLogs],
+  );
+  const latestStool = stoolEntries[0];
+  const latestSymptom = symptomEntries[0];
+  const symptomSignal = getSymptomSignal(latestSymptom?.notes, latestStool);
+  const todayFoodCount = foodLogs.filter((log) => isSameDay(new Date(log.created_at), today)).length;
+  const mealsLabel = todayFoodCount > 0 ? `${todayFoodCount} logged` : "No meal yet";
+  const mealsBadge = todayFoodCount > 0 ? "Today" : "Add meal";
+  const todayHasStoolSignal = stoolEntries.some((log) => {
+    const signal = getSymptomSignal(undefined, log);
+    return isSameDay(new Date(log.created_at), today) && signal.label !== "Normal" && signal.label !== "None logged";
+  });
+  const todayLoggedCount = [
+    foodLogs.some((log) => isSameDay(new Date(log.created_at), today)),
+    stoolEntries.some((log) => isSameDay(new Date(log.created_at), today)),
+    symptomEntries.some((log) => isSameDay(new Date(log.created_at), today)) || todayHasStoolSignal,
+  ].filter(Boolean).length;
+  const remainingToday = Math.max(0, 3 - todayLoggedCount);
+  const todayBadge = remainingToday === 0 ? "Done" : `${remainingToday} left`;
+  const allActivityLogs = useMemo(
+    () => [...foodLogs, ...stoolEntries, ...symptomEntries],
+    [foodLogs, stoolEntries, symptomEntries],
+  );
+  const currentWeekStart = getDaysAgo(today, 6);
+  const tomorrowStart = getDaysAgo(today, -1);
+  const previousWeekStart = getDaysAgo(today, 13);
+  const currentLoggedDays = getLoggedDayCount(allActivityLogs, currentWeekStart, tomorrowStart);
+  const previousLoggedDays = getLoggedDayCount(allActivityLogs, previousWeekStart, currentWeekStart);
+  const consistencyScore = Math.round((currentLoggedDays / 7) * 100);
+  const previousConsistencyScore = Math.round((previousLoggedDays / 7) * 100);
+  const consistencyDelta = consistencyScore - previousConsistencyScore;
+  const weekActivity = getWeekActivity(allActivityLogs, today);
+  const rhythmTitle =
+    currentLoggedDays >= 5
+      ? "Your gut rhythm is steady"
+      : currentLoggedDays >= 3
+        ? "Your gut rhythm is building"
+        : "Start building your gut rhythm";
+  const patternTitle =
+    foodLogs.length > 0 && stoolEntries.length > 0
+      ? "Meal and stool logs are ready for pattern spotting."
+      : "Log meals and stool together to unlock better patterns.";
+  const patternDescription =
+    foodLogs.length > 0 && stoolEntries.length > 0
+      ? "Gutly can compare what you eat with digestion timing as your history grows."
+      : "This is an association from your recent logs, not a diagnosis.";
+
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
       <section className="relative overflow-hidden rounded-[24px] bg-primary px-5 py-5 text-primary-foreground shadow-card sm:rounded-[28px] sm:px-8 sm:py-9">
@@ -356,25 +515,25 @@ function TodayOverview({
               <span className="flex size-8 items-center justify-center rounded-2xl bg-primary-soft text-primary sm:size-10">
                 <Check aria-hidden="true" />
               </span>
-              <Badge variant="secondary" className="hidden text-[11px] min-[390px]:inline-flex sm:inline-flex">1 left</Badge>
+              <Badge variant="secondary" className="hidden text-[11px] min-[390px]:inline-flex sm:inline-flex">{todayBadge}</Badge>
             </div>
             <div>
               <CardDescription className="text-[11px] leading-tight sm:text-sm">Today</CardDescription>
-              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">2/3 logged</CardTitle>
+              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">{todayLoggedCount}/3 logged</CardTitle>
             </div>
           </CardHeader>
         </Card>
         <Card className="border border-border/50 shadow-none">
           <CardHeader className="gap-2 p-2.5 min-[390px]:p-3 sm:gap-3 sm:p-5">
             <div className="flex items-center justify-between gap-1.5">
-              <span className="flex size-8 items-center justify-center rounded-2xl bg-amber-100 text-amber-800 sm:size-10">
-                <Scroll aria-hidden="true" />
+              <span className="flex size-8 items-center justify-center rounded-2xl bg-orange-100 text-orange-700 sm:size-10">
+                <Utensils aria-hidden="true" />
               </span>
-              <Badge variant="secondary" className="text-[11px]">Normal</Badge>
+              <Badge variant="secondary" className="text-[11px]">{mealsBadge}</Badge>
             </div>
             <div>
-              <CardDescription className="text-[11px] leading-tight sm:text-sm">Stool</CardDescription>
-              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">Type 4</CardTitle>
+              <CardDescription className="text-[11px] leading-tight sm:text-sm">Meals</CardDescription>
+              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">{mealsLabel}</CardTitle>
             </div>
           </CardHeader>
         </Card>
@@ -384,11 +543,11 @@ function TodayOverview({
               <span className="flex size-8 items-center justify-center rounded-2xl bg-rose-100 text-rose-700 sm:size-10">
                 <HeartPulse aria-hidden="true" />
               </span>
-              <Badge className="bg-primary-soft text-[11px] text-primary hover:bg-primary-soft">Low</Badge>
+              <Badge className="bg-primary-soft text-[11px] text-primary hover:bg-primary-soft">{symptomSignal.badge}</Badge>
             </div>
             <div>
               <CardDescription className="text-[11px] leading-tight sm:text-sm">Symptoms</CardDescription>
-              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">Mild</CardTitle>
+              <CardTitle className="mt-0.5 text-[15px] leading-tight min-[390px]:text-base sm:mt-1 sm:text-xl">{symptomSignal.label}</CardTitle>
             </div>
           </CardHeader>
         </Card>
@@ -400,29 +559,31 @@ function TodayOverview({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <CardDescription>This week</CardDescription>
-                <CardTitle className="mt-1 text-2xl">Your gut rhythm is steadier</CardTitle>
+                <CardTitle className="mt-1 text-2xl">{rhythmTitle}</CardTitle>
               </div>
-              <Badge className="bg-primary-soft text-primary hover:bg-primary-soft">+12%</Badge>
+              <Badge className="bg-primary-soft text-primary hover:bg-primary-soft">
+                {consistencyDelta > 0 ? "+" : ""}{consistencyDelta}%
+              </Badge>
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-5 px-6 pb-5">
             <div>
               <div className="mb-2 flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Consistency score</span>
-                <span className="font-semibold">78 / 100</span>
+                <span className="font-semibold">{consistencyScore} / 100</span>
               </div>
-              <Progress value={78} className="h-2.5" />
+              <Progress value={consistencyScore} className="h-2.5" />
             </div>
             <div className="grid grid-cols-7 gap-2" aria-label="Seven day activity">
-              {["W", "T", "F", "S", "S", "M", "T"].map((day, index) => (
-                <div key={`${day}-${index}`} className="flex flex-col items-center gap-2">
+              {weekActivity.map((day) => (
+                <div key={day.key} className="flex flex-col items-center gap-2">
                   <div
                     className={cn(
-                      "w-full rounded-xl",
-                      index < 5 ? "h-12 bg-primary/80" : index === 6 ? "h-9 bg-primary/35" : "h-7 bg-muted"
+                      "w-full rounded-xl transition-colors",
+                      day.count >= 3 ? "h-12 bg-primary/80" : day.count === 2 ? "h-10 bg-primary/65" : day.count === 1 ? "h-8 bg-primary/35" : "h-7 bg-muted"
                     )}
                   />
-                  <span className="text-xs text-muted-foreground">{day}</span>
+                  <span className="text-xs text-muted-foreground">{day.label}</span>
                 </div>
               ))}
             </div>
@@ -441,11 +602,11 @@ function TodayOverview({
               <Sparkles aria-hidden="true" />
             </span>
             <CardDescription>Pattern worth noticing</CardDescription>
-            <CardTitle className="text-xl leading-snug">Fiber-rich breakfasts align with calmer afternoons.</CardTitle>
+            <CardTitle className="text-xl leading-snug">{patternTitle}</CardTitle>
           </CardHeader>
           <CardContent className="px-6 pb-4">
             <p className="text-sm leading-relaxed text-muted-foreground">
-              This is an association from your recent logs, not a diagnosis.
+              {patternDescription}
             </p>
           </CardContent>
           <CardFooter className="px-6 pb-6">
