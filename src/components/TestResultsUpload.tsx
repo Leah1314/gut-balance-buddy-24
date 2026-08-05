@@ -26,6 +26,22 @@ interface TestResult {
   summary: string;
 }
 
+const getFunctionErrorMessage = async (error: any) => {
+  const fallback = error?.message || "Unknown error";
+
+  try {
+    const context = error?.context;
+    if (context && typeof context.json === "function") {
+      const body = await context.json();
+      return body?.details || body?.error || fallback;
+    }
+  } catch (parseError) {
+    console.error("Failed to read function error body:", parseError);
+  }
+
+  return fallback;
+};
+
 const TestResultsUpload = () => {
   const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -43,12 +59,6 @@ const TestResultsUpload = () => {
         setAnalysisResult(null);
         setSavedResultId(null);
         
-        // Show info toast for PDF files
-        if (file.type === 'application/pdf') {
-          toast.info("PDF files have limited analysis. For best results, please upload an image (JPG/PNG) of your test results.", {
-            duration: 5000
-          });
-        }
       } else {
         toast.error("Please select an image (JPG, PNG) or PDF file");
       }
@@ -56,7 +66,15 @@ const TestResultsUpload = () => {
   };
 
   const saveTestResultToDatabase = async (result: TestResult) => {
-    if (!user || !selectedFile) return null;
+    if (!user) {
+      toast.error("Please sign in before saving test results.");
+      return null;
+    }
+
+    if (!selectedFile) {
+      toast.error("Please select a file before saving.");
+      return null;
+    }
 
     setIsSaving(true);
     try {
@@ -84,7 +102,7 @@ const TestResultsUpload = () => {
 
       if (error) {
         console.error('Error saving test result:', error);
-        toast.error("Failed to save test result to database");
+        toast.error(`Failed to save test result: ${error.message}`);
         return null;
       }
 
@@ -94,7 +112,8 @@ const TestResultsUpload = () => {
       return data;
     } catch (error) {
       console.error('Error saving test result:', error);
-      toast.error("Failed to save test result");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Failed to save test result: ${message}`);
       return null;
     } finally {
       setIsSaving(false);
@@ -104,11 +123,6 @@ const TestResultsUpload = () => {
   const analyzeTestResults = async () => {
     if (!selectedFile) {
       toast.error("Please select a file first");
-      return;
-    }
-
-    if (!user) {
-      toast.error("You must be logged in to analyze test results");
       return;
     }
 
@@ -130,13 +144,15 @@ const TestResultsUpload = () => {
           const { data, error } = await supabase.functions.invoke('analyze-test-results', {
             body: { 
               image: base64Data,
-              fileType: selectedFile.type
+              fileType: selectedFile.type,
+              fileName: selectedFile.name
             }
           });
 
           if (error) {
             console.error('Error analyzing test results:', error);
-            toast.error(`Failed to analyze test results: ${error.message || 'Unknown error'}`);
+            const message = await getFunctionErrorMessage(error);
+            toast.error(`Failed to analyze test results: ${message}`);
             return;
           }
 
@@ -228,7 +244,7 @@ const TestResultsUpload = () => {
               <div className="flex items-start gap-2 mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
                 <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-blue-700">
-                  <strong>PDF Note:</strong> For best analysis results, consider taking a clear photo of your test results instead of uploading a PDF.
+                  <strong>PDF supported:</strong> Gutly can analyze readable PDFs. If a scan is blurry, a clear photo may work better.
                 </p>
               </div>
             )}
@@ -236,7 +252,7 @@ const TestResultsUpload = () => {
           
           <Button
             onClick={analyzeTestResults}
-            disabled={!selectedFile || isAnalyzing || !user}
+            disabled={!selectedFile || isAnalyzing}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-10"
           >
             {isAnalyzing ? (
@@ -366,4 +382,3 @@ const TestResultsUpload = () => {
 };
 
 export default TestResultsUpload;
-

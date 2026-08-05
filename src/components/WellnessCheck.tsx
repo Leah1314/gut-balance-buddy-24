@@ -15,6 +15,7 @@ import {
   TrendingUp,
   CheckCircle
 } from "lucide-react";
+import { useWellnessLogs } from "@/hooks/useWellnessLogs";
 
 const WellnessCheck = () => {
   const [stressLevel, setStressLevel] = useState([5]);
@@ -22,6 +23,7 @@ const WellnessCheck = () => {
   const [waterIntake, setWaterIntake] = useState([6]);
   const [exerciseMinutes, setExerciseMinutes] = useState([30]);
   const [isCompleted, setIsCompleted] = useState(false);
+  const { wellnessLogs, addWellnessLog, loading } = useWellnessLogs();
 
   const wellnessMetrics = [
     {
@@ -78,10 +80,9 @@ const WellnessCheck = () => {
     }
   ];
 
-  const todayCheckins = [
-    { time: "Morning", score: 85, mood: "Good" },
-    { time: "Afternoon", score: 72, mood: "Fair" },
-  ];
+  const todayCheckins = wellnessLogs.filter(
+    (log) => new Date(log.created_at).toDateString() === new Date().toDateString(),
+  );
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -89,14 +90,20 @@ const WellnessCheck = () => {
     return "text-red-600";
   };
 
-  const handleCompleteCheckin = () => {
-    setIsCompleted(true);
-    console.log("Wellness check-in completed:", {
-      stress: stressLevel[0],
-      sleep: sleepHours[0], 
-      water: waterIntake[0],
-      exercise: exerciseMinutes[0]
+  const handleCompleteCheckin = async () => {
+    const score = calculateOverallScore();
+    const result = await addWellnessLog({
+      stress_level: stressLevel[0],
+      sleep_hours: sleepHours[0],
+      water_glasses: waterIntake[0],
+      exercise_minutes: exerciseMinutes[0],
+      wellness_score: score,
+      notes: `Stress ${stressLevel[0]}/10 · Sleep ${sleepHours[0]}h · Water ${waterIntake[0]} glasses · Exercise ${exerciseMinutes[0]} min`,
     });
+
+    if (result) {
+      setIsCompleted(true);
+    }
   };
 
   const calculateOverallScore = () => {
@@ -159,9 +166,10 @@ const WellnessCheck = () => {
             <Button 
               onClick={handleCompleteCheckin}
               className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+              disabled={loading}
             >
               <CheckCircle className="w-4 h-4 mr-2" />
-              Complete Check-in
+              {loading ? "Saving..." : "Complete Check-in"}
             </Button>
           ) : (
             <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
@@ -184,20 +192,33 @@ const WellnessCheck = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {todayCheckins.map((checkin, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-900">{checkin.time}</p>
-                <p className="text-sm text-gray-600">Mood: {checkin.mood}</p>
+          {todayCheckins.length > 0 ? (
+            todayCheckins.map((checkin) => (
+              <div key={checkin.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {new Date(checkin.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Stress {checkin.stress_level}/10 · Sleep {checkin.sleep_hours}h
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Water {checkin.water_glasses} glasses · Exercise {checkin.exercise_minutes} min
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-lg font-bold ${getScoreColor(checkin.wellness_score)}`}>
+                    {checkin.wellness_score}%
+                  </p>
+                  <p className="text-xs text-gray-500">Wellness Score</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className={`text-lg font-bold ${getScoreColor(checkin.score)}`}>
-                  {checkin.score}%
-                </p>
-                <p className="text-xs text-gray-500">Wellness Score</p>
-              </div>
+            ))
+          ) : (
+            <div className="rounded-lg bg-gray-50 p-4 text-center text-sm text-gray-600">
+              No wellness check-ins yet today.
             </div>
-          ))}
+          )}
         </CardContent>
       </Card>
 

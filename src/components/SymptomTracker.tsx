@@ -18,12 +18,16 @@ import {
   Calendar,
   Clock
 } from "lucide-react";
+import { toast } from "sonner";
+import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 const SymptomTracker = () => {
   const { t } = useTranslation();
   const [selectedSymptom, setSelectedSymptom] = useState("");
   const [severity, setSeverity] = useState([3]);
   const [notes, setNotes] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const { addStoolLog } = useStoolLogs();
 
   const commonSymptoms = [
     t('symptoms.common.bloating'),
@@ -74,13 +78,32 @@ const SymptomTracker = () => {
     return "bg-red-100 text-red-800";
   };
 
-  const handleLogSymptom = () => {
-    if (selectedSymptom) {
-      console.log("Logging symptom:", { selectedSymptom, severity: severity[0], notes });
-      // Here you would typically save to a database
-      setSelectedSymptom("");
-      setSeverity([3]);
-      setNotes("");
+  const handleLogSymptom = async () => {
+    if (!selectedSymptom.trim() || isSaving) return;
+
+    setIsSaving(true);
+    const symptomNote = [
+      `Symptom: ${selectedSymptom.trim()}`,
+      `Severity: ${severity[0]}/10`,
+      notes.trim() ? `Notes: ${notes.trim()}` : "",
+    ].filter(Boolean).join("\n");
+
+    try {
+      const result = await addStoolLog({
+        bristol_type: null,
+        consistency: null,
+        color: null,
+        notes: symptomNote,
+      });
+
+      if (result) {
+        toast.success("Symptom saved");
+        setSelectedSymptom("");
+        setSeverity([3]);
+        setNotes("");
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -155,10 +178,10 @@ const SymptomTracker = () => {
           <Button 
             onClick={handleLogSymptom}
             className="w-full bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600"
-            disabled={!selectedSymptom}
+            disabled={!selectedSymptom.trim() || isSaving}
           >
             <Activity className="w-4 h-4 mr-2" />
-            {t('buttons.logSymptom')}
+            {isSaving ? "Saving..." : t('buttons.logSymptom')}
           </Button>
         </CardContent>
       </Card>

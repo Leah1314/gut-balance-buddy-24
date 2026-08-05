@@ -41,6 +41,9 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import FoodAnalyzer from "@/components/FoodAnalyzer";
 import StoolTracker from "@/components/StoolTracker";
+import SymptomTracker from "@/components/SymptomTracker";
+import WellnessCheck from "@/components/WellnessCheck";
+import TestResultsUpload from "@/components/TestResultsUpload";
 import ChatPage from "@/components/ChatPage";
 import HealthProfile from "@/components/HealthProfile";
 import Analytics from "@/components/Analytics";
@@ -53,7 +56,7 @@ import { useStoolLogs } from "@/hooks/useStoolLogs";
 
 type MainView = "today" | "insights" | "coach" | "profile";
 type NavView = MainView | "log";
-type LogView = "food" | "stool";
+type LogView = "food" | "symptom" | "stool" | "wellness" | "test";
 type TimelineItem = {
   id: string;
   createdAt: string;
@@ -278,18 +281,36 @@ function QuickLogDrawer({
   const resetDrawer = (nextOpen: boolean) => {
     setOpen(nextOpen);
     if (!nextOpen) {
-      setSelectedLogView(null);
+      window.setTimeout(() => setSelectedLogView(null), 180);
     }
   };
 
-  const choose = (id: string) => {
-    if (id === "food" || id === "stool") {
-      setSelectedLogView(id);
+  const choose = (id: string, event?: React.SyntheticEvent) => {
+    if (!["food", "symptom", "stool", "wellness", "test"].includes(id)) return;
+
+    event?.preventDefault();
+    event?.stopPropagation();
+    setSelectedLogView(id as LogView);
+  };
+
+  const handleLogOptionPointerDown = (id: string, event: React.PointerEvent<HTMLButtonElement>) => {
+    if (event.pointerType === "mouse") return;
+
+    choose(id, event);
+  };
+
+  const handleLogOptionClick = (id: string, event: React.MouseEvent<HTMLButtonElement>) => {
+    choose(id, event);
+  };
+
+  const handleLogOptionKeyDown = (id: string, event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      choose(id, event);
     }
   };
 
   return (
-    <Drawer open={open} onOpenChange={resetDrawer}>
+    <Drawer open={open} onOpenChange={resetDrawer} dismissible={!selectedLogView} modal>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="mx-auto max-h-[92svh] max-w-2xl rounded-t-[28px] border-border/60">
         <DrawerHeader className="px-6 pb-3 pt-2 text-left">
@@ -307,7 +328,11 @@ function QuickLogDrawer({
               </Button>
               <div>
                 <DrawerTitle className="text-2xl">
-                  {selectedLogView === "food" ? "Log food" : "Log stool"}
+                  {selectedLogView === "food" && "Log meal"}
+                  {selectedLogView === "symptom" && "Log symptom"}
+                  {selectedLogView === "stool" && "Log stool"}
+                  {selectedLogView === "wellness" && "Wellness check-in"}
+                  {selectedLogView === "test" && "Upload test result"}
                 </DrawerTitle>
                 <DrawerDescription>
                   Add the detail and return to your dashboard when you are done.
@@ -325,19 +350,25 @@ function QuickLogDrawer({
         </DrawerHeader>
         <div className="overflow-y-auto px-4 pb-8 sm:px-6">
           {selectedLogView ? (
-            selectedLogView === "food" ? <FoodAnalyzer /> : <StoolTracker />
+            <>
+              {selectedLogView === "food" && <FoodAnalyzer />}
+              {selectedLogView === "symptom" && <SymptomTracker />}
+              {selectedLogView === "stool" && <StoolTracker />}
+              {selectedLogView === "wellness" && <WellnessCheck />}
+              {selectedLogView === "test" && <TestResultsUpload />}
+            </>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
               {logOptions.map((option) => {
                 const Icon = option.icon;
-                const enabled = option.id === "food" || option.id === "stool";
                 return (
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => choose(option.id)}
-                    disabled={!enabled}
-                    className="group flex min-h-20 items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 text-left transition-colors hover:border-primary/30 hover:bg-primary-soft/30 disabled:cursor-not-allowed disabled:opacity-50"
+                    onPointerDown={(event) => handleLogOptionPointerDown(option.id, event)}
+                    onClick={(event) => handleLogOptionClick(option.id, event)}
+                    onKeyDown={(event) => handleLogOptionKeyDown(option.id, event)}
+                    className="group flex min-h-20 touch-manipulation select-none items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 text-left transition-colors hover:border-primary/30 hover:bg-primary-soft/30"
                   >
                     <span className={cn("flex size-11 items-center justify-center rounded-2xl", option.tone)}>
                       <Icon aria-hidden="true" />
@@ -346,11 +377,7 @@ function QuickLogDrawer({
                       <span className="block font-semibold text-foreground">{option.label}</span>
                       <span className="block text-sm text-muted-foreground">{option.description}</span>
                     </span>
-                    {enabled ? (
-                      <ChevronRight className="text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-                    ) : (
-                      <Badge variant="secondary">Soon</Badge>
-                    )}
+                    <ChevronRight className="text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                   </button>
                 );
               })}
