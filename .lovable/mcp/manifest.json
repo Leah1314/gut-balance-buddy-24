@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ppfonjpfpyfeklecowpd.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "gutlyhealth",
+      "version": "0.1.0",
+      "title": "gutlyhealth"
+    },
+    "tools": [
+      {
+        "name": "list_food_logs",
+        "title": "List food logs",
+        "description": "List the signed-in user's most recent food log entries, newest first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "How many entries to return."
+            },
+            "since": {
+              "type": "string",
+              "description": "Optional ISO date/time; only entries created after it are returned."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_food_log",
+        "title": "Add food log",
+        "description": "Record a meal or food item for the signed-in user.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "food_name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Name of the meal or food item."
+            },
+            "description": {
+              "type": "string",
+              "description": "Optional notes about the meal."
+            },
+            "created_at": {
+              "type": "string",
+              "description": "Optional ISO timestamp for backdated entries."
+            }
+          },
+          "required": [
+            "food_name"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_stool_logs",
+        "title": "List stool logs",
+        "description": "List the signed-in user's most recent stool entries (Bristol type, colour, consistency), newest first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "How many entries to return."
+            },
+            "since": {
+              "type": "string",
+              "description": "Optional ISO date/time; only entries created after it are returned."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_stool_log",
+        "title": "Add stool log",
+        "description": "Record a stool entry for the signed-in user.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "bristol_type": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7,
+              "description": "Bristol stool scale type, 1-7."
+            },
+            "color": {
+              "type": "string",
+              "description": "Colour, e.g. brown, green, black."
+            },
+            "consistency": {
+              "type": "string",
+              "description": "Consistency description."
+            },
+            "notes": {
+              "type": "string",
+              "description": "Optional notes."
+            },
+            "created_at": {
+              "type": "string",
+              "description": "Optional ISO timestamp for backdated entries."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_wellness_logs",
+        "title": "List wellness logs",
+        "description": "List the signed-in user's daily wellness check-ins (sleep, stress, water, exercise), newest first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 14,
+              "description": "How many entries to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_health_profile",
+        "title": "Get health profile",
+        "description": "Read the signed-in user's gut health profile: age, diet, restrictions, conditions, medications.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_test_results",
+        "title": "List test results",
+        "description": "List the signed-in user's uploaded lab/test result summaries, newest first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "description": "How many results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
