@@ -14,11 +14,56 @@ interface LogEntry {
   timestamp: string;
   title: string;
   content: string;
+  score: number | null;
   details?: any;
 }
 
+const clampScore = (score: number) => Math.max(0, Math.min(100, Math.round(score)));
+
+const stringifyAnalysis = (value: unknown) => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return '';
+  }
+};
+
+const normalizeScoreValue = (value: number, scale?: number) => {
+  if (scale === 100 && value > 100 && value <= 1000) {
+    return clampScore(value / 10);
+  }
+
+  if (scale === 10 || (!scale && value <= 10)) {
+    return clampScore(value * 10);
+  }
+
+  return clampScore(value);
+};
+
+const extractScoreFromText = (value: unknown): number | null => {
+  const text = stringifyAnalysis(value);
+  if (!text) return null;
+
+  const scoreWithScale = text.match(
+    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3}(?:\.\d+)?)(?:\s*\/\s*(10|100))?/i
+  );
+
+  if (scoreWithScale) {
+    return normalizeScoreValue(Number(scoreWithScale[1]), scoreWithScale[2] ? Number(scoreWithScale[2]) : undefined);
+  }
+
+  const jsonScore = text.match(/\b(?:gutHealthRating|healthScore|score|rating)"?\s*[:=]\s*(\d{1,3}(?:\.\d+)?)/i);
+  if (jsonScore) {
+    return normalizeScoreValue(Number(jsonScore[1]));
+  }
+
+  return null;
+};
+
 const normalizeHistoricalScoreText = (value: unknown) => {
-  const text = typeof value === 'string' ? value : JSON.stringify(value);
+  const text = stringifyAnalysis(value);
 
   return text
     .replace(/Gut Health Rating:\s*(\d{1,2})\/10/gi, (_, score) => `Gut Fit Score: ${Number(score) * 10}/100`)
@@ -56,6 +101,7 @@ const LogHistory = () => {
           timestamp: log.created_at,
           title: t('history.foodEntry'),
           content: log.food_name,
+          score: extractScoreFromText(log.analysis_result) ?? extractScoreFromText(log.description),
           details: {
             description: log.description,
             analysis_result: log.analysis_result,
@@ -74,6 +120,7 @@ const LogHistory = () => {
           timestamp: log.created_at,
           title: t('history.stoolEntry'),
           content: log.notes || `Bristol Type ${log.bristol_type || 'N/A'}`,
+          score: extractScoreFromText(log.notes),
           details: {
             bristol_type: log.bristol_type,
             color: log.color,
@@ -94,6 +141,29 @@ const LogHistory = () => {
   useEffect(() => {
     fetchStoolLogs();
   }, []);
+
+  useEffect(() => {
+    const refreshLogs = () => {
+      refreshFoodLogs();
+      fetchStoolLogs();
+    };
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refreshLogs();
+      }
+    };
+
+    window.addEventListener('gutly:logs-updated', refreshLogs);
+    window.addEventListener('focus', refreshLogs);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+
+    return () => {
+      window.removeEventListener('gutly:logs-updated', refreshLogs);
+      window.removeEventListener('focus', refreshLogs);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, [refreshFoodLogs]);
 
   useEffect(() => {
     combineAndSortLogs();
@@ -246,9 +316,21 @@ const LogHistory = () => {
                   <h3 className="text-[15px] font-semibold text-foreground truncate">
                     {entry.title}
                   </h3>
-                  <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">
-                    {formatTimestamp(entry.timestamp)}
-                  </span>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    {entry.score !== null && (
+                      <span className={cn(
+                        "rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums",
+                        entry.type === 'food'
+                          ? "bg-primary-soft text-primary"
+                          : "bg-accent/20 text-accent-foreground"
+                      )}>
+                        {entry.score}/100
+                      </span>
+                    )}
+                    <span className="text-[11px] text-muted-foreground tabular-nums">
+                      {formatTimestamp(entry.timestamp)}
+                    </span>
+                  </div>
                 </div>
                 {renderLogContent(entry)}
               </div>

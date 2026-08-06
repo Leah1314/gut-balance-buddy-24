@@ -47,6 +47,7 @@ import TestResultsUpload from "@/components/TestResultsUpload";
 import ChatPage from "@/components/ChatPage";
 import HealthProfile from "@/components/HealthProfile";
 import Analytics from "@/components/Analytics";
+import LogHistory from "@/components/LogHistory";
 import UserMenu from "@/components/UserMenu";
 import LanguageSelector from "@/components/LanguageSelector";
 import GutlyMascot from "@/components/gutly/GutlyMascot";
@@ -54,7 +55,7 @@ import GutlyLogoMark from "@/components/gutly/GutlyLogoMark";
 import { useFoodLogs } from "@/hooks/useFoodLogs";
 import { useStoolLogs } from "@/hooks/useStoolLogs";
 
-type MainView = "today" | "insights" | "coach" | "profile";
+type MainView = "today" | "insights" | "history" | "coach" | "profile";
 type NavView = MainView | "log";
 type LogView = "food" | "symptom" | "stool" | "wellness" | "test";
 type TimelineItem = {
@@ -404,9 +405,11 @@ function QuickLogDrawer({
 
 function TodayOverview({
   onInsights,
+  onHistory,
   onCoach,
 }: {
   onInsights: () => void;
+  onHistory: () => void;
   onCoach: () => void;
 }) {
   const { foodLogs } = useFoodLogs();
@@ -664,7 +667,7 @@ function TodayOverview({
             <CardDescription>Recent activity</CardDescription>
             <CardTitle className="mt-1 text-xl">{timelineTitle}</CardTitle>
           </div>
-          <Button variant="ghost" size="sm" onClick={onInsights}>View history</Button>
+          <Button variant="ghost" size="sm" onClick={onHistory}>View history</Button>
         </CardHeader>
         <CardContent className="px-6 pb-6">
           {timelineItems.length > 0 ? (
@@ -717,6 +720,7 @@ const Index = () => {
       return (
         <TodayOverview
           onInsights={() => setActiveMainView("insights")}
+          onHistory={() => setActiveMainView("history")}
           onCoach={() => setActiveMainView("coach")}
         />
       );
@@ -724,6 +728,7 @@ const Index = () => {
     if (activeMainView === "insights") {
       return <Analytics onSwitchToChat={() => setActiveMainView("coach")} />;
     }
+    if (activeMainView === "history") return <LogHistory />;
     if (activeMainView === "coach") return <ChatPage />;
     if (activeMainView === "profile") return <HealthProfile />;
   };
