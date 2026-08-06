@@ -133,7 +133,7 @@ const StoolTracker = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-4">
       {/* Success Card Overlay */}
       {showSuccessCard && (
         <SuccessCard 
@@ -219,7 +219,7 @@ const StoolTracker = () => {
           />
 
           {/* Save Button */}
-          <div className="text-center pt-2">
+          <div className="sticky bottom-0 z-10 -mx-4 bg-background/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 text-center backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
             <Button
               onClick={handleSave}
               disabled={isSaving || !selectedType || !selectedConsistency || !selectedColor}

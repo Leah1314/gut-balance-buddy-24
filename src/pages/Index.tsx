@@ -312,7 +312,7 @@ function QuickLogDrawer({
   return (
     <Drawer open={open} onOpenChange={resetDrawer} dismissible={!selectedLogView} modal>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="mx-auto flex h-[92svh] max-w-2xl flex-col rounded-t-[28px] border-border/60">
+      <DrawerContent className="mx-auto flex h-[90svh] max-w-2xl flex-col overflow-hidden rounded-t-[28px] border-border/60">
         <DrawerHeader className="shrink-0 px-6 pb-3 pt-2 text-left">
           {selectedLogView ? (
             <div className="flex items-start gap-3">
@@ -348,7 +348,7 @@ function QuickLogDrawer({
             </>
           )}
         </DrawerHeader>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+2rem)] sm:px-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+5.5rem)] sm:px-6">
           {selectedLogView ? (
             <>
               {selectedLogView === "food" && <FoodAnalyzer />}

@@ -139,7 +139,7 @@ const FoodDiary = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-4">
       <Tabs defaultValue="camera" className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/70 rounded-2xl p-1">
           <TabsTrigger 
@@ -269,7 +269,7 @@ const FoodDiary = () => {
                         </Badge>
                       ))}
                     </div>
-                    <div className="sticky bottom-0 -mx-4 bg-card/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+                    <div className="sticky bottom-0 z-10 -mx-4 bg-card/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
                       <Button
                         type="button"
                         onClick={handleLogSelectedFoods}
