@@ -80,6 +80,25 @@ const averageScores = (scores: number[]) => {
   return clampScore(scores.reduce((sum, score) => sum + score, 0) / scores.length);
 };
 
+// Fallback scoring for manually logged entries without an AI score
+const BRISTOL_SCORES: Record<number, number> = {
+  1: 30,
+  2: 50,
+  3: 85,
+  4: 95,
+  5: 70,
+  6: 40,
+  7: 25,
+};
+
+const estimateFoodScore = (log: any): number => {
+  const text = `${log?.food_name ?? ''} ${log?.description ?? ''}`;
+  let score = 65;
+  if (/pizza|burger|fries|chips|soda|candy|processed|fast food|fried|cake|donut|ice cream/i.test(text)) score -= 20;
+  if (/apple|banana|oats|beans|broccoli|spinach|berries|whole grain|quinoa|sweet potato|vegetable|salad|yogurt|kefir|lentil/i.test(text)) score += 15;
+  return clampScore(score);
+};
+
 const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -167,7 +186,8 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     const explicitAverage = averageScores(explicitScores);
     if (explicitAverage !== null) return explicitAverage;
 
-    return null;
+    // Manual entries without an AI score still count toward the day
+    return averageScores(dayLogs.map(estimateFoodScore));
   };
 
   const calculateEnhancedStoolScore = (logs: any[], date: Date): number | null => {
@@ -184,7 +204,12 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
     if (latestExplicitScore !== undefined) return latestExplicitScore;
 
-    return null;
+    // Fall back to Bristol type for manually logged entries
+    const bristolScores = dayLogs
+      .map(log => (typeof log.bristol_type === 'number' ? BRISTOL_SCORES[log.bristol_type] : undefined))
+      .filter((score): score is number => typeof score === 'number');
+
+    return averageScores(bristolScores);
   };
 
   const calculateHistoricalScores = () => {
