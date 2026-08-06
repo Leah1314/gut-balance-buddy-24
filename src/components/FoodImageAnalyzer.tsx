@@ -38,6 +38,7 @@ const FoodImageAnalyzer = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [nutritionData, setNutritionData] = useState<NutritionData | null>(null);
   const [userNotes, setUserNotes] = useState<string>("");
+  const [showSavedConfirmation, setShowSavedConfirmation] = useState(false);
   const { addFoodLog } = useFoodLogs();
   const gutScore = nutritionData ? Math.round(nutritionData.gutHealthRating * 10) : null;
 
@@ -52,6 +53,7 @@ const FoodImageAnalyzer = () => {
       reader.readAsDataURL(file);
       setNutritionData(null);
       setUserNotes("");
+      setShowSavedConfirmation(false);
       
       toast.success(t('food.foodUploaded'));
       console.log('Image uploaded:', file.name, file.size, 'bytes');
@@ -181,6 +183,7 @@ const FoodImageAnalyzer = () => {
       setImagePreview(null);
       setNutritionData(null);
       setUserNotes("");
+      setShowSavedConfirmation(true);
     } else {
       toast.error(t('food.saveAnalysisFailed'));
       console.error('Failed to save analysis to log');
@@ -195,6 +198,18 @@ const FoodImageAnalyzer = () => {
 
   return (
     <div className="space-y-4">
+      {showSavedConfirmation && (
+        <Card className="border-primary/20 bg-primary-soft/60 shadow-soft">
+          <CardContent className="flex items-start gap-3 p-4">
+            <CheckCircle className="mt-0.5 w-5 h-5 shrink-0 text-primary" />
+            <div>
+              <p className="font-semibold text-foreground">Meal saved to history</p>
+              <p className="text-sm text-muted-foreground">You can view it in recent activity and history.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Image Upload - Mobile optimized */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader className="pb-3">
@@ -370,7 +385,7 @@ const FoodImageAnalyzer = () => {
           </Card>
 
           {/* Save to Log Button */}
-          <div className="sticky bottom-0 z-10 -mx-4 bg-background/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 text-center backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+          <div className="pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-2 text-center">
             <Button 
               onClick={saveAnalysisToLog}
               className="w-full h-12 text-white font-medium transition-colors rounded-lg"

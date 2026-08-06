@@ -219,7 +219,7 @@ const StoolTracker = () => {
           />
 
           {/* Save Button */}
-          <div className="sticky bottom-0 z-10 -mx-4 bg-background/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 text-center backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+          <div className="pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-2 text-center">
             <Button
               onClick={handleSave}
               disabled={isSaving || !selectedType || !selectedConsistency || !selectedColor}

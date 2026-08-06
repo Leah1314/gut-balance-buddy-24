@@ -55,14 +55,14 @@ const extractScoreFromText = (value: unknown): number | null => {
   if (!text) return null;
 
   const scoreWithScale = text.match(
-    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3})(?:\s*\/\s*(10|100))?/i
+    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3}(?:\.\d+)?)(?:\s*\/\s*(10|100))?/i
   );
 
   if (scoreWithScale) {
     return normalizeScoreValue(Number(scoreWithScale[1]), scoreWithScale[2] ? Number(scoreWithScale[2]) : undefined);
   }
 
-  const jsonScore = text.match(/\b(?:gutHealthRating|healthScore|score|rating)"?\s*[:=]\s*(\d{1,3})(?:\.\d+)?/i);
+  const jsonScore = text.match(/\b(?:gutHealthRating|healthScore|score|rating)"?\s*[:=]\s*(\d{1,3}(?:\.\d+)?)/i);
   if (jsonScore) {
     return normalizeScoreValue(Number(jsonScore[1]));
   }
@@ -82,9 +82,9 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
   const [historicalData, setHistoricalData] = useState<DayScore[]>([]);
   const [filteredHistoricalData, setFilteredHistoricalData] = useState<DayScore[]>([]);
-  const [todayScore, setTodayScore] = useState(0);
-  const [foodScore, setFoodScore] = useState(0);
-  const [stoolScore, setStoolScore] = useState(0);
+  const [todayScore, setTodayScore] = useState<number | null>(null);
+  const [foodScore, setFoodScore] = useState<number | null>(null);
+  const [stoolScore, setStoolScore] = useState<number | null>(null);
   const [foodSummary, setFoodSummary] = useState<FoodSummary>({
     totalMeals: 0,
     varietyScore: 0,
@@ -129,41 +129,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     const explicitAverage = averageScores(explicitScores);
     if (explicitAverage !== null) return explicitAverage;
 
-    let score = 0;
-    
-    // Meal frequency scoring (optimal: 3-5 meals)
-    const mealCount = dayLogs.length;
-    if (mealCount >= 3 && mealCount <= 5) {
-      score += 30;
-    } else if (mealCount >= 2 && mealCount <= 6) {
-      score += 20;
-    } else {
-      score += 10;
-    }
-
-    // Food variety scoring
-    const uniqueFoods = new Set(dayLogs.map(log => log.food_name.toLowerCase()));
-    const varietyBonus = Math.min(uniqueFoods.size * 8, 30);
-    score += varietyBonus;
-
-    // Fiber-rich foods detection
-    const fiberFoods = dayLogs.filter(log => 
-      /apple|banana|oats|beans|broccoli|spinach|berries|whole grain|quinoa|sweet potato/i.test(log.food_name)
-    );
-    if (fiberFoods.length > 0) score += 20;
-
-    // Processed food detection (penalty)
-    const processedFoods = dayLogs.filter(log => 
-      /pizza|burger|fries|chips|soda|candy|processed|fast food|fried/i.test(log.food_name)
-    );
-    const processedPenalty = Math.min(processedFoods.length * 10, 30);
-    score -= processedPenalty;
-
-    // Nutritional analysis bonus
-    const hasNutritionalData = dayLogs.some(log => log.analysis_result);
-    if (hasNutritionalData) score += 20;
-
-    return Math.max(0, Math.min(score, 100));
+    return null;
   };
 
   const calculateEnhancedStoolScore = (logs: any[], date: Date): number | null => {
@@ -181,7 +147,10 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     const explicitAverage = averageScores(explicitScores);
     if (explicitAverage !== null) return explicitAverage;
 
-    const latestLog = dayLogs[0];
+    const typedLogs = dayLogs.filter(log => log.bristol_type !== null && log.bristol_type !== undefined);
+    if (typedLogs.length === 0) return null;
+
+    const latestLog = typedLogs[0];
     let score = 0;
 
     // Bristol type scoring
@@ -221,7 +190,17 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
   const calculateHistoricalScores = () => {
     const today = new Date();
-    const daysToShow = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 60;
+    const allLogDates = [...foodLogs, ...stoolLogs]
+      .map(log => new Date(log.created_at))
+      .filter(date => !Number.isNaN(date.getTime()));
+    const earliestLogDate = allLogDates.length > 0
+      ? new Date(Math.min(...allLogDates.map(date => date.getTime())))
+      : today;
+    const allTimeDays = Math.max(
+      1,
+      Math.ceil((today.getTime() - earliestLogDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    );
+    const daysToShow = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : allTimeDays;
     const historical: DayScore[] = [];
 
     for (let i = daysToShow - 1; i >= 0; i--) {
@@ -258,7 +237,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     
     // Set today's scores from the last day in historical data
     const todayData = historical[historical.length - 1];
-    setTodayScore(todayData.score || 0);
+    setTodayScore(todayData.score);
     setFoodScore(todayData.foodScore);
     setStoolScore(todayData.stoolScore);
   };
@@ -305,14 +284,16 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     });
   };
 
-  const getScoreEmoji = (score: number) => {
+  const getScoreEmoji = (score: number | null) => {
+    if (score === null) return '📊';
     if (score >= 80) return '💪';
     if (score >= 60) return '👍';
     if (score >= 40) return '⚠️';
     return '🚨';
   };
 
-  const getScoreLabel = (score: number) => {
+  const getScoreLabel = (score: number | null) => {
+    if (score === null) return 'No score yet';
     if (score >= 80) return t('analytics.excellent');
     if (score >= 60) return t('analytics.good');
     if (score >= 40) return t('analytics.needsAttention');
@@ -322,7 +303,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const getPersonalizedSuggestions = (): string[] => {
     const suggestions: string[] = [];
 
-    if (stoolScore < 60) {
+    if (stoolScore !== null && stoolScore < 60) {
       if (stoolLogs.length > 0) {
         const recentStool = stoolLogs[0];
         if (recentStool.bristol_type <= 2) {
@@ -333,7 +314,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
       }
     }
 
-    if (foodScore < 60) {
+    if (foodScore !== null && foodScore < 60) {
       if (foodSummary.varietyScore < 50) {
         suggestions.push(t('analytics.suggestions.aimForVegetables'));
       }
@@ -350,7 +331,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     }
 
     // General tips if doing well
-    if (todayScore >= 80) {
+    if (todayScore !== null && todayScore >= 80) {
       suggestions.push(t('analytics.suggestions.keepUp'));
     }
 
@@ -384,13 +365,13 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
             </p>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-[44px] font-semibold tabular-nums text-primary leading-none sm:text-[52px]">
-                {todayScore}
+                {todayScore !== null ? todayScore : '--'}
               </span>
               <span className="text-[13px] font-medium text-foreground/70">
                 {getScoreLabel(todayScore)}
               </span>
             </div>
-            <Progress value={todayScore} className="h-1.5 mt-2 bg-muted sm:mt-3" />
+            <Progress value={todayScore ?? 0} className="h-1.5 mt-2 bg-muted sm:mt-3" />
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             {getTrendDirection() === 'up' && <TrendingUp className="w-4 h-4 text-primary" />}
