@@ -186,7 +186,8 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     const explicitAverage = averageScores(explicitScores);
     if (explicitAverage !== null) return explicitAverage;
 
-    return null;
+    // Manual entries without an AI score still count toward the day
+    return averageScores(dayLogs.map(estimateFoodScore));
   };
 
   const calculateEnhancedStoolScore = (logs: any[], date: Date): number | null => {
@@ -203,7 +204,12 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
     if (latestExplicitScore !== undefined) return latestExplicitScore;
 
-    return null;
+    // Fall back to Bristol type for manually logged entries
+    const bristolScores = dayLogs
+      .map(log => (typeof log.bristol_type === 'number' ? BRISTOL_SCORES[log.bristol_type] : undefined))
+      .filter((score): score is number => typeof score === 'number');
+
+    return averageScores(bristolScores);
   };
 
   const calculateHistoricalScores = () => {
