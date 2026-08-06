@@ -107,6 +107,7 @@ const SymptomTracker = () => {
         setSelectedSymptom("");
         setSeverity([3]);
         setNotes("");
+        loadRecentEntries();
       }
     } finally {
       setIsSaving(false);
@@ -231,8 +232,11 @@ const SymptomTracker = () => {
               </div>
             </div>
           ))}
-          <Button variant="outline" className="w-full">
-            {t('buttons.viewAllEntries')}
+          {recentEntries.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No symptoms logged yet.
+            </p>
+          )}
           </Button>
         </CardContent>
       </Card>
