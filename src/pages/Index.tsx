@@ -197,6 +197,19 @@ const getStoolStatus = (type?: number | null) => {
 
 const getSymptomSeverityFromNotes = (notes?: string | null) => {
   if (!notes?.trim()) return null;
+  // Structured entries logged from the symptom tracker
+  const name = notes.match(/Symptom:\s*(.+)/i)?.[1]?.trim();
+  const severity = Number(notes.match(/Severity:\s*(\d{1,2})\s*\/\s*10/i)?.[1] ?? NaN);
+  if (name) {
+    const badge = Number.isFinite(severity)
+      ? severity >= 7
+        ? "High"
+        : severity >= 4
+          ? "Medium"
+          : "Low"
+      : "Logged";
+    return { label: name, badge };
+  }
   if (/\b(severe|intense|bad|worse|painful)\b/i.test(notes)) return { label: "Severe", badge: "High" };
   if (/\b(moderate|medium|some|bloated|bloating|cramp|pain|gas|reflux|heartburn)\b/i.test(notes)) {
     return { label: "Moderate", badge: "Medium" };
