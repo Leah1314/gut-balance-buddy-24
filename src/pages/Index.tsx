@@ -473,7 +473,6 @@ function TodayOverview({
     () => stoolLogs.filter((log) => log.notes?.trim() && (log.bristol_type === null || log.bristol_type === undefined)),
     [stoolLogs],
   );
-  const latestStool = stoolEntries[0];
   // Only reflect entries from today so the card never shows stale symptoms
   const todaySymptom = symptomEntries.find((log) => isSameDay(new Date(log.created_at), today));
   const todayStool = stoolEntries.find((log) => isSameDay(new Date(log.created_at), today));
