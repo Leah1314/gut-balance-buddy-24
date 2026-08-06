@@ -88,11 +88,6 @@ const estimateFoodScore = (text: string): number => {
   return clampScore(score);
 };
 
-const unusedNormalize = (value: unknown) => {
-  const text = stringifyAnalysis(value);
-  return text;
-};
-
 const LogHistory = () => {
   const { t } = useTranslation();
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
