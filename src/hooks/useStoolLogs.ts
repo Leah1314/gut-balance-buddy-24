@@ -44,6 +44,7 @@ export const useStoolLogs = () => {
 
       console.log('Stool log saved successfully:', data);
       toast.success('Stool entry saved successfully!');
+      window.dispatchEvent(new Event('gutly:logs-updated'));
       return data;
     } catch (error) {
       console.error('Error in addStoolLog:', error);

@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 import { TrendingUp, MessageCircle, Calendar, Target, Apple, Heart, TrendingDown, Sparkles } from 'lucide-react';
 import { useFoodLogs } from '@/hooks/useFoodLogs';
 import { useStoolLogs } from '@/hooks/useStoolLogs';
+import { useAuth } from '@/hooks/useAuth';
 import MonthlyActivityCalendar from './MonthlyActivityCalendar';
 import { useTranslation } from 'react-i18next';
 import SectionCard from './gutly/SectionCard';
@@ -81,6 +82,7 @@ const averageScores = (scores: number[]) => {
 
 const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { foodLogs, refreshFoodLogs } = useFoodLogs();
   const { getStoolLogs } = useStoolLogs();
   const [stoolLogs, setStoolLogs] = useState<any[]>([]);
@@ -104,18 +106,50 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   };
 
   useEffect(() => {
-    fetchStoolLogs();
-  }, []);
+    if (user) {
+      fetchStoolLogs();
+      refreshFoodLogs();
+    } else {
+      setStoolLogs([]);
+      setHistoricalData([]);
+      setFilteredHistoricalData([]);
+      setTodayScore(null);
+      setFoodScore(null);
+      setStoolScore(null);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const refreshScores = () => {
+      if (!user) return;
+      refreshFoodLogs();
+      fetchStoolLogs();
+    };
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refreshScores();
+      }
+    };
+
+    window.addEventListener('gutly:logs-updated', refreshScores);
+    window.addEventListener('focus', refreshScores);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+
+    return () => {
+      window.removeEventListener('gutly:logs-updated', refreshScores);
+      window.removeEventListener('focus', refreshScores);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, [user, refreshFoodLogs]);
 
   const handleEntryAdded = async () => {
     await Promise.all([refreshFoodLogs(), fetchStoolLogs()]);
   };
 
   useEffect(() => {
-    if (foodLogs.length > 0 || stoolLogs.length > 0) {
-      calculateHistoricalScores();
-      calculateFoodSummary();
-    }
+    calculateHistoricalScores();
+    calculateFoodSummary();
   }, [foodLogs, stoolLogs, dateRange]);
 
   const calculateEnhancedFoodScore = (logs: any[], date: Date): number | null => {

@@ -66,6 +66,7 @@ export const useFoodLogs = () => {
       
       console.log('Food log added successfully:', data);
       await fetchFoodLogs(); // Refresh the list
+      window.dispatchEvent(new Event('gutly:logs-updated'));
       return data;
     } catch (error: any) {
       console.error('Error adding food log:', error);
