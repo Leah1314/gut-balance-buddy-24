@@ -237,7 +237,6 @@ const SymptomTracker = () => {
               No symptoms logged yet.
             </p>
           )}
-          </Button>
         </CardContent>
       </Card>
 
