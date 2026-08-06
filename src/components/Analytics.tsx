@@ -60,7 +60,7 @@ const extractScoreFromText = (value: unknown): number | null => {
   if (!text) return null;
 
   const scoreWithScale = text.match(
-    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3}(?:\.\d+)?)(?:\s*\/\s*(10|100))?/i
+    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3}(?:\.\d+)?)(?:\s*\/\s*(100|10)\b)?/i
   );
 
   if (scoreWithScale) {
@@ -221,7 +221,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
       historical.push({
         date: date.toISOString().split('T')[0],
-        displayDate: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        displayDate: date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          ...(date.getFullYear() !== today.getFullYear() ? { year: '2-digit' as const } : {}),
+        }),
         score: dayScore,
         foodScore: dayFoodScore,
         stoolScore: dayStoolScore
