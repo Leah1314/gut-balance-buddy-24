@@ -31,6 +31,12 @@ interface NutritionData {
   gutHealthRating: number;
 }
 
+const normalizeGutHealthScore = (score: number) => {
+  if (score > 100 && score <= 1000) return Math.round(score / 10);
+  if (score > 10) return Math.round(score);
+  return Math.round(score * 10);
+};
+
 const FoodImageAnalyzer = () => {
   const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -40,7 +46,7 @@ const FoodImageAnalyzer = () => {
   const [userNotes, setUserNotes] = useState<string>("");
   const [showSavedConfirmation, setShowSavedConfirmation] = useState(false);
   const { addFoodLog } = useFoodLogs();
-  const gutScore = nutritionData ? Math.round(nutritionData.gutHealthRating * 10) : null;
+  const gutScore = nutritionData ? normalizeGutHealthScore(nutritionData.gutHealthRating) : null;
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -156,7 +162,7 @@ const FoodImageAnalyzer = () => {
     const imageUrl = URL.createObjectURL(selectedImage);
     
     const nutritionInfo = `Nutrition: ${nutritionData.calories} cal, ${nutritionData.protein}g protein, ${nutritionData.carbs}g carbs, ${nutritionData.fat}g fat`;
-    const aiAnalysis = `AI Analysis - Gut Fit Score: ${Math.round(nutritionData.gutHealthRating * 10)}/100. ${nutritionData.insights.join('. ')}`;
+    const aiAnalysis = `AI Analysis - Gut Fit Score: ${normalizeGutHealthScore(nutritionData.gutHealthRating)}/100. ${nutritionData.insights.join('. ')}`;
     
     // Combine nutrition info, AI analysis, and user notes
     let fullDescription = nutritionInfo;
