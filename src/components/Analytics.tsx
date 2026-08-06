@@ -221,7 +221,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
       historical.push({
         date: date.toISOString().split('T')[0],
-        displayDate: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        displayDate: date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          ...(date.getFullYear() !== today.getFullYear() ? { year: '2-digit' as const } : {}),
+        }),
         score: dayScore,
         foodScore: dayFoodScore,
         stoolScore: dayStoolScore
