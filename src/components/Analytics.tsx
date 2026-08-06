@@ -140,12 +140,11 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
 
     if (dayLogs.length === 0) return null;
 
-    const explicitScores = dayLogs
+    const latestExplicitScore = dayLogs
       .map(log => extractScoreFromText(log.notes))
-      .filter((score): score is number => score !== null);
+      .find((score): score is number => score !== null);
 
-    const explicitAverage = averageScores(explicitScores);
-    if (explicitAverage !== null) return explicitAverage;
+    if (latestExplicitScore !== undefined) return latestExplicitScore;
 
     const typedLogs = dayLogs.filter(log => log.bristol_type !== null && log.bristol_type !== undefined);
     if (typedLogs.length === 0) return null;

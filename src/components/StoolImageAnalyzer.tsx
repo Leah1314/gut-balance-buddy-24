@@ -145,7 +145,10 @@ const StoolImageAnalyzer = () => {
     try {
       const imageUrl = URL.createObjectURL(selectedImage);
       
-      const aiAnalysis = `AI Analysis - Stool Health Score: ${Math.round(analysisData.healthScore * 10)}/100. Insights: ${analysisData.insights.join('. ')}`;
+      const stoolHealthScore = analysisData.healthScore > 10
+        ? Math.round(analysisData.healthScore)
+        : Math.round(analysisData.healthScore * 10);
+      const aiAnalysis = `AI Analysis - Stool Health Score: ${stoolHealthScore}/100. Insights: ${analysisData.insights.join('. ')}`;
       const combinedNotes = userNotes ? `${aiAnalysis}. User Notes: ${userNotes}` : aiAnalysis;
       
       const stoolLogData = {
