@@ -79,46 +79,6 @@ const averageScores = (scores: number[]) => {
   return clampScore(scores.reduce((sum, score) => sum + score, 0) / scores.length);
 };
 
-const estimateFoodQualityScore = (log: any): number | null => {
-  const text = `${log.food_name || ''} ${stringifyAnalysis(log.description)} ${stringifyAnalysis(log.analysis_result)}`.toLowerCase();
-  if (!text.trim()) return null;
-
-  let score = 70;
-  let hasSignal = false;
-
-  if (/(vegetable|salad|leafy|spinach|broccoli|beans|lentil|oat|oats|berries|apple|banana|quinoa|whole grain|sourdough|yogurt|kefir|kimchi|fiber|fibre)/i.test(text)) {
-    score += 14;
-    hasSignal = true;
-  }
-
-  if (/(fish|chicken|egg|eggs|tofu|tempeh|protein|nuts|seed|seeds)/i.test(text)) {
-    score += 6;
-    hasSignal = true;
-  }
-
-  if (/(fried|fries|burger|pizza|chips|soda|candy|processed|fast food|dessert|cake|cookie|ice cream|honey|syrup|sugar)/i.test(text)) {
-    score -= 22;
-    hasSignal = true;
-  }
-
-  const nutrition = text.match(/nutrition:\s*(\d{1,4})\s*cal,\s*(\d{1,3})g protein,\s*(\d{1,3})g carbs,\s*(\d{1,3})g fat/i);
-  if (nutrition) {
-    hasSignal = true;
-    const [, caloriesRaw, proteinRaw, carbsRaw, fatRaw] = nutrition;
-    const calories = Number(caloriesRaw);
-    const protein = Number(proteinRaw);
-    const carbs = Number(carbsRaw);
-    const fat = Number(fatRaw);
-
-    if (protein >= 15 && protein <= 55) score += 4;
-    if (calories > 900) score -= 10;
-    if (carbs > 120) score -= 8;
-    if (fat > 45) score -= 8;
-  }
-
-  return hasSignal ? clampScore(score) : null;
-};
-
 const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const { t } = useTranslation();
   const { foodLogs, refreshFoodLogs } = useFoodLogs();
@@ -167,16 +127,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
     if (dayLogs.length === 0) return null;
 
     const explicitScores = dayLogs
-      .map(log => {
-        const explicitScore = extractScoreFromText(log.analysis_result) ?? extractScoreFromText(log.description);
-        const estimatedScore = estimateFoodQualityScore(log);
-
-        if (explicitScore !== null && explicitScore >= 95 && estimatedScore !== null) {
-          return Math.min(explicitScore, estimatedScore);
-        }
-
-        return explicitScore;
-      })
+      .map(log => extractScoreFromText(log.analysis_result) ?? extractScoreFromText(log.description))
       .filter((score): score is number => score !== null);
 
     const explicitAverage = averageScores(explicitScores);
@@ -527,7 +478,7 @@ const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
         </div>
         {filteredHistoricalData.length > 0 && (
           <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-            Scores are normalized to 100. Trend lines connect logged score days.
+            Scores are normalized to 100. Only entries with a saved AI/scored result appear in the trend.
           </p>
         )}
       </SectionCard>
