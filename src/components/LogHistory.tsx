@@ -47,7 +47,7 @@ const extractScoreFromText = (value: unknown): number | null => {
   if (!text) return null;
 
   const scoreWithScale = text.match(
-    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3}(?:\.\d+)?)(?:\s*\/\s*(10|100))?/i
+    /\b(?:gut\s*(?:fit|health)?\s*score|gut\s*health\s*rating|stool\s*health\s*score|health\s*score|rating|score)\b[^\d]{0,24}(\d{1,3}(?:\.\d+)?)(?:\s*\/\s*(100|10)\b)?/i
   );
 
   if (scoreWithScale) {
@@ -66,8 +66,31 @@ const normalizeHistoricalScoreText = (value: unknown) => {
   const text = stringifyAnalysis(value);
 
   return text
-    .replace(/Gut Health Rating:\s*(\d{1,2})\/10/gi, (_, score) => `Gut Fit Score: ${Number(score) * 10}/100`)
-    .replace(/Health Score:\s*(\d{1,2})\/10/gi, (_, score) => `Stool Health Score: ${Number(score) * 10}/100`);
+    .replace(/Gut Health Rating:\s*(\d{1,2})\/10\b/gi, (_, score) => `Gut Fit Score: ${Number(score) * 10}/100`)
+    .replace(/Health Score:\s*(\d{1,2})\/10\b/gi, (_, score) => `Stool Health Score: ${Number(score) * 10}/100`);
+};
+
+// Fallback scoring for manually logged entries without an AI score (matches Insights)
+const BRISTOL_SCORES: Record<number, number> = {
+  1: 30,
+  2: 50,
+  3: 85,
+  4: 100,
+  5: 70,
+  6: 45,
+  7: 25,
+};
+
+const estimateFoodScore = (text: string): number => {
+  let score = 65;
+  if (/pizza|burger|fries|chips|soda|candy|processed|fast food|fried|cake|donut|ice cream/i.test(text)) score -= 20;
+  if (/apple|banana|oats|beans|broccoli|spinach|berries|whole grain|quinoa|sweet potato|vegetable|salad|yogurt|kefir|lentil/i.test(text)) score += 15;
+  return clampScore(score);
+};
+
+const unusedNormalize = (value: unknown) => {
+  const text = stringifyAnalysis(value);
+  return text;
 };
 
 const LogHistory = () => {
