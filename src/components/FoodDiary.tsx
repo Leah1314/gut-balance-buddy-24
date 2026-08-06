@@ -269,14 +269,16 @@ const FoodDiary = () => {
                         </Badge>
                       ))}
                     </div>
-                    <Button
-                      type="button"
-                      onClick={handleLogSelectedFoods}
-                      className="w-full"
-                      size="lg"
-                    >
-                      {t('food.logSelectedFoods').replace('{count}', selectedFoods.length.toString())}
-                    </Button>
+                    <div className="sticky bottom-0 -mx-4 bg-card/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+                      <Button
+                        type="button"
+                        onClick={handleLogSelectedFoods}
+                        className="w-full"
+                        size="lg"
+                      >
+                        {t('food.logSelectedFoods').replace('{count}', selectedFoods.length.toString())}
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
