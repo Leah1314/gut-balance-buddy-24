@@ -197,6 +197,19 @@ const getStoolStatus = (type?: number | null) => {
 
 const getSymptomSeverityFromNotes = (notes?: string | null) => {
   if (!notes?.trim()) return null;
+  // Structured entries logged from the symptom tracker
+  const name = notes.match(/Symptom:\s*(.+)/i)?.[1]?.trim();
+  const severity = Number(notes.match(/Severity:\s*(\d{1,2})\s*\/\s*10/i)?.[1] ?? NaN);
+  if (name) {
+    const badge = Number.isFinite(severity)
+      ? severity >= 7
+        ? "High"
+        : severity >= 4
+          ? "Medium"
+          : "Low"
+      : "Logged";
+    return { label: name, badge };
+  }
   if (/\b(severe|intense|bad|worse|painful)\b/i.test(notes)) return { label: "Severe", badge: "High" };
   if (/\b(moderate|medium|some|bloated|bloating|cramp|pain|gas|reflux|heartburn)\b/i.test(notes)) {
     return { label: "Moderate", badge: "Medium" };
@@ -460,9 +473,10 @@ function TodayOverview({
     () => stoolLogs.filter((log) => log.notes?.trim() && (log.bristol_type === null || log.bristol_type === undefined)),
     [stoolLogs],
   );
-  const latestStool = stoolEntries[0];
-  const latestSymptom = symptomEntries[0];
-  const symptomSignal = getSymptomSignal(latestSymptom?.notes, latestStool);
+  // Only reflect entries from today so the card never shows stale symptoms
+  const todaySymptom = symptomEntries.find((log) => isSameDay(new Date(log.created_at), today));
+  const todayStool = stoolEntries.find((log) => isSameDay(new Date(log.created_at), today));
+  const symptomSignal = getSymptomSignal(todaySymptom?.notes, todayStool);
   const todayFoodCount = foodLogs.filter((log) => isSameDay(new Date(log.created_at), today)).length;
   const mealsLabel = todayFoodCount > 0 ? `${todayFoodCount} logged` : "No meal yet";
   const mealsBadge = todayFoodCount > 0 ? "Today" : "Add meal";
