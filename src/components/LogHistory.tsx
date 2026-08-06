@@ -119,7 +119,10 @@ const LogHistory = () => {
           timestamp: log.created_at,
           title: t('history.foodEntry'),
           content: log.food_name,
-          score: extractScoreFromText(log.analysis_result) ?? extractScoreFromText(log.description),
+          score:
+            extractScoreFromText(log.analysis_result) ??
+            extractScoreFromText(log.description) ??
+            estimateFoodScore(`${log.food_name ?? ''} ${log.description ?? ''}`),
           details: {
             description: log.description,
             analysis_result: log.analysis_result,
@@ -138,7 +141,9 @@ const LogHistory = () => {
           timestamp: log.created_at,
           title: t('history.stoolEntry'),
           content: log.notes || `Bristol Type ${log.bristol_type || 'N/A'}`,
-          score: extractScoreFromText(log.notes),
+          score:
+            extractScoreFromText(log.notes) ??
+            (typeof log.bristol_type === 'number' ? BRISTOL_SCORES[log.bristol_type] ?? null : null),
           details: {
             bristol_type: log.bristol_type,
             color: log.color,
