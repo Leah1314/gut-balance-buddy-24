@@ -43,6 +43,10 @@ const stringifyAnalysis = (value: unknown) => {
 };
 
 const normalizeScoreValue = (value: number, scale?: number) => {
+  if (scale === 100 && value > 100 && value <= 1000) {
+    return clampScore(value / 10);
+  }
+
   if (scale === 10 || (!scale && value <= 10)) {
     return clampScore(value * 10);
   }

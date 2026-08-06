@@ -32,6 +32,12 @@ interface StoolAnalysisData {
   recommendations: string[];
 }
 
+const normalizeStoolHealthScore = (score: number) => {
+  if (score > 100 && score <= 1000) return Math.round(score / 10);
+  if (score > 10) return Math.round(score);
+  return Math.round(score * 10);
+};
+
 const StoolImageAnalyzer = () => {
   const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -145,9 +151,7 @@ const StoolImageAnalyzer = () => {
     try {
       const imageUrl = URL.createObjectURL(selectedImage);
       
-      const stoolHealthScore = analysisData.healthScore > 10
-        ? Math.round(analysisData.healthScore)
-        : Math.round(analysisData.healthScore * 10);
+      const stoolHealthScore = normalizeStoolHealthScore(analysisData.healthScore);
       const aiAnalysis = `AI Analysis - Stool Health Score: ${stoolHealthScore}/100. Insights: ${analysisData.insights.join('. ')}`;
       const combinedNotes = userNotes ? `${aiAnalysis}. User Notes: ${userNotes}` : aiAnalysis;
       
@@ -281,7 +285,7 @@ const StoolImageAnalyzer = () => {
 
           <SectionCard>
             <StatNumber
-              value={analysisData.healthScore * 10}
+              value={normalizeStoolHealthScore(analysisData.healthScore)}
               max={100}
               label={t('stool.healthScore')}
             />
