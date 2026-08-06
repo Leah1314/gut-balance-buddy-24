@@ -474,8 +474,10 @@ function TodayOverview({
     [stoolLogs],
   );
   const latestStool = stoolEntries[0];
-  const latestSymptom = symptomEntries[0];
-  const symptomSignal = getSymptomSignal(latestSymptom?.notes, latestStool);
+  // Only reflect entries from today so the card never shows stale symptoms
+  const todaySymptom = symptomEntries.find((log) => isSameDay(new Date(log.created_at), today));
+  const todayStool = stoolEntries.find((log) => isSameDay(new Date(log.created_at), today));
+  const symptomSignal = getSymptomSignal(todaySymptom?.notes, todayStool);
   const todayFoodCount = foodLogs.filter((log) => isSameDay(new Date(log.created_at), today)).length;
   const mealsLabel = todayFoodCount > 0 ? `${todayFoodCount} logged` : "No meal yet";
   const mealsBadge = todayFoodCount > 0 ? "Today" : "Add meal";
