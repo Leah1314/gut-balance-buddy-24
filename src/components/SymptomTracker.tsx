@@ -215,11 +215,11 @@ const SymptomTracker = () => {
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-3 h-3" />
-                      <span>{entry.date}</span>
+                      <span>{formatDate(entry.createdAt)}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
-                      <span>{entry.time}</span>
+                      <span>{formatTime(entry.createdAt)}</span>
                     </div>
                   </div>
                   {entry.notes && (
