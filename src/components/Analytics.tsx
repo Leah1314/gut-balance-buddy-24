@@ -80,6 +80,25 @@ const averageScores = (scores: number[]) => {
   return clampScore(scores.reduce((sum, score) => sum + score, 0) / scores.length);
 };
 
+// Fallback scoring for manually logged entries without an AI score
+const BRISTOL_SCORES: Record<number, number> = {
+  1: 30,
+  2: 50,
+  3: 85,
+  4: 95,
+  5: 70,
+  6: 40,
+  7: 25,
+};
+
+const estimateFoodScore = (log: any): number => {
+  const text = `${log?.food_name ?? ''} ${log?.description ?? ''}`;
+  let score = 65;
+  if (/pizza|burger|fries|chips|soda|candy|processed|fast food|fried|cake|donut|ice cream/i.test(text)) score -= 20;
+  if (/apple|banana|oats|beans|broccoli|spinach|berries|whole grain|quinoa|sweet potato|vegetable|salad|yogurt|kefir|lentil/i.test(text)) score += 15;
+  return clampScore(score);
+};
+
 const Analytics = ({ onSwitchToChat }: AnalyticsProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
