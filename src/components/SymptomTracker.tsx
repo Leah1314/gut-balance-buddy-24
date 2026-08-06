@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,37 @@ const SymptomTracker = () => {
   const [severity, setSeverity] = useState([3]);
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const { addStoolLog } = useStoolLogs();
+  const { addStoolLog, getStoolLogs } = useStoolLogs();
+  const [recentEntries, setRecentEntries] = useState<
+    { symptom: string; severity: number; notes: string; createdAt: string }[]
+  >([]);
+
+  const loadRecentEntries = useCallback(async () => {
+    const logs = await getStoolLogs();
+    const parsed = (logs || [])
+      .filter((log: any) => typeof log.notes === "string" && /^\s*Symptom:/i.test(log.notes))
+      .map((log: any) => {
+        const notes: string = log.notes;
+        return {
+          symptom: notes.match(/Symptom:\s*(.+)/i)?.[1]?.trim() || "Symptom",
+          severity: Number(notes.match(/Severity:\s*(\d{1,2})\s*\/\s*10/i)?.[1] ?? 0),
+          notes: notes.match(/Notes:\s*([\s\S]+)/i)?.[1]?.trim() || "",
+          createdAt: log.created_at,
+        };
+      })
+      .slice(0, 5);
+    setRecentEntries(parsed);
+  }, [getStoolLogs]);
+
+  useEffect(() => {
+    loadRecentEntries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 
   const commonSymptoms = [
     t('symptoms.common.bloating'),
@@ -40,30 +70,6 @@ const SymptomTracker = () => {
     t('symptoms.common.stomachPain'),
     t('symptoms.common.fatigue'),
     t('symptoms.common.headache')
-  ];
-
-  const recentEntries = [
-    { 
-      symptom: t('symptoms.common.bloating'), 
-      severity: 4, 
-      time: "2 hours ago", 
-      date: t('common.today'),
-      notes: "After lunch, feeling quite uncomfortable" 
-    },
-    { 
-      symptom: "Energy Level", 
-      severity: 8, 
-      time: t('common.morning'), 
-      date: t('common.today'),
-      notes: "Feeling great after good sleep" 
-    },
-    { 
-      symptom: t('symptoms.common.stomachPain'), 
-      severity: 2, 
-      time: t('common.yesterday'), 
-      date: "Dec 19",
-      notes: "Mild discomfort, went away quickly" 
-    },
   ];
 
   const getSeverityIcon = (level: number) => {
